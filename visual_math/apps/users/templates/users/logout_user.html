@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выйти из учетной записи</title>
+</head>
+<body>
+    <h2>Вы уверены, что хотите выйти?</h2>
+    <form action="{% url 'logout_confirmed' %}" method="POST">
+        {% csrf_token %}
+        <button type="submit">Продолжить</button>
+    </form>
+    <a href="{% url 'home' %}">Отменить</a>
+</body>
+</html>

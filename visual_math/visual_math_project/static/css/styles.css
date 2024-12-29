@@ -1,0 +1,100 @@
+body {
+    background-color: lemonchiffon; /* Светлый фон #FFC0CB */
+}
+
+.card {
+    border-radius: 20px !important; /* Закругленные углы */
+    overflow: hidden;
+}
+
+.btn-primary {
+    background-color: #C71585;
+    border: none;
+    border-radius: 20px;
+}
+
+.btn-primary:hover {
+    background-color: #00008B;
+}
+
+
+.custom-header {
+    background-color: lightpink; /* Цвет фона cornflowerblue */
+    color: #ffffff; /* Цвет текста */
+}
+
+aside{
+    float: left;
+    width: 20%;
+    background-color: #FFE4E1;
+    padding: 2.5%;
+    height: 100vh;
+    border-right: 5px solid #B0C4DE;
+}
+
+.sidebar h3 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 28px;
+    text-align: center;
+    color: #C71585;
+}
+.sidebar p{
+    margin-top: 5px;
+    margin-left: 10px;
+    text-align: left;
+    color: indigo;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+main h1{
+    margin-top: 10px;
+    text-align: center;
+    color: #C71585;
+}
+main {
+    padding: 20px;
+}
+
+.btn-logout{
+    background-color: #C71585; /* Цвет фона */
+    color: white; /* Цвет текста */
+    border: none; /* Без границы */
+    border-radius: 20px; /* Закругленные углы */
+    padding: 10px 20px; /* Отступы внутри кнопки: сверху/снизу 10px, слева/справа 20px */
+    font-size: 12px; /* Размер шрифта */
+    cursor: pointer; /* Курсор при наведении */
+    transition: transform .1s ease;
+    float: right;
+    position: absolute; /* Фиксированное позиционирование */
+    left: 10px; /* Отступ слева */
+    bottom: 20px; /* Отступ снизу */
+    white-space: nowrap;
+}
+
+.btn-logout:hover{
+    transform: scale(1.05);
+}
+.btn-delete{
+    background-color: #C71585; /* Цвет фона */
+    color: white; /* Цвет текста */
+    border: none; /* Без границы */
+    border-radius: 20px; /* Закругленные углы */
+    padding: 10px 20px; /* Отступы внутри кнопки: сверху/снизу 10px, слева/справа 20px */
+    font-size: 12px; /* Размер шрифта */
+    cursor: pointer; /* Курсор при наведении */
+    transition: transform .1s ease;
+    float: right;
+    position: absolute; /* Фиксированное позиционирование */
+    left: 180px; /* Отступ слева */
+    bottom: 20px; /* Отступ снизу */
+    white-space: nowrap;
+}
+
+.btn-delete:hover{
+    transform: scale(1.05);
+}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Главная страница</title>
+    {% load static %}
+    <!-- Подключаем CSS файл -->
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/icon.png' %}">
+    <style>
+        /* Стили для панели */
+        .sidebar {
+            height: 100vh; /* Высота панели равна высоте окна */
+            width: 0; /* Начальное состояние - панель скрыта */
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #FFE4E1;
+            overflow-x: hidden; /* Убираем горизонтальную прокрутку */
+            transition: 0.0s ease; /* Анимация плавного открытия/закрытия */
+            overflow: hidden;
+            padding-top: 20px;
+            box-sizing: border-box;
+        }
+
+        .resizer {
+            width: 5px;
+            height: 100%;
+            background-color: #C71585;
+            cursor: ew-resize;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+
+        .sidebar a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .open-btn {
+            margin-top: 20px;
+            margin-left: 20px;
+            font-size: 20px;
+            border-radius: 20px;
+            background-color: #C71585;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 1000; /* Кнопка должна быть выше панели */
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: #C71585;
+            cursor: pointer;
+        }
+        .btn-create{
+            align-content: center;
+            color: #C71585;
+            background-color: aliceblue;
+            border-radius: 50px;
+            margin-top: 100px;
+            margin-left: 20px;
+            font-size: 50px;
+            padding: 10px;
+            width: 500px;
+            height: 500px;
+        }
+
+        main {
+            margin-left: 10px;
+            padding: 20px;
+            text-align: center;
+            color: darkslateblue;
+            transition: margin-left 0.0s; /* Анимация для основного контента */
+        }
+        main p{
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        main-shifted {
+            margin-left: 150px; /* Отступ основного контента при открытой панели */
+        }
+    </style>
+</head>
+<body>
+<button class="open-btn" onclick="openSidebar()">☰ Аккаунт</button>
+<div id="sidebar" class="sidebar">
+    <button class="close-btn" onclick="closeSidebar()">×</button>
+    <h3>{{ user.get_role_display }}</h3>
+    <p>Имя пользователя: {{ user.username }}</p>
+    <p><br>Email: {{ user.email }}</p>
+    <a href = "{% url 'logout' %}"><button class="btn-logout">Выйти из аккаунта</button></a>
+    <a href = "{% url 'delete_user' %}"><button class="btn-delete">Удалить аккаунт</button></a>
+    <div id="resizer" class="resizer"></div>
+</div>
+
+<main>
+    <h1>Платформа для создания презентаций</h1>
+    <p>Как дела?</p>
+
+    {% if request.user.role == 'teacher' %}
+    <p>Так как вы преподаватель, вы можете создавать презентации:</p>
+    <button class="btn-create">Создать новую презентацию</button>
+    {% else %}
+    <button>вы студент!:</button>
+    {% endif %}
+</main>
+<script>
+    function openSidebar() {
+            document.getElementById('sidebar').style.width = '335px';
+            document.getElementById('main').classList.add('main-shifted');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').style.width = '0';
+            document.getElementById('main').classList.remove('main-shifted');
+        }
+        const sidebar = document.getElementById('sidebar');
+        const resizer = document.getElementById('resizer');
+        const mainContent = document.getElementById('main');
+
+        let isResizing = false;
+
+        // Начало ресайза
+        resizer.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            document.body.style.cursor = 'ew-resize';
+            document.body.style.userSelect = 'none'; // Отключаем выделение текста
+        });
+
+        // Во время ресайза
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+
+            const newWidth = e.clientX;
+            if (newWidth > 100 && newWidth < 500) { // Ограничиваем ширину
+                sidebar.style.width = `${newWidth}px`;
+                mainContent.style.marginLeft = `${newWidth}px`;
+            }
+        });
+
+        // Завершение ресайза
+        document.addEventListener('mouseup', () => {
+            if (isResizing) {
+                isResizing = false;
+                document.body.style.cursor = 'default';
+                document.body.style.userSelect = 'auto'; // Включаем выделение текста обратно
+            }
+        });
+</script>
+</body>
+</html>
