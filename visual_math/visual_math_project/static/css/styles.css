@@ -1,100 +1,177 @@
-body {
-    background-color: lemonchiffon; /* Светлый фон #FFC0CB */
-}
-
-.card {
-    border-radius: 20px !important; /* Закругленные углы */
-    overflow: hidden;
-}
-
-.btn-primary {
-    background-color: #C71585;
-    border: none;
-    border-radius: 20px;
-}
-
-.btn-primary:hover {
-    background-color: #00008B;
-}
-
-
-.custom-header {
-    background-color: lightpink; /* Цвет фона cornflowerblue */
-    color: #ffffff; /* Цвет текста */
-}
-
-aside{
-    float: left;
-    width: 20%;
-    background-color: #FFE4E1;
-    padding: 2.5%;
-    height: 100vh;
-    border-right: 5px solid #B0C4DE;
-}
-
-.sidebar h3 {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    font-size: 28px;
-    text-align: center;
-    color: #C71585;
-}
-.sidebar p{
-    margin-top: 5px;
-    margin-left: 10px;
-    text-align: left;
-    color: indigo;
-}
-
 * {
-    margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    margin: 0;
 }
-main h1{
-    margin-top: 10px;
+header h1 {
+    font-family: "Montserrat Medium", serif;
     text-align: center;
-    color: #C71585;
+    font-size: 3rem;
+    color: white;
+    background: linear-gradient(to bottom, #4a90e2, #007bff);
+    padding: 20px 0;
+    margin: 0;
+    transform: scale(0.94);
+    animation: scale 1s forwards cubic-bezier(0.5, 1, 0.89, 1);
+}
+ /* header animation */
+@keyframes scale {
+    100% {
+        transform: scale(1);
+    }
+}
+
+span {
+    display: inline-block;
+    opacity: 0;
+}
+span:nth-child(1) {
+    animation: fade-in 0.8 0.2s forwards cubic-bezier(0.11, 0, 0.5, 0);
+}
+span:nth-child(2) {
+    animation: fade-in 0.8 0.35s forwards cubic-bezier(0.11, 0, 0.5, 0);
+}
+span:nth-child(3) {
+    animation: fade-in 0.8 0.45s forwards cubic-bezier(0.11, 0, 0.5, 0);
+}
+@keyframes fade-in {
+    100% {
+        opacity: 7;
+    }
+}
+body {
+    background: #f4f4f9;
+    color: #333;
 }
 main {
+    display: flex;
+    justify-content: space-between;
+    padding: 2rem;
+}
+
+article {
+    margin-bottom: 1rem;
+    padding: 1.5rem;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+article, .container{
+    border-radius: 10px;
+}
+section {
+    margin-bottom: 1.5rem;
+}
+.text {
+    width: 60%;
+}
+
+/* table opportunities */
+table {
+    width: 100%;
+    border-collapse: collapse; /* отображение смежных ячеек */
+    margin: 20px 0;
+}
+
+th, td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+th {
+    background-color: #007bff;
+    color:white
+}
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/*for mobile phones*/
+@media (max-width: 768px) {
+    main {
+        flex-direction: column;
+    }
+}
+
+/* form sign up and input */
+.container {
+    width: 30%;
+    margin: 0 0;
+    max-width: 300px;
+    background: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+}
+
+.send {
+    width: 30%;
+    margin-top: 5px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 8px 15px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.reg {
+    width: 75%;
+}
+.send:hover {
+    background-color: #0056b3;
+}
+
+.card-body {
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    width: 100%;
+}
+
+.login-box, .signup-box {
+    width: 80%; /* Контейнеры форм занимают всю ширину */
+}
+
+.forms {
+    /*display: flex;*/
+    width: 100%;
     padding: 20px;
+    transition: all 0.3s ease;
+}
+.input-group {
+    display: flex;
+    align-items: center; /* Выравниваем элементы по вертикали */
+    margin-bottom: 8px; /* Отступ между группами ввода */
+}
+.input-group-text {
+    padding: 10px; /* Отступы для иконки */
+    background-color: #f8f9fa; /* Фон для иконки */
+    border: 1px solid #ced4da; /* Граница для иконки */
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+
+    /* на всякий случай но вроде и без этого работает*/
+    display: flex; /* Используем flexbox для центровки иконки */
+    justify-content: center; /* Горизонтальная центровка */
+    align-items: center; /* Вертикальная центровка */
+    /* на всякий случай но вроде и без этого работает*/
 }
 
-.btn-logout{
-    background-color: #C71585; /* Цвет фона */
-    color: white; /* Цвет текста */
-    border: none; /* Без границы */
-    border-radius: 20px; /* Закругленные углы */
-    padding: 10px 20px; /* Отступы внутри кнопки: сверху/снизу 10px, слева/справа 20px */
-    font-size: 12px; /* Размер шрифта */
-    cursor: pointer; /* Курсор при наведении */
-    transition: transform .1s ease;
-    float: right;
-    position: absolute; /* Фиксированное позиционирование */
-    left: 10px; /* Отступ слева */
-    bottom: 20px; /* Отступ снизу */
-    white-space: nowrap;
+input.form-control {
+    flex: 1;
+    padding: 8px;
+    font-size: 0.9rem;
+    border: 1px solid #ced4da;
+    width: 70%;
+    margin: 4px 0 2px auto;
+    border-radius: 5px;
 }
 
-.btn-logout:hover{
-    transform: scale(1.05);
-}
-.btn-delete{
-    background-color: #C71585; /* Цвет фона */
-    color: white; /* Цвет текста */
-    border: none; /* Без границы */
-    border-radius: 20px; /* Закругленные углы */
-    padding: 10px 20px; /* Отступы внутри кнопки: сверху/снизу 10px, слева/справа 20px */
-    font-size: 12px; /* Размер шрифта */
-    cursor: pointer; /* Курсор при наведении */
-    transition: transform .1s ease;
-    float: right;
-    position: absolute; /* Фиксированное позиционирование */
-    left: 180px; /* Отступ слева */
-    bottom: 20px; /* Отступ снизу */
-    white-space: nowrap;
+input.form-control:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
-.btn-delete:hover{
-    transform: scale(1.05);
-}
+

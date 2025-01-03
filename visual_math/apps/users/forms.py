@@ -18,3 +18,31 @@ class LoginForm(forms.Form):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'placeholder': 'Пароль', 'class': 'form-control'}),
     )
+
+class UpdateProfileForm(forms.ModelForm):
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Введите новый email',
+    }))
+    username = forms.CharField(required=True, widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Введите новое имя пользователя',
+    }))
+
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+class UpdatePasswordForm(PasswordChangeForm):
+    old_password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Старый пароль'}),
+    )
+    new_password1 = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Новый пароль'}),
+    )
+    new_password2 = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Подтвердите новый пароль'}),
+    )
