@@ -22,7 +22,7 @@ header h1 {
 
 span {
     display: inline-block;
-    opacity: 0;
+    opacity: 1;
 }
 span:nth-child(1) {
     animation: fade-in 0.8 0.2s forwards cubic-bezier(0.11, 0, 0.5, 0);
@@ -35,7 +35,7 @@ span:nth-child(3) {
 }
 @keyframes fade-in {
     100% {
-        opacity: 7;
+        opacity: 1;
     }
 }
 body {
@@ -53,6 +53,9 @@ article {
     padding: 1.5rem;
     background: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 20px;        /* Размер шрифта */
+    color: #333333;         /* Темный цвет текста */
+    line-height: 1.6;       /* Межстрочный интервал */
 }
 article, .container{
     border-radius: 10px;
@@ -95,7 +98,7 @@ tr:hover {
 .container {
     width: 30%;
     margin: 0 0;
-    max-width: 300px;
+    max-width: 500px;
     background: #ffffff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
@@ -104,7 +107,6 @@ tr:hover {
 
 .send {
     width: 30%;
-    margin-top: 5px;
     background-color: #007bff;
     color: white;
     border: none;
@@ -113,12 +115,15 @@ tr:hover {
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    display: block;
+    margin: auto;
 }
 .reg {
     width: 75%;
 }
 .send:hover {
     background-color: #0056b3;
+    transform: scale(1.05);
 }
 
 .card-body {
@@ -172,6 +177,24 @@ input.form-control:focus {
     outline: none;
     border-color: #007bff;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.invalid-feedback{
+    color: white;
+    padding: 4px;
+    background: red;
+    margin-left: 4px;
+    border-radius: 10px;
+}
+
+.password-reset-link {
+    text-decoration: none;  /* Убирает подчеркивание */
+    font-size: 0.9em;       /* Устанавливает меньший размер шрифта */
+    color: #808080;         /* Устанавливает серый цвет текста */
+}
+
+.password-reset-link:hover {
+    color: #555555;         /* Цвет при наведении (темно-серый) */
 }
 
 

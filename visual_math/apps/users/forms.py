@@ -46,3 +46,6 @@ class UpdatePasswordForm(PasswordChangeForm):
         required=True,
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Подтвердите новый пароль'}),
     )
+
+class PasswordResetForm(forms.Form):
+    email = forms.EmailField(label='Введите ваш email')
