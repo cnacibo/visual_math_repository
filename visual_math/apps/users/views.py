@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, update_session_auth_hash, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import CustomUserCreationForm
+from .forms import LoginForm
 from django.contrib.auth.decorators import login_required
 
 def register(request):
@@ -43,3 +44,20 @@ def logout_view(request):
 def logout_confirmed(request):
     logout(request)  # Выход из аккаунта
     return redirect('register')  # Перенаправляем на страницу регистрации
+
+def login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('home')  # Замените 'home' на имя вашей домашней страницы
+            else:
+                form.add_error(None, 'Неправильное имя пользователя или пароль')
+    else:
+        form = LoginForm()
+
+    return render(request, 'users/login.html', {'form': form})

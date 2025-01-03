@@ -8,4 +8,5 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),  # Путь для выхода
     path('delete-user/', views.delete_user_confirmed, name='delete_user_confirmed'),
     path('logout-user/', views.logout_confirmed, name='logout_confirmed'),
+    path('login/', views.login_view, name='login'),
 ]

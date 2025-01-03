@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конструктор презентаций</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
+    <style>
+        #canvas-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: beige;
+        }
+        canvas {
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="canvas" width="800" height="600"></canvas>
+    </div>
+    <button onclick="addText()">Добавить текст</button>
+    <button onclick="saveCanvas()">Сохранить</button>
+    <button onclick="loadCanvas()">Загрузить</button>
+
+    <script>
+        var canvas = new fabric.Canvas('canvas');
+
+        // Добавить текст
+        function addText() {
+            var text = new fabric.Text('Ваш текст здесь', {
+                left: 100,
+                top: 100,
+                fontSize: 30,
+                fill: 'black'
+            });
+            canvas.add(text);
+        }
+
+        // Сохранение содержимого холста
+        function saveCanvas() {
+            var json = JSON.stringify(canvas.toJSON());
+            console.log('Сохраненные данные:', json);
+            // Отправить данные на сервер через fetch
+            fetch('/api/slides/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    content: json,
+                    order: 1,
+                    presentation: 1, // ID презентации
+                }),
+            })
+            .then(response => response.json())
+            .then(data => console.log('Успешно сохранено:', data))
+            .catch(error => console.error('Ошибка сохранения:', error));
+        }
+
+        // Загрузка данных с сервера
+        function loadCanvas() {
+            fetch('/api/slides/1/')  // ID слайда
+                .then(response => response.json())
+                .then(data => {
+                    var content = JSON.parse(data.content);
+                    canvas.loadFromJSON(content);
+                })
+                .catch(error => console.error('Ошибка загрузки:', error));
+        }
+    </script>
+</body>
+</html>

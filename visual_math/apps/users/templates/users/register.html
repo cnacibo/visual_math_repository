@@ -23,6 +23,7 @@
                     <div class="card-header custom-header text-center py-3 ">
                         <h2>Регистрация</h2>
                     </div>
+                    <a href = "{% url 'login' %}"><button>Войти в аккаунт</button></a>
                     <div class="card-body px-5">
                         <form method="POST">
                             {% csrf_token %}
