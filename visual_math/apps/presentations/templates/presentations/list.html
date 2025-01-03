@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список презентаций</title>
+</head>
+<body>
+    <h1>Список презентаций</h1>
+    {% if presentations %}
+        <ul>
+            {% for presentation in presentations %}
+                <li>{{ presentation.title }} <a href="{% url 'editor' presentation.id %}">Просмотреть или отредактировать презентацию</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>У вас нет презентаций</p>
+    {% endif %}
+    <a href="{% url 'create_presentation' %}">Создать новую презентацию</a>
+</body>
+</html>

@@ -108,7 +108,7 @@
 
     {% if request.user.role == 'teacher' %}
     <p>Так как вы преподаватель, вы можете создавать презентации:</p>
-    <button class="btn-create">Создать новую презентацию</button>
+    <a href = "/presentations/"><button class="btn-create">Просмотреть мои презентации</button></a>
     {% else %}
     <button>вы студент!:</button>
     {% endif %}
