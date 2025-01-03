@@ -5,10 +5,16 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import CustomUserCreationForm
 from .forms import LoginForm
 from django.contrib.auth.decorators import login_required
-from .forms import UpdateProfileForm, UpdatePasswordForm
+from .forms import UpdateProfileForm, UpdatePasswordForm, PasswordResetForm
 from django.contrib import messages
+import random
+import string
+from django.core.mail import send_mail
+from .models import User
 
 def register(request):
+    reg_form = CustomUserCreationForm()
+    log_form = LoginForm()
     if request.method == 'POST':
         if 'register' in request.POST:
             reg_form = CustomUserCreationForm(request.POST)
@@ -16,6 +22,8 @@ def register(request):
                 user = reg_form.save()
                 login(request, user)  # Авторизуем пользователя сразу после регистрации
                 return redirect('home')  # Перенаправляем на главную страницу
+            else:
+                reg_form.add_error(None, 'Неверные данные при регистрации')
         elif 'login' in request.POST:
             log_form = LoginForm(request.POST)
             if log_form.is_valid():
@@ -27,9 +35,9 @@ def register(request):
                     return redirect('home')
                 else:
                     log_form.add_error(None, 'Неправильное имя пользователя или пароль')
-    else:
-        reg_form = CustomUserCreationForm()
-        log_form = LoginForm()
+            else:
+                log_form.add_error(None, 'Неверные данные при входе')
+
     return render(request, 'users/register.html', {
         'reg_form': reg_form,
         'log_form': log_form
@@ -108,3 +116,40 @@ def update_password(request):
         form = UpdatePasswordForm(user=request.user)
 
     return render(request, 'users/update_password.html', {'form': form})
+
+
+def generate_random_password(length=8):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(random.choice(characters) for i in range(length))
+
+# Представление для сброса пароля
+def reset_password(request):
+    if request.method == 'POST':
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            user = User.objects.filter(email=email).first()
+
+            if user:
+                new_password = generate_random_password()  # Генерируем новый случайный пароль
+                user.set_password(new_password)  # Устанавливаем новый пароль
+                user.save()
+
+                # Отправляем email с новым паролем
+                send_mail(
+                    'Ваш новый пароль',
+                    f'Ваш новый пароль: {new_password}',
+                    'from@example.com',  # Укажите ваш реальный email отправителя
+                    [email],
+                    fail_silently=False,
+                )
+
+                return redirect('register')
+            else:
+                # Если пользователь не найден, можно отобразить ошибку
+                return render(request, 'users/password_reset_form.html', {'form': form, 'error': 'Пользователь с таким email не найден.'})
+
+    else:
+        form = PasswordResetForm()
+
+    return render(request, 'users/password_reset_form.html', {'form': form})

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     {% load static %}
     <meta charset="UTF-8">
@@ -46,7 +46,7 @@
                                class="form-control {{ log_form.username.errors|yesno:'is-invalid,' }}"
                                placeholder="Имя пользователя"
                                value="{{ log_form.username.value|default:'' }}">
-                        {% if form.username.errors %}
+                        {% if log_form.username.errors %}
                             <div class="invalid-feedback">
                                 {{ log_form.username.errors|striptags }}
                             </div>
@@ -68,6 +68,7 @@
                     </div>
                     <!-- Кнопка отправки -->
                     <button type="submit" class="send reg" name="login">Войти</button>
+                    <p style="text-align: right; margin-top: 10px;"><a href="{% url 'password_reset' %}" class="password-reset-link">Забыли пароль?</a></p>
                 </form>
             </div>
 
@@ -77,18 +78,38 @@
                      <div class="input-group mb-3">
                          <span class="input-group-text"><i class="fas fa-user"></i></span>
                          <input type="text" name="username" class="form-control" placeholder="Имя пользователя">
+                         {% if reg_form.username.errors %}
+                            <div class="invalid-feedback">
+                                {{ reg_form.username.errors|striptags }}
+                            </div>
+                        {% endif %}
                      </div>
                      <div class="input-group mb-3">
                          <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                          <input type="email" name="email" class="form-control" placeholder="Email">
+                         {% if reg_form.email.errors %}
+                            <div class="invalid-feedback">
+                                {{ reg_form.email.errors|striptags }}
+                            </div>
+                        {% endif %}
                      </div>
                      <div class="input-group mb-3">
                          <span class="input-group-text"><i class="fas fa-lock"></i></span>
                          <input type="password" name="password1" class="form-control" placeholder="Пароль">
+                         {% if reg_form.password1.errors %}
+                            <div class="invalid-feedback">
+                                {{ reg_form.password1.errors|striptags }}
+                            </div>
+                        {% endif %}
                      </div>
                      <div class="input-group mb-3">
                          <span class="input-group-text"><i class="fas fa-lock"></i></span>
                          <input type="password" name="password2" class="form-control" placeholder="Подтвердите пароль">
+                         {% if reg_form.password2.errors %}
+                            <div class="invalid-feedback">
+                                {{ reg_form.password2.errors|striptags }}
+                            </div>
+                        {% endif %}
                      </div>
                         <div class="input-group mb-3">
                             <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
