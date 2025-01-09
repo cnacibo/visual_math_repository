@@ -1,14 +1,18 @@
-const introduction = "Этот сайт создан для того, чтобы сделать ваше обучение математике " +
-    "более  <span style='color: #007bff; font-weight: bold; font-size: 22px'>удобным</span>" +
-    ", <span style='color: #007bff; font-weight: bold; font-size: 22px; '>интерактивным</span> и " +
-    "<span style='color: #007bff; font-weight: bold; font-size: 22px; '>" +
+const introduction = "<div style=\"display: flex; align-items: center; font-family: 'Montserrat Medium', serif; justify-content: center; gap: 6px;\"><span style=\"font-weight: bold; text-align: center; font-size: 40px;\">Немного о платформе</span></div>" +
+    "<span style='font-weight: bold;'>Этот сайт создан </span> " +
+    "для того, чтобы сделать ваше обучение математике " +
+    "более  <span style='color:#2C6E49; font-weight: bold; font-size: 25px'>удобным</span>" +
+    ", <span style='color: #2C6E49; font-weight: bold; font-size: 25px; '>интерактивным</span> и " +
+    "<span style='color: #2C6E49; font-weight: bold; font-size: 25px; '>" +
     "эффективным</span>. Здесь вы найдете все необходимые инструменты для" +
-    " изучения материала, подготовки к занятиям и проверки своих знаний. <br> <br>Платформа позволяет преподавателям " +
+    " изучения материала, подготовки к занятиям и проверки своих знаний. <br> <br>" +
+    "<span style='font-weight: bold; '>Платформа позволяет</span> преподавателям " +
     "создавать и хранить учебные материалы, которые всегда будут доступны вам в одном месте. " +
     "Вы сможете участвовать в интерактивных лекциях, выполнять проверочные задания и тесты, чтобы " +
     "закрепить пройденное и оценить свой прогресс.";
 
-const footer = "*При регистрации не забудьте обязательно указать свой статус: Студент/Преподаватель"
+const footer = "<span style='color: red; font-weight: bold; font-size: 25px'>!</span>При " +
+    "регистрации не забудьте обязательно указать свой статус: <br> - Студент <br>- Преподаватель"
 
 document.getElementById("introduction-text").innerHTML = introduction;
 document.getElementById("footer").textContent = footer;

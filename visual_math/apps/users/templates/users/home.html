@@ -2,159 +2,111 @@
 <html>
 <head>
     <title>Главная страница</title>
+    <meta charset="utf-8"/>
     {% load static %}
     <!-- Подключаем CSS файл -->
-    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    <link href="{% static 'css/home.css' %}" rel="stylesheet">
+    <script src="{% static 'js/home.js' %}" defer></script>
     <link rel="icon" type="image/x-icon" href="{% static 'images/icon.png' %}">
-    <style>
-        /* Стили для панели */
-        .sidebar {
-            height: 100vh; /* Высота панели равна высоте окна */
-            width: 0; /* Начальное состояние - панель скрыта */
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: #FFE4E1;
-            overflow-x: hidden; /* Убираем горизонтальную прокрутку */
-            transition: 0.0s ease; /* Анимация плавного открытия/закрытия */
-            overflow: hidden;
-            padding-top: 20px;
-            box-sizing: border-box;
-        }
-
-        .resizer {
-            width: 5px;
-            height: 100%;
-            background-color: #C71585;
-            cursor: ew-resize;
-            position: absolute;
-            top: 0;
-            right: 0;
-        }
-
-
-        .sidebar a:hover {
-            background-color: #f1f1f1;
-        }
-
-        .open-btn {
-            margin-top: 20px;
-            margin-left: 20px;
-            font-size: 20px;
-            border-radius: 20px;
-            background-color: #C71585;
-            color: #ffffff;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            z-index: 1000; /* Кнопка должна быть выше панели */
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            font-size: 24px;
-            background: none;
-            border: none;
-            color: #C71585;
-            cursor: pointer;
-        }
-        .btn-create{
-            align-content: center;
-            color: #C71585;
-            background-color: aliceblue;
-            border-radius: 50px;
-            margin-top: 100px;
-            margin-left: 20px;
-            font-size: 50px;
-            padding: 10px;
-            width: 500px;
-            height: 500px;
-        }
-
-        main {
-            margin-left: 10px;
-            padding: 20px;
-            text-align: center;
-            color: darkslateblue;
-            transition: margin-left 0.0s; /* Анимация для основного контента */
-        }
-        main p{
-            margin-top: 10px;
-            margin-bottom: 10px;
-        }
-
-        main-shifted {
-            margin-left: 150px; /* Отступ основного контента при открытой панели */
-        }
-    </style>
 </head>
 <body>
-<button class="open-btn" onclick="openSidebar()">☰ Аккаунт</button>
-<div id="sidebar" class="sidebar">
-    <button class="close-btn" onclick="closeSidebar()">×</button>
-    <h3>{{ user.get_role_display }}</h3>
-    <p>Имя пользователя: {{ user.username }}</p>
-    <p><br>Email: {{ user.email }}</p>
-    <a href = "{% url 'logout' %}"><button class="btn-logout">Выйти из аккаунта</button></a>
-    <a href = "{% url 'delete_user' %}"><button class="btn-delete">Удалить аккаунт</button></a>
-    <div id="resizer" class="resizer"></div>
+
+<header id="header">
+    <h1><span class = "teacher-name">Здравствуйте,</span> <span id="teacher-name" class = "teacher-name">{{ user.username }}</span></h1>
 </div>
+</header>
+
 
 <main>
-    <h1>Платформа для создания презентаций</h1>
-    <p>Как дела?</p>
+    <!-- Боковая панель -->
+    <article class="side-nav">
+        <section>
+             <!-- Панель информации об аккаунте -->
+            <div id="sidebar" class="sidebar">
+            <button class="close-btn" onclick="closeSidebar()"> <img src="{% static 'images/close-sidebar.png' %}" alt="Аккаунт"></button>
+            <h3>Информация </br> об аккаунте</h3>
+            <p><strong>Статус:</strong> {{ user.role }} </p>
+            <p><strong>Имя пользователя:</strong> {{ user.username}}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+                   <a href = "{% url 'register' %}"><button class="btn-logout">Выйти из аккаунта</button></a>
+                   <button class="btn-values" onclick="showContent('change')">Изменить данные аккаунта</button>
+                   <a href = "{% url 'delete_user' %}"><button class="btn-delete">Удалить аккаунт</button></a>
+            </div>
 
-    {% if request.user.role == 'teacher' %}
-    <p>Так как вы преподаватель, вы можете создавать презентации:</p>
-    <a href = "/presentations/"><button class="btn-create">Просмотреть мои презентации</button></a>
-    {% else %}
-    <button>вы студент!:</button>
-    {% endif %}
+           <nav class="side-nav">
+           <!-- Кнопка открытия панели -->
+            <button id = "account" class="open-btn" onclick="openSidebar()">☰ Аккаунт</button>
+               <div class="navigation">
+                   {% if user.role == 'teacher' %}
+                       <button class="butt" onclick="showContent('create-module')">Модули</button>
+                   {% endif %}
+                   </br>
+                   <button class="butt" onclick="showContent('library')">Библиотека лекций</button>
+               </div>
+           </nav>
+        </section>
+    </article>
+
+    <!-- Основной контент -->
+    <div class="content">
+        <article class = "con">
+            <h2 id="desc">Навигация по сайту</h2>
+            <div class = "text">
+                <h3>Аккаунт</h3>
+                <ul>
+                    <li><p>В этом разделе отображается основная информация о пользователе: статус (например, "Преподаватель"), имя пользователя, email и другие данные.</p></li>
+                    <li><p>Предоставляется возможность редактировать данные аккаунта (например, изменить имя, email или пароль) или удалить акакунт.</p></li>
+               </ul>
+                {% if user.role == 'teacher' %}
+                <h3>Модули</h3>
+                <ul>
+                    <li><p>Данный раздел доступен только преподавателям для создания учебных модулей (конкретно изучаемой области математики)</p></li>
+                    <li><p>Преподаватель может структурировать материал, добавлять новые лекции, редактировать, удалять существующие.</p></li>
+               </ul>
+                 {% endif %}
+                <h3>Библиотека лекций</h3>
+                <ul>
+                    <li><p>В этом разделе хранятся все созданные преподавателем лекции.</p></li>
+                    <li><p>Возможна сортировка по названию лекции / по модулю лекции.</p></li>
+               </ul>
+            </div>
+        </article>
+        <div id="library-content" class="hidden">
+            <section>
+                <h2 id="section2">Библиотека лекций</h2>
+                <label for="subject">Выберите предмет:</label>
+                <select id="subject">
+                    <option value="">-- Выберите предмет --</option>
+                    <option value="math-analysis">Математический анализ</option>
+                    <option value="algebra">Алгебра</option>
+                    <option value="discrete-math">Дискретная математика</option>
+                </select>
+
+                <div id="math-analysis" class="lecture-list" style="display: none;"></div>
+                <div id="algebra" class="lecture-list" style="display: none;"></div>
+                <div id="discrete-math" class="lecture-list" style="display: none;"></div>
+                <button class = "close" onclick="closeModule()">Назад</button>
+            </section>
+        </div>
+
+    <div id="change-content" class="hidden">
+        <h2>Изменение данных аккаунта</h2>
+        <a href = "{% url 'update_profile' %}"><button class="btn">Изменить профиль аккаунта</button></a>
+        <a href = "{% url 'update_password' %}"><button class="btn">Изменить пароль аккаунта</button></a>
+        <button class = "close" onclick="closeModule()">Назад</button>
+    </div>
+    </div>
+
 </main>
-<script>
-    function openSidebar() {
-            document.getElementById('sidebar').style.width = '335px';
-            document.getElementById('main').classList.add('main-shifted');
-        }
 
-        function closeSidebar() {
-            document.getElementById('sidebar').style.width = '0';
-            document.getElementById('main').classList.remove('main-shifted');
-        }
-        const sidebar = document.getElementById('sidebar');
-        const resizer = document.getElementById('resizer');
-        const mainContent = document.getElementById('main');
+<footer>
+    <div class = "wrapper">
+        <p class = "title">Контакты</p>
+        <div class = "textwidget">
+            <p><b>Почта:</b> visualmathproject2024@gmail.com </p>
+        </div>
+    </div>
+</footer>
 
-        let isResizing = false;
-
-        // Начало ресайза
-        resizer.addEventListener('mousedown', (e) => {
-            isResizing = true;
-            document.body.style.cursor = 'ew-resize';
-            document.body.style.userSelect = 'none'; // Отключаем выделение текста
-        });
-
-        // Во время ресайза
-        document.addEventListener('mousemove', (e) => {
-            if (!isResizing) return;
-
-            const newWidth = e.clientX;
-            if (newWidth > 100 && newWidth < 500) { // Ограничиваем ширину
-                sidebar.style.width = `${newWidth}px`;
-                mainContent.style.marginLeft = `${newWidth}px`;
-            }
-        });
-
-        // Завершение ресайза
-        document.addEventListener('mouseup', () => {
-            if (isResizing) {
-                isResizing = false;
-                document.body.style.cursor = 'default';
-                document.body.style.userSelect = 'auto'; // Включаем выделение текста обратно
-            }
-        });
-</script>
 </body>
 </html>
