@@ -1,0 +1,354 @@
+* {
+    font-family: "Georgia", serif;
+}
+
+/* HEADER */
+header {
+    z-index: 0;
+    display: flex;
+    background: linear-gradient(to bottom, #4a90e2, #007bff);
+    padding: 1rem;
+    position: relative;
+}
+
+header h1 {
+    flex: 2;
+    text-align: center;
+    font-size: 2.5rem;
+    color: #faf1df;
+    background: linear-gradient(to bottom, #4a90e2, #007bff);
+    margin: 0;
+    margin-top: 10px;
+    transform: scale(0.94);
+    animation: scale 1s forwards cubic-bezier(0.5, 1, 0.89, 1);
+}
+
+@keyframes scale {
+    100% {
+        transform: scale(1);
+    }
+}
+
+span .teacher-name {
+    display: inline-block;
+    opacity: 1;
+}
+span:nth-child(1) {
+    animation: fade-in 0.8 0.35s forwards cubic-bezier(0.11, 0, 0.5, 0);
+}
+span:nth-child(2) {
+    animation: fade-in 0.8 0.65s forwards cubic-bezier(0.11, 0, 0.5, 0);
+}
+@keyframes fade-in {
+    100% {
+        opacity: 1;
+    }
+}
+
+/* SIDEBAR */
+
+/* Стили для панели */
+.sidebar {
+    position: absolute; /* Фиксируем панель внутри навигации */
+    top: 5px; /* Задайте нужное смещение от верхнего края nav */
+    left: 0px; /* Выравнивание относительно левого края nav */
+    width: calc(100% - 35px);
+    height: 0; /* Начальное состояние - панель скрыта */
+    background-color: #faf1df;
+    overflow: hidden; /* Скрываем содержимое */
+    transition: height 0.3s ease; /* Анимация плавного открытия/закрытия */
+    border-radius: 10px;
+    z-index: 1000; /* Панель выше других элементов */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 10px 10px 10px 15px; /* Отступы от всех сторон */
+    border: solid #385ff4;
+}
+
+.sidebar a:hover {
+    background-color: #f1f1f1;
+}
+
+.sidebar h3 {
+    margin-top: 3px;
+    line-height: 1.2;
+    text-align: center;
+    color: black;
+}
+.sidebar p {
+    line-height: 1rem;
+    text-align: left;
+    margin-left: 3px;
+    color: black;
+}
+.sidebar.open {
+    display: block;
+    height: 350px;    /* Высота открытой панели */
+    /*overflow-y: auto; !* Добавляем прокрутку, если контент не помещается *!*/
+}
+.open-btn {
+    margin-bottom: 1rem;
+    font-size: 18px;
+    border-radius: 20px;
+    /*background-color: #faf1df;*/
+    color: #ffffff;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+/* Стили для кнопки закрытия панели */
+.close-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 24px;
+    color: #05000c;
+    cursor: pointer;
+    background: none; /* Убираем фон */
+    border: none; /* Убираем границы */
+    padding: 0; /* Убираем отступы */
+}
+.close-btn img {
+    width: 20px; /* Задаем размер изображения */
+    height: 20px;
+}
+
+.btn-logout, .btn-delete, .btn-values {
+    background-color: #4d87f6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    width: 80%;
+    margin-top: 0.5rem;
+}
+
+.btn-logout:hover, .btn-delete:hover {
+    background-color: #9150ff;
+}
+
+.side-nav {
+    z-index: 0;
+    position: relative; /* Для позиционирования панели внутри */
+    background-color: #007bff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: padding-top 0.3s ease; /* Анимация для смещения вниз */
+    left: 0;
+    margin-right: 10px;
+}
+
+.side-nav .navigation {
+    list-style: none;
+    line-height: 1pt;
+    margin: 0;
+    padding: 0;
+}
+
+.side-nav button {
+    margin-bottom: 0.5rem;
+    text-align: left;
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.side-nav button:hover {
+    background-color: #0056b3;
+}
+.content {
+    flex: 4;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s ease;
+}
+.text{
+    text-align: left;
+    color: #040e0e;
+    line-height: 15px;
+}
+main {
+    background: #ffeecf;
+    display: flex;
+    z-index: 0;
+    position: relative;
+    margin-left: 10px;
+    padding: 20px;
+    text-align: center;
+    color: darkslateblue;
+    transition: margin-left 0.0s; /* Анимация для основного контента */
+}
+main p{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.main-shifted {
+    margin-right: 335px; /* Ширина панели */
+    transition: margin-right 0.3s ease; /* Анимация */
+}
+
+body {
+    margin: 5px;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8ecd5;
+    z-index: 0;
+    position: relative;
+}
+
+article {
+    /*flex: 4;*/
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #faf1df;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.con {
+    border-left: dotted blue;
+    border-left-width: 5px ;
+}
+article .side-nav {
+    flex: 1;
+}
+section{
+    width: 100%;
+    margin-bottom: 1.5rem;
+    margin-left: 0;
+}
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: black;
+}
+input[type="text"],
+select {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+
+
+button:hover {
+    background-color: #0056b3;
+}
+
+
+.contents {
+    width: 80%;
+    padding: 20px;
+}
+.butt {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+}
+.butt:hover {
+    background-color: #0056b3;
+}
+.hidden {
+    display: none;
+}
+
+.close img{
+    width: 20px; /* Задаем размер изображения */
+    height: 20px;
+}
+
+
+footer {
+    background: #ffeecf;
+    color: black;
+}
+/* Основные стили для футера */
+footer {
+    background-color: #f69fb6; /* Тёмный фон */
+    color: #030404; /* Светлый текст */
+    padding: 10px 0; /* Отступы сверху и снизу */
+    border-top: 4px solid #d36582; /* Синяя полоса сверху */
+    text-align: left; /* Выравнивание текста по центру */
+    height: 80px;
+}
+
+/* Стили для контейнера внутри футера */
+footer .wrapper {
+    max-width: 1200px; /* Максимальная ширина контейнера */
+    margin: 0 10px; /* Центрирование контейнера */
+    padding: 0 10px; /* Отступы слева и справа */
+}
+
+/* Стили для заголовка футера */
+footer .title {
+    font-size: 1rem; /* Размер шрифта */
+    font-weight: bold; /* Жирный шрифт */
+    margin-bottom: 1rem; /* Отступ снизу */
+    color: #030404; /* Синий цвет заголовка */
+    text-transform: uppercase; /* Заглавные буквы */
+}
+
+/* Стили для текста внутри футера */
+footer .textwidget p {
+    font-size: 1rem; /* Размер шрифта */
+    margin: 0.5rem 0; /* Отступы между строками */
+    line-height: 1.2; /* Межстрочный интервал */
+}
+
+/* Стили для ссылок (если они появятся) */
+footer a {
+    color: #3498db; /* Синий цвет ссылок */
+    text-decoration: none; /* Убираем подчёркивание */
+    transition: color 0.3s ease; /* Плавное изменение цвета */
+}
+
+footer a:hover {
+    color: #1abc9c; /* Цвет ссылки при наведении */
+}
+
+/* Адаптивный дизайн */
+@media (max-width: 768px) {
+    main {
+        padding: 1rem;
+    }
+    article {
+        padding: 1rem;
+    }
+
+     footer {
+        padding: 1.5rem 0; /* Уменьшаем отступы */
+    }
+
+    footer .title {
+        font-size: 1.25rem; /* Уменьшаем размер заголовка */
+    }
+
+    footer .textwidget p {
+        font-size: 0.9rem; /* Уменьшаем размер текста */
+    }
+}
