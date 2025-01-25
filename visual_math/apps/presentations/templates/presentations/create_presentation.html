@@ -2,15 +2,94 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Создать презентацию</title>
+    <title>Блок создания лекции</title>
+<!--    <link rel="stylesheet" href="../css/create-presentation.css">-->
+<!--    <script src="../js/create-presentation.js" defer></script>-->
+    <link href="{% static 'css/create-presentation.css' %}" rel="stylesheet">
+    <script src="{% static 'js/create-presentation.js' %}" defer></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 </head>
+
 <body>
-    <h1>Создать новую презентацию</h1>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Создать</button>
-    </form>
+<main>
+    <div id="content" class="content">
+        <article>
+            <section>
+                <button class="open" onclick="showContent('text-module')">Текстовый модуль</button><br>
+                <button class="open" onclick="showContent('visual-module')">Визуальный модуль</button><br>
+                <button class="open" onclick="showContent('questionnaire')">Вопросник</button><br>
+                <button class="open" onclick="showContent('test-block')">Проверочный блок</button><br>
+            </section>
+        </article>
+
+        <!-- Блоки контента -->
+        <div id="text-module-content" class="hidden">
+            <div class="module-header">
+                <input type="text" id="module-name" placeholder="Название модуля" oninput="updateModuleButton()">
+                <button id="module-button" style="background-color: #4CAF50; color: white;">Название модуля</button>
+                <button onclick="loadModule()">Загрузить</button>
+                <input type="file" id="file-input" accept=".tex,.katex" style="display: none;">
+                <button onclick="document.getElementById('file-input').click()">Загрузить файл</button>
+            </div>
+            <div class="tabs">
+                <button onclick="insertText('$', '$')">Math</button>
+                <button onclick="insertText('\\alpha')">Greek</button>
+                <button onclick="insertText('\\sum')">Symbols</button>
+                <button onclick="insertText('\\textbf{', '}')">Bold</button>
+                <button onclick="insertText('\\textit{', '}')">Italic</button>
+                <button onclick="insertText('\\underline{', '}')">Underline</button>
+                <button onclick="insertText('\\frac{', '}{}')">Functions</button>
+                <button onclick="insertText('\\pm')">+/-</button>
+                <button onclick="insertText('\\rightarrow')">→</button>
+            </div>
+            <div class="editor">
+                <div class="textarea">
+                    <textarea id="tex-input" placeholder="Введите TeX код..."></textarea>
+                </div>
+                <div class="output" id="katex-output"></div>
+            </div>
+            <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+            <button onclick="hideContent('text-module-content')">Назад</button>
+        </div>
+        <div id="visual-module-content" class="hidden">
+            <p>Визуальный модуль</p>
+            <div class="visual-header">
+                <button onclick="loadVisualModule()">Загрузить визуальный модуль</button>
+            </div>
+            <div class="visual-container">
+                <canvas id="visual-canvas"></canvas>
+            </div>
+            <div class="controls">
+                <button onclick="zoomIn()">Приблизить</button>
+                <button onclick="zoomOut()">Отдалить</button>
+                <button onclick="moveCamera('left')">Влево</button>
+                <button onclick="moveCamera('right')">Вправо</button>
+                <button onclick="moveCamera('up')">Вверх</button>
+                <button onclick="moveCamera('down')">Вниз</button>
+            </div>
+            <button onclick="hideContent('visual-module-content')">Назад</button>
+        </div>
+        <div id="questionnaire-content" class="hidden">
+            <p>Вопросник</p>
+            <div class="questionnaire-header">
+                <button onclick="loadQuestionnaire()">Загрузить вопросник</button>
+            </div>
+            <div class="questionnaire-editor">
+                <div class="textarea">
+                    <textarea id="questionnaire-input" placeholder="Введите текст вопросника..."></textarea>
+                </div>
+                <div class="preview" id="questionnaire-preview"></div>
+            </div>
+            <button onclick="hideContent('questionnaire-content')">Назад</button>
+        </div>
+        <div id="test-block-content" class="hidden">
+            <p>Проверочный блок</p>
+            <button onclick="hideContent('test-block-content')">Назад</button>
+        </div>
+    </div>
+</main>
+
 </body>
 </html>
+
