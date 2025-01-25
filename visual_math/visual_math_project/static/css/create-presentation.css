@@ -1,0 +1,128 @@
+/* Общие стили */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+main {
+    display: flex;
+    height: 100vh;
+}
+
+/* Боковое меню */
+article {
+    width: 20%; /* 1/5 ширины экрана */
+    background-color: #1f2937; /* Тёмно-серый цвет */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+article button {
+    background-color: #374151; /* Более светлый серый */
+    color: white;
+    border: none;
+    padding: 15px;
+    margin-bottom: 10px;
+    text-align: left;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+article button:hover {
+    background-color: #4b5563; /* Ещё более светлый серый */
+}
+
+/* Основная область контента */
+#content {
+    flex: 1; /* Оставшаяся ширина (4/5 экрана) */
+    padding: 20px;
+    overflow-y: auto;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Выравнивание сверху */
+}
+
+.hidden {
+    display: none;
+}
+
+/* Текстовый модуль */
+textarea, input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.editor {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+textarea {
+    flex: 1;
+    height: 150px;
+    resize: none;
+}
+
+#katex-output {
+    flex: 1;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Визуальный модуль */
+.visual-container {
+    margin: 20px 0;
+    text-align: center;
+}
+
+canvas {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 100%;
+    height: 300px;
+}
+
+/* Вопросник */
+textarea#questionnaire-input {
+    height: 150px;
+}
+
+.preview {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Кнопки действий */
+button {
+    background-color: #1d4ed8;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2563eb;
+}
