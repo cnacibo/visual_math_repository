@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    {% load static %}
     <title>Блок создания лекции</title>
 <!--    <link rel="stylesheet" href="../css/create-presentation.css">-->
 <!--    <script src="../js/create-presentation.js" defer></script>-->
@@ -22,6 +23,9 @@
                 <button class="open" onclick="showContent('test-block')">Проверочный блок</button><br>
             </section>
         </article>
+        <button id="save-button" onclick="savePresentation()">Сохранить</button>
+
+
 
         <!-- Блоки контента -->
         <div id="text-module-content" class="hidden">

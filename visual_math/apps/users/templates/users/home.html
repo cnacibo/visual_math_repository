@@ -12,7 +12,11 @@
 <body>
 
 <header id="header">
-    <h1><span class = "teacher-name">Здравствуйте,</span> <span id="teacher-name" class = "teacher-name">{{ user.username }}</span></h1>
+    <h1>
+        <span>Welcome</span>
+        <span>to</span>
+        <span>VisualMath</span>
+    </h1>
 </div>
 </header>
 
@@ -20,31 +24,27 @@
 <main>
     <!-- Боковая панель -->
     <article class="side-nav">
-        <section>
-             <!-- Панель информации об аккаунте -->
-            <div id="sidebar" class="sidebar">
-            <button class="close-btn" onclick="closeSidebar()"> <img src="{% static 'images/close-sidebar.png' %}" alt="Аккаунт"></button>
+    <!-- Панель информации об аккаунте -->
+        <div id="sidebar" class="sidebar">
+            <button class="close-btn" onclick="closeSidebar()">
+                <img src="{% static 'images/close-sidebar.png' %}" alt="Закрыть">
+            </button>
             <h3>Информация </br> об аккаунте</h3>
-            <p><strong>Статус:</strong> {{ user.role }} </p>
-            <p><strong>Имя пользователя:</strong> {{ user.username}}</p>
+            <p><strong>Статус:</strong> {{ user.get_role_display }}</p>
+            <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
             <p><strong>Email:</strong> {{ user.email }}</p>
-                   <a href = "{% url 'register' %}"><button class="btn-logout">Выйти из аккаунта</button></a>
-                   <button class="btn-values" onclick="showContent('change')">Изменить данные аккаунта</button>
-                   <a href = "{% url 'delete_user' %}"><button class="btn-delete">Удалить аккаунт</button></a>
-            </div>
-
-           <nav class="side-nav">
-           <!-- Кнопка открытия панели -->
-            <button id = "account" class="open-btn" onclick="openSidebar()">☰ Аккаунт</button>
-               <div class="navigation">
-                   {% if user.role == 'teacher' %}
-                       <button class="butt" onclick="showContent('create-module')">Модули</button>
-                   {% endif %}
-                   </br>
-                   <button class="butt" onclick="showContent('library')">Библиотека лекций</button>
-               </div>
-           </nav>
-        </section>
+            <a href="{% url 'register' %}">
+                <button class="btn-logout">Выйти из аккаунта</button>
+            </a>
+            <button class="btn-values" onclick="showContent('change')">Изменить данные аккаунта</button>
+            <a href="{% url 'delete_user' %}">
+                <button class="btn-delete">Удалить аккаунт</button>
+            </a>
+        </div>
+        <!-- Кнопка открытия панели -->
+        <button id="account" class="open-btn" onclick="openSidebar()">☰ Аккаунт</button>
+        <!-- Навигация -->
+            <button class="butt" onclick="showContent('library')">Библиотека лекций</button>
     </article>
 
     <!-- Основной контент -->
@@ -70,6 +70,7 @@
                     <li><p>Возможна сортировка по названию лекции / по модулю лекции.</p></li>
                </ul>
             </div>
+            <h3 class="show-role">Ваша роль: <b class="role">{{ user.get_role_display }}</b></h3>
         </article>
         <div id="library-content" class="hidden">
             <section>
@@ -86,6 +87,10 @@
                 <div id="algebra" class="lecture-list" style="display: none;"></div>
                 <div id="discrete-math" class="lecture-list" style="display: none;"></div>
                 <button class = "close" onclick="closeModule()">Назад</button>
+                {% if user.role == 'teacher' %}
+                    <a href = "/presentations/new/"><button class = "close" >Создать лекцию</button></a>
+                {% endif %}
+
             </section>
         </div>
 
@@ -98,7 +103,6 @@
     </div>
 
 </main>
-
 <footer>
     <div class = "wrapper">
         <p class = "title">Контакты</p>

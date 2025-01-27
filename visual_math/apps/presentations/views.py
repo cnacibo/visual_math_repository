@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Presentation, Slide
-from .forms import PresentationForm, SlideForm
+from .forms import PresentationForm, SlideForm, CreatePresentationForm
 from rest_framework import viewsets
 from .models import Presentation, Slide
 from .serializers import PresentationSerializer, SlideSerializer
@@ -14,15 +14,27 @@ def presentation_list(request):
     presentations = Presentation.objects.all()
     return render(request, 'presentations/list.html', {'presentations': presentations})
 
+def create_new(request):
+    if request.method == 'POST':
+        form = CreatePresentationForm(request.POST)
+        if form.is_valid():
+            presentation = form.save(commit=False)
+            presentation.creator = request.user
+            presentation.save()
+            return redirect('create_presentation',  presentation_id=presentation.id)
+    else:
+        form = CreatePresentationForm()
+    return render(request, 'presentations/create_new.html', {'form': form})
+
 # Создание новой презентации
-def create_presentation(request):
+def create_presentation(request, presentation_id):
     if request.method == 'POST':
         form = PresentationForm(request.POST)
         if form.is_valid():
             presentation = form.save(commit=False)
             presentation.user = request.user
             presentation.save()
-            return redirect('presentation_detail', presentation_id=presentation.id)
+            return redirect('presentation_detail')
     else:
         form = PresentationForm()
     return render(request, 'presentations/create_presentation.html', {'form': form})
@@ -80,3 +92,28 @@ def slides_view(request):
             return JsonResponse({"status": "error", "message": "Slide not found"}, status=404)
     else:
         return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
+
+
+@csrf_exempt
+def save_presentation(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+
+            # Создаем новую или обновляем существующую презентацию
+            presentation_id = data.get("id")
+            if presentation_id:
+                presentation = Presentation.objects.get(id=presentation_id)
+            else:
+                presentation = Presentation(creator=request.user)
+
+            presentation.title = data["title"]
+            presentation.subject = data.get("subject", presentation.subject)
+            presentation.data = data.get("data", presentation.data)
+            presentation.save()
+
+            return JsonResponse({"success": True, "id": presentation.id})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+    else:
+        return JsonResponse({"success": False, "error": "Invalid request method."})

@@ -1,26 +1,27 @@
-* {
+main, footer {
     font-family: "Georgia", serif;
 }
 
 /* HEADER */
 header {
-    z-index: 0;
     display: flex;
     background: linear-gradient(to bottom, #4a90e2, #007bff);
-    padding: 1rem;
     position: relative;
+    z-index: 10000;
 }
 
 header h1 {
     flex: 2;
     text-align: center;
-    font-size: 2.5rem;
-    color: #faf1df;
+    font-size: 3rem;
+    color: white;
     background: linear-gradient(to bottom, #4a90e2, #007bff);
     margin: 0;
-    margin-top: 10px;
     transform: scale(0.94);
     animation: scale 1s forwards cubic-bezier(0.5, 1, 0.89, 1);
+    font-family: "Montserrat Medium", serif;
+    padding: 10px 0;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes scale {
@@ -49,19 +50,22 @@ span:nth-child(2) {
 
 /* Стили для панели */
 .sidebar {
-    position: absolute; /* Фиксируем панель внутри навигации */
-    top: 5px; /* Задайте нужное смещение от верхнего края nav */
-    left: 0px; /* Выравнивание относительно левого края nav */
-    width: calc(100% - 35px);
-    height: 0; /* Начальное состояние - панель скрыта */
-    background-color: #faf1df;
-    overflow: hidden; /* Скрываем содержимое */
-    transition: height 0.3s ease; /* Анимация плавного открытия/закрытия */
+    position: absolute;
+    top: 5px;
+    left: 50%; /* Центрируем по горизонтали */
+    width: 80%;
+    height: 50%;
+    background-color: white;
+    overflow: hidden;
+    transition: transform 0.3s ease, height 0.3s ease; /* Плавные переходы для transform и height */
+    transform: translateX(-50%) scaleY(0); /* Панель скрыта при закрытии */
+    transform-origin: top; /* Центрируем анимацию по верхнему краю */
     border-radius: 10px;
-    z-index: 1000; /* Панель выше других элементов */
+    z-index: 1000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin: 10px 10px 10px 15px; /* Отступы от всех сторон */
-    border: solid #385ff4;
+    margin: 10px auto;
+    border: solid black;
+    padding: 1rem; /* Фиксированные отступы */
 }
 
 .sidebar a:hover {
@@ -82,8 +86,12 @@ span:nth-child(2) {
 }
 .sidebar.open {
     display: block;
-    height: 350px;    /* Высота открытой панели */
+    height: calc(50%);    /* Высота открытой панели */
     /*overflow-y: auto; !* Добавляем прокрутку, если контент не помещается *!*/
+    transform: translateX(-50%); /* Центрируем по горизонтали */
+    padding: 1rem; /* Внутренние отступы */
+    overflow-y: auto;
+
 }
 .open-btn {
     margin-bottom: 1rem;
@@ -136,10 +144,12 @@ span:nth-child(2) {
     background-color: #007bff;
     padding: 1.5rem;
     border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.3);
     transition: padding-top 0.3s ease; /* Анимация для смещения вниз */
     left: 0;
+    width: 15%;
     margin-right: 10px;
+    border: 7px double #8CBA80;
 }
 
 .side-nav .navigation {
@@ -174,7 +184,7 @@ span:nth-child(2) {
     line-height: 15px;
 }
 main {
-    background: #ffeecf;
+    background:#f4f4f9;
     display: flex;
     z-index: 0;
     position: relative;
@@ -183,6 +193,7 @@ main {
     text-align: center;
     color: darkslateblue;
     transition: margin-left 0.0s; /* Анимация для основного контента */
+    flex-grow: 1; /* Расширяем основной контент, чтобы занять всё свободное пространство */
 }
 main p{
     margin-top: 10px;
@@ -194,25 +205,30 @@ main p{
 }
 
 body {
-    margin: 5px;
+    margin: 0;
     line-height: 1.6;
     color: #333;
-    background-color: #f8ecd5;
+    background-color: #f4f4f9;
     z-index: 0;
     position: relative;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column; /* Вертикальный стек */
 }
 
 article {
     /*flex: 4;*/
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: #faf1df;
+    background: white;
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 .con {
-    border-left: dotted blue;
-    border-left-width: 5px ;
+    border-left: solid #8CBA80;
+    border-left-width: 4px ;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 article .side-nav {
     flex: 1;
@@ -264,6 +280,7 @@ button:hover {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
+    margin-top: 10px;
     background-color: #007bff;
     color: white;
     border: none;
@@ -282,6 +299,14 @@ button:hover {
     height: 20px;
 }
 
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column; /* Вертикальный стек */
+}
+
 
 footer {
     background: #ffeecf;
@@ -289,12 +314,14 @@ footer {
 }
 /* Основные стили для футера */
 footer {
-    background-color: #f69fb6; /* Тёмный фон */
-    color: #030404; /* Светлый текст */
-    padding: 10px 0; /* Отступы сверху и снизу */
-    border-top: 4px solid #d36582; /* Синяя полоса сверху */
+    background: #007BFF; /* Тёмный фон */
+    color: white; /* Светлый текст */
+    padding: 0 0 15px 0; /* Отступы сверху и снизу */
     text-align: left; /* Выравнивание текста по центру */
     height: 80px;
+    /*border-top: 4px solid #8CBA80;  Верхняя граница футера */
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
 }
 
 /* Стили для контейнера внутри футера */
@@ -309,7 +336,7 @@ footer .title {
     font-size: 1rem; /* Размер шрифта */
     font-weight: bold; /* Жирный шрифт */
     margin-bottom: 1rem; /* Отступ снизу */
-    color: #030404; /* Синий цвет заголовка */
+    color: white; /* Синий цвет заголовка */
     text-transform: uppercase; /* Заглавные буквы */
 }
 
@@ -318,6 +345,10 @@ footer .textwidget p {
     font-size: 1rem; /* Размер шрифта */
     margin: 0.5rem 0; /* Отступы между строками */
     line-height: 1.2; /* Межстрочный интервал */
+}
+
+footer .textwidget b {
+    color: black;
 }
 
 /* Стили для ссылок (если они появятся) */
@@ -351,4 +382,15 @@ footer a:hover {
     footer .textwidget p {
         font-size: 0.9rem; /* Уменьшаем размер текста */
     }
+}
+
+.show-role {
+    color: green;
+    text-align: right;
+    line-height: 15px;
+}
+
+.show-role b{
+    color: black;
+    font-weight: normal;
 }
