@@ -220,3 +220,58 @@ function loadQuestionnaire() {
 
 // Инициализация
 renderPreview();
+
+async function savePresentation() {
+    const title = document.getElementById("module-name").value;
+    const textModule = document.getElementById("tex-input").value;
+    const questionnaire = document.getElementById("questionnaire-input").value;
+
+    // Собираем данные для отправки
+    const data = {
+        title: title,
+        subject: "Calculus", // Это можно сделать динамическим
+        data: {
+            textModule: textModule,
+            questionnaire: questionnaire,
+        },
+    };
+
+    try {
+        const response = await fetch("/presentations/save-presentation/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken"), // Подтяните CSRF-токен
+            },
+            body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert("Презентация успешно сохранена!");
+            window.location.href = '/home/';
+        } else {
+            alert("Ошибка сохранения: " + result.error);
+        }
+    } catch (error) {
+        console.error("Ошибка:", error);
+        alert("Не удалось сохранить презентацию. Проверьте соединение с сервером.");
+    }
+}
+
+// Функция для получения CSRF-токена
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}

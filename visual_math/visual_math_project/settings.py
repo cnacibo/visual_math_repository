@@ -89,7 +89,7 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
-# STATICFILES_DIRS = [BASE_DIR / 'visual_math_project/static'] - твоя строка была
+STATICFILES_DIRS = [BASE_DIR / 'visual_math_project/static'] #- твоя строка была
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
