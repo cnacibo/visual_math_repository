@@ -192,3 +192,17 @@ function closeModule() {
     // Показываем секцию навигации по сайту
     document.querySelector('.con').classList.remove('hidden');
 }
+
+function filterBySubject() {
+        const selectedSubject = document.getElementById('subject').value;
+        const cards = document.querySelectorAll('.presentation-card');
+
+        cards.forEach(card => {
+            const cardSubject = card.getAttribute('data-subject');
+            if (!selectedSubject || cardSubject === selectedSubject) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+}

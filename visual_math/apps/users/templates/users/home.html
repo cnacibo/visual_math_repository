@@ -76,12 +76,26 @@
             <section>
                 <h2 id="section2">Библиотека лекций</h2>
                 <label for="subject">Выберите предмет:</label>
-                <select id="subject">
+                <select id="subject" onchange="filterBySubject()">
                     <option value="">-- Выберите предмет --</option>
-                    <option value="math-analysis">Математический анализ</option>
-                    <option value="algebra">Алгебра</option>
-                    <option value="discrete-math">Дискретная математика</option>
+                    <option value="Calculus">Математический анализ</option>
+                    <option value="Algebra">Алгебра</option>
+                    <option value="Discrete">Дискретная математика</option>
                 </select>
+
+                <div id="presentations-container">
+                    {% if user.presentations.exists %}
+                        {% for el in user.presentations.all %}
+                            <div class="presentation-card" data-subject="{{ el.subject }}">
+                                <h3>{{ el.title }}</h3>
+                                <p><strong>Предмет:</strong> {{ el.get_subject_display }}</p>
+                                <p><strong>Дата создания:</strong> {{ el.created_at|date:"d.m.Y H:i" }}</p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>У вас еще нет презентаций.</p>
+                    {% endif %}
+                </div>
 
                 <div id="math-analysis" class="lecture-list" style="display: none;"></div>
                 <div id="algebra" class="lecture-list" style="display: none;"></div>
