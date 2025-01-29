@@ -55,6 +55,7 @@ span:nth-child(2) {
     left: 50%; /* Центрируем по горизонтали */
     width: 80%;
     height: 50%;
+    max-height: 400px;
     background-color: white;
     overflow: hidden;
     transition: transform 0.3s ease, height 0.3s ease; /* Плавные переходы для transform и height */
@@ -393,4 +394,46 @@ footer a:hover {
 .show-role b{
     color: black;
     font-weight: normal;
+}
+
+#subject {
+    margin-bottom: 20px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#presentations-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start;
+}
+
+.presentation-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    width: calc(33.333% - 20px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: #f9f9f9;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.presentation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.presentation-card h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+.presentation-card p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #666;
 }
