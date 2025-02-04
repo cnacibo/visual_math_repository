@@ -79,9 +79,28 @@ document.getElementById('tex-input').addEventListener('input', () => {
     renderKaTeX();
 });
 
+// Функция для переключения видимости меню
+function toggleTabMenu(menuId) {
+    // Закрываем все открытые меню
+    document.querySelectorAll('.tab-menu').forEach(menu => {
+        if (menu.id !== menuId) {
+            menu.classList.add('hidden');
+        }
+    });
+
+    const menu = document.getElementById(menuId);
+    menu.classList.toggle("hidden");
+}
+
+
 // Функция для вставки текста
 function insertText(startTag, endTag = '') {
     const texInput = document.getElementById('tex-input');
+    if (!texInput) {
+        console.error("Элемент tex-input не найден!");
+        alert("Элемент tex-input не найден!");
+        return;
+    }
     const start = texInput.selectionStart;
     const end = texInput.selectionEnd;
     const text = texInput.value;
@@ -100,6 +119,57 @@ function insertText(startTag, endTag = '') {
 
 // Инициализация
 renderKaTeX();
+
+
+function downloadTexFile() {
+    const texContent = document.getElementById('tex-input').value;
+    const fileName = document.getElementById('module-name').value || 'document'; // Имя файла из названия модуля
+    const blob = new Blob([texContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+
+    // Создаем ссылку для скачивания
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${fileName}.tex`;
+    a.click();
+
+    // Освобождаем память
+    URL.revokeObjectURL(url);
+}
+
+function downloadPdfFile() {
+    alert("Функция загрузки из tex в pdf формат будет реализована позже.");
+}
+
+// Инициализация
+renderPreview();
+
+
+function toggleUploadMenu() {
+    const menu = document.getElementById('upload-menu');
+    menu.classList.toggle('hidden');
+}
+
+function loadFromLibrary() {
+    alert('Загрузка из библиотеки...');
+    // Здесь можно добавить логику для загрузки из библиотеки
+    toggleUploadMenu(); // Закрыть меню после выбора
+}
+
+function loadFromComputer() {
+    document.getElementById('file-input').click(); // Открыть диалог выбора файла
+    toggleUploadMenu(); // Закрыть меню после выбора
+}
+
+// Обработка выбора файла
+document.getElementById('file-input').addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    // if (file) {
+    //     alert(`Выбран файл: ${file.name}`);
+    //     // Здесь можно добавить логику для обработки файла
+    // }
+});
+
 
 // ВИЗУАЛЬНЫЙ МОДУЛЬ
 
@@ -200,6 +270,13 @@ const questionnairePreview = document.getElementById('questionnaire-preview');
 
 // Функция для визуализации текста
 function renderPreview() {
+    const questionnaireInput = document.getElementById('questionnaire-input');
+    const questionnairePreview = document.getElementById('questionnaire-preview');
+
+    if (!questionnaireInput || !questionnairePreview) {
+        console.error("Элементы questionnaire-input или questionnaire-preview не найдены!");
+        return;
+    }
     const text = questionnaireInput.value;
     questionnairePreview.innerHTML = text
         .replace(/\n/g, '<br>') // Заменяем переносы строк на <br>
@@ -218,60 +295,4 @@ function loadQuestionnaire() {
     alert("Функция загрузки вопросника будет реализована позже.");
 }
 
-// Инициализация
-renderPreview();
 
-async function savePresentation() {
-    const title = document.getElementById("module-name").value;
-    const textModule = document.getElementById("tex-input").value;
-    const questionnaire = document.getElementById("questionnaire-input").value;
-
-    // Собираем данные для отправки
-    const data = {
-        title: title,
-        subject: "Calculus", // Это можно сделать динамическим
-        data: {
-            textModule: textModule,
-            questionnaire: questionnaire,
-        },
-    };
-
-    try {
-        const response = await fetch("/presentations/save-presentation/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": getCookie("csrftoken"), // Подтяните CSRF-токен
-            },
-            body: JSON.stringify(data),
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            alert("Презентация успешно сохранена!");
-            window.location.href = '/home/';
-        } else {
-            alert("Ошибка сохранения: " + result.error);
-        }
-    } catch (error) {
-        console.error("Ошибка:", error);
-        alert("Не удалось сохранить презентацию. Проверьте соединение с сервером.");
-    }
-}
-
-// Функция для получения CSRF-токена
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
