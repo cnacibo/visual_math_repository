@@ -1,128 +1,287 @@
+body, html {
+    overflow-x: hidden; /* Скрываем горизонтальную прокрутку */
+    width: 100%; /* Фиксируем ширину */
+}
+/* Убедимся, что все элементы не выходят за пределы экрана */
+* {
+    box-sizing: border-box; /* Учитываем padding и border в ширине */
+}
+.hidden {
+    display: none;
+}
+
 /* Общие стили */
 body {
+    font-family: 'Arial', sans-serif;
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    padding: 0;
+    background: linear-gradient(to right, #f9f9f9, #e0e0e0); /* Градиент для основного контента */
     color: #333;
+    height: 120vh;
 }
-
-main {
-    display: flex;
-    height: 100vh;
-}
-
-/* Боковое меню */
-article {
-    width: 20%; /* 1/5 ширины экрана */
-    background-color: #1f2937; /* Тёмно-серый цвет */
+/* Обновленный header */
+header {
+    /*background: linear-gradient(to right, #3e57ba, #64ae67);*/
+    background: linear-gradient(to right, #6170f4, #39c0f8); /* Градиент для основного контента */
     color: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    padding: 20px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    font-family: 'Arial', sans-serif;
 }
 
-article button {
-    background-color: #374151; /* Более светлый серый */
+/* Обновленный sidebar */
+.sidebar {
+    width: 100%;
+    /*background: linear-gradient(to right, #3e57ba, #64ae67); !* Градиент от цвета header к цвету sidebar *!*/
+    background: linear-gradient(to right, #6170f4, #39c0f8); /* Градиент для основного контента */
+    padding: 10px;
+    text-align: center;
+}
+
+.sidebar button {
+    background-color: rgba(255, 255, 255, 0.2); /* Полупрозрачный белый */
     color: white;
     border: none;
-    padding: 15px;
-    margin-bottom: 10px;
-    text-align: left;
-    border-radius: 8px;
-    font-size: 16px;
+    padding: 10px 20px;
+    margin: 5px;
     cursor: pointer;
+    font-size: 16px;
+    border-radius: 4px;
     transition: background-color 0.3s ease;
 }
 
-article button:hover {
-    background-color: #4b5563; /* Ещё более светлый серый */
+.sidebar button:hover {
+    background-color: rgba(255, 255, 255, 0.3); /* Более яркий при наведении */
 }
 
-/* Основная область контента */
-#content {
-    flex: 1; /* Оставшаяся ширина (4/5 экрана) */
-    padding: 20px;
-    overflow-y: auto;
-    background-color: white;
+main {
+    background: linear-gradient(to right, #f9f9f9, #e0e0e0); /* Градиент для основного контента */
     display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Выравнивание сверху */
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin-top: -10px; /* Чтобы градиенты header и main перекрывались */
+
+    height: calc(100vh - 120px); /* Подгон под высоту header */
+}
+
+/* Заголовок текстового модуля */
+.module-header {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end; /* Выравниваем кнопки по правому краю */
+    gap: 12px; /* Расстояние между кнопками */
+    padding: 10px 0; /* Отступы сверху и снизу */
+    position: sticky; /* Фиксируем кнопки внизу */
+    bottom: 0; /* Прижимаем к нижнему краю */
+    z-index: 1000; /* Убедимся, что кнопки поверх других элементов */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Тень для выделения */
+    background-color: white; /* Фон для кнопок */
+}
+
+.button-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0;
+}
+
+.module-header input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 200px;
+}
+
+.module-header button {
+    background: linear-gradient(to right, #7a87fb, #67d3ff);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: filter 0.3s ease; /* Запрет переноса текста */
+}
+
+.module-header button:hover {
+    filter: brightness(1.1); /* Эффект при наведении */
+}
+.upload-container {
+    position: relative;
+    display: inline-block;
+}
+/* Панель вкладок */
+.tabs {
+    width: 100%;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+/* Стили для контейнера с выпадающим меню */
+.tab-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* Стили для выпадающего меню */
+.tab-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: flex;
+    gap: 5px;
+    padding: 5px;
+
+    width: 250px; /* Фиксированная ширина меню */
+    flex-direction: row; /* Изменено на row */
+    flex-wrap: wrap; /* Добавлено для переноса строк */
+}
+
+
+.tab-menu button {
+    background-color: #f9f9f9;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.tab-menu button:hover {
+    background-color: #e0e0e0;
 }
 
 .hidden {
     display: none;
 }
 
-/* Текстовый модуль */
-textarea, input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 14px;
-}
-
-.editor {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-textarea {
-    flex: 1;
-    height: 150px;
-    resize: none;
-}
-
-#katex-output {
-    flex: 1;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
-}
-
-/* Визуальный модуль */
-.visual-container {
-    margin: 20px 0;
-    text-align: center;
-}
-
-canvas {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    width: 100%;
-    height: 300px;
-}
-
-/* Вопросник */
-textarea#questionnaire-input {
-    height: 150px;
-}
-
-.preview {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-/* Кнопки действий */
-button {
-    background-color: #1d4ed8;
+.tabs button {
+    background-color: #7a87fb;
     color: white;
     border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
+    padding: 10px 20px;
     cursor: pointer;
     font-size: 14px;
+    border-radius: 4px;
     transition: background-color 0.3s ease;
 }
 
-button:hover {
-    background-color: #2563eb;
+.tabs button:hover {
+    background-color: #7a87fb;
 }
+
+/* Редактор и вывод */
+.editor {
+    width: 100%;
+    /*display: flex;*/
+
+    height: 70vh; /* Фиксированная высота */
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Две равные колонки */
+    gap: 20px;
+}
+
+.textarea, .output {
+    /*flex: 1;*/
+    height: 100%;
+    overflow: auto; /* Добавить скролл при переполнении */
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 4px;
+    box-sizing: border-box; /* Учитываем padding в ширине */
+}
+
+textarea {
+    height: 100%;
+    width: 100%;
+    resize: none; /* Отключить изменение размера */
+}
+
+.output {
+    overflow-x: hidden; /* Скрываем горизонтальную прокрутку */
+    overflow-y: auto; /* Оставляем вертикальную прокрутку */
+    word-wrap: break-word; /* Перенос слов на следующую строку */
+    white-space: pre-wrap; /* Сохраняем пробелы и переносы, но переносим текст */
+}
+
+
+#katex-output {
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+    width: 100%; /* Занимает всю ширину родительского контейнера */
+    overflow-x: hidden; /* Скрываем горизонтальную прокрутку */
+    word-wrap: break-word; /* Перенос слов на следующую строку */
+    white-space: pre-wrap; /* Сохраняем пробелы и переносы, но переносим текст */
+}
+
+/* Кнопка "Назад" */
+button[onclick*="hideContent"] {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+
+button[onclick*="hideContent"]:hover {
+    background-color: #e53935;
+}
+
+.upload-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 5px;
+}
+
+.upload-menu button {
+    background: linear-gradient(to right, #7a87fb, #67d3ff); /* Градиент для основного контента */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    text-align: left;
+}
+
+.upload-menu button:hover {
+    background-color: #95cef6;
+}
+
+.hidden {
+    display: none;
+}
+
