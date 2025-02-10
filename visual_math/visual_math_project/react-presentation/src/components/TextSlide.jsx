@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 
-const TextSlide = ({ content, onChange, onImageUpload }) => {
+const TextSlide = ({ content, onChange, onImageUpload, slideId }) => {
     const [texInput, setTexInput] = useState(content || '');
 
     const handleImageUpload = (e) => {
@@ -16,10 +16,9 @@ const TextSlide = ({ content, onChange, onImageUpload }) => {
         }
     };
 
-
     return (
         <div>
-            <h2>Текстовый слайд</h2>
+            <h2>Слайд {slideId + 1} - текстовый</h2> {/* Здесь отображаем ID слайда */}
             <textarea
                 value={texInput}
                 onChange={(e) => {

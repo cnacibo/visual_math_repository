@@ -113,12 +113,13 @@
                                 {{ reg_form.password2.errors|striptags }}
                             </div>
                         {% endif %}
+
                      </div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
-                           {{ reg_form.role }}  <!-- Добавляем поле для выбора роли -->
-                        </div>
+
                      <button type="submit" class="send reg" name='register'>Зарегистрироваться</button>
+                     <div class="button-container">
+                        <button  onclick="IsTeacher()"  class="link-button" >Вы преподаватель?</button>
+                     </div>
                  </form>
             </div>
         </div>

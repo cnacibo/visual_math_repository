@@ -57,10 +57,15 @@
                     <li><p>В этом разделе отображается основная информация о пользователе: статус (например, "Преподаватель"), имя пользователя, email и другие данные.</p></li>
                     <li><p>Предоставляется возможность редактировать данные аккаунта (например, изменить имя, email или пароль) или удалить акакунт.</p></li>
                </ul>
-                <h3>Библиотека лекций</h3>
+                {% if user.role == 'teacher' %}
+                <h3>Модули</h3>
                 <ul>
                     <li><p>Данный раздел доступен только преподавателям для создания учебных модулей (конкретно изучаемой области математики)</p></li>
                     <li><p>Преподаватель может структурировать материал, добавлять новые лекции, редактировать, удалять существующие.</p></li>
+               </ul>
+                 {% endif %}
+                <h3>Библиотека лекций</h3>
+                <ul>
                     <li><p>В этом разделе хранятся все созданные преподавателем лекции.</p></li>
                     <li><p>Возможна сортировка по названию лекции / по модулю лекции.</p></li>
                </ul>
@@ -70,6 +75,12 @@
         <div id="library-content" class="hidden">
             <section>
                 <h2 id="section2">Библиотека лекций</h2>
+                <div id="nav-presentation">
+                    <button class = "close" onclick="closeModule()">Назад</button>
+                    {% if user.role == 'teacher' %}
+                        <a href = "/presentations/new/"><button class = "close" >Создать лекцию</button></a>
+                    {% endif %}
+                </div>
                 <label for="subject">Выберите предмет:</label>
                 <select id="subject" onchange="filterBySubject()">
                     <option value="">-- Выберите предмет --</option>
@@ -79,12 +90,13 @@
                 </select>
 
                 <div id="presentations-container">
-                    {% if user.presentations.exists %}
-                        {% for el in user.presentations.all %}
+                    {% if presentations %}
+                        {% for el in presentations %}
                             <div class="presentation-card" data-subject="{{ el.subject }}">
                                 <h3>{{ el.title }}</h3>
                                 <p><strong>Предмет:</strong> {{ el.get_subject_display }}</p>
                                 <p><strong>Дата создания:</strong> {{ el.created_at|date:"d.m.Y H:i" }}</p>
+                                <button  onclick="deleteLecture({{ el.id }})"  class="link-button" >Удалить лекцию</button>
                             </div>
                         {% endfor %}
                     {% else %}
@@ -95,10 +107,6 @@
                 <div id="math-analysis" class="lecture-list" style="display: none;"></div>
                 <div id="algebra" class="lecture-list" style="display: none;"></div>
                 <div id="discrete-math" class="lecture-list" style="display: none;"></div>
-                <button class = "close" onclick="closeModule()">Назад</button>
-                {% if user.role == 'teacher' %}
-                    <a href = "/presentations/new/"><button class = "close" >Создать лекцию</button></a>
-                {% endif %}
 
             </section>
         </div>

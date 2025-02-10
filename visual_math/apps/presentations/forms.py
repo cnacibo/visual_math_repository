@@ -9,7 +9,7 @@ class PresentationForm(forms.ModelForm):
 class SlideForm(forms.ModelForm):
     class Meta:
         model = Slide
-        fields = ['content', 'order']
+        fields = ['content']
 
 
 class CreatePresentationForm(forms.ModelForm):

@@ -45,7 +45,8 @@ def register(request):
 
 @login_required
 def home(request):
-    return render(request, 'users/home.html', {'user': request.user})
+    presentations = request.user.presentations.all().order_by('-created_at')  # Сортируем по убыванию
+    return render(request, 'users/home.html', {'user': request.user, 'presentations': presentations})
 
 
 @login_required
@@ -153,3 +154,4 @@ def reset_password(request):
         form = PasswordResetForm()
 
     return render(request, 'users/password_reset_form.html', {'form': form})
+

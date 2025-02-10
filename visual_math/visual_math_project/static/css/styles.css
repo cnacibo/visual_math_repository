@@ -38,16 +38,22 @@ span:nth-child(3) {
         opacity: 1;
     }
 }
-body {
-    background: #f4f4f9;
-    color: #333;
-}
+
 main {
     display: flex;
     justify-content: space-between;
     padding: 2rem;
+    position: relative;
+    flex-grow: 1;
 }
-
+body {
+    background: #f4f4f9;
+    color: #333;
+    position: relative;
+    height: 100vh;
+    display: flex;
+    flex-direction: column; /* Вертикальный стек */
+}
 article {
     margin-bottom: 1rem;
     padding: 1.5rem;
@@ -198,3 +204,74 @@ input.form-control:focus {
 }
 
 
+footer {
+    background: #007BFF; /* Тёмный фон */
+    color: white; /* Светлый текст */
+    padding: 10px 0 10px 0; /* Отступы сверху и снизу */
+    text-align: left; /* Выравнивание текста по центру */
+    height: 80px;
+    /*border-top: 4px solid #8CBA80;  Верхняя граница футера */
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    position: relative;
+}
+
+/* Стили для контейнера внутри футера */
+footer .wrapper {
+    max-width: 1200px; /* Максимальная ширина контейнера */
+    margin: 0 10px; /* Центрирование контейнера */
+    padding: 0 10px; /* Отступы слева и справа */
+}
+
+/* Стили для заголовка футера */
+footer .title {
+    margin-top: 5px;
+    font-size: 1rem; /* Размер шрифта */
+    font-weight: bold; /* Жирный шрифт */
+    margin-bottom: 1rem; /* Отступ снизу */
+    color: white; /* Синий цвет заголовка */
+    text-transform: uppercase; /* Заглавные буквы */
+}
+
+/* Стили для текста внутри футера */
+footer .textwidget p {
+    font-size: 1rem; /* Размер шрифта */
+    margin: 0.5rem 0; /* Отступы между строками */
+    line-height: 1.2; /* Межстрочный интервал */
+}
+
+footer .textwidget b {
+    color: black;
+}
+
+/* Стили для ссылок (если они появятся) */
+footer a {
+    color: #3498db; /* Синий цвет ссылок */
+    text-decoration: none; /* Убираем подчёркивание */
+    transition: color 0.3s ease; /* Плавное изменение цвета */
+}
+
+footer a:hover {
+    color: #1abc9c; /* Цвет ссылки при наведении */
+}
+
+.button-container {
+    display: flex;          /* Делаем контейнер гибким */
+    justify-content: flex-end; /* Выровнять содержимое вправо */
+    margin-top: 10px;       /* Добавить отступ сверху */
+}
+
+.link-button {
+    all: unset;             /* Убирает все стандартные стили кнопки */
+    font-size: 0.9em;       /* Устанавливает меньший размер шрифта */
+    color: #808080;         /* Устанавливает серый цвет текста */
+    cursor: pointer;        /* Делаем кнопку кликабельной */
+    display: block;         /* Размещает кнопку как блочный элемент */
+    text-align: right;      /* Выровнять текст по правому краю */
+    margin-top: 10px;       /* Добавляет отступ сверху */
+
+}
+
+.link-button:hover {
+    color: #555555;         /* Меняет цвет при наведении */
+}

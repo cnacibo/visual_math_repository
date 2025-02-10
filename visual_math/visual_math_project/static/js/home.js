@@ -144,27 +144,7 @@ function addLecture() {
 }
 
 // Удаление лекции
-function deleteLecture() {
-    const lectureSelect = document.getElementById("lecture-search");
-    const selectedUrl = lectureSelect.value;
 
-    if (selectedUrl) {
-        let lectures = JSON.parse(localStorage.getItem("lectures")) || [];
-
-        // Фильтруем лекции, оставляя все, кроме выбранной
-        lectures = lectures.filter(lecture => lecture.url !== selectedUrl);
-
-        // Сохраняем обновленный список лекций
-        localStorage.setItem("lectures", JSON.stringify(lectures));
-
-        // Обновляем список лекций
-        loadLectures();
-
-        alert("Лекция успешно удалена!");
-    } else {
-        alert("Пожалуйста, выберите лекцию для удаления.");
-    }
-}
 
 // Загрузка лекций при загрузке страницы
 document.addEventListener('DOMContentLoaded', loadLectures);
@@ -205,4 +185,54 @@ function filterBySubject() {
                 card.style.display = 'none';
             }
         });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Если нашли cookie с нужным именем
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+async function deleteLecture(presentationId) {
+    if (!presentationId) {
+        alert("Не указан ID презентации.");
+        return;
+    }
+
+    if (!confirm("Вы уверены, что хотите удалить презентацию?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch("/presentations/delete-presentation/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken"),
+            },
+            body: JSON.stringify({ id: presentationId }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert("Презентация успешно удалена!");
+            location.reload(); // Обновляем страницу
+        } else {
+            alert("Ошибка удаления: " + result.error);
+        }
+    } catch (error) {
+        console.error("Ошибка:", error);
+        alert("Не удалось удалить презентацию. Проверьте соединение с сервером.");
+    }
 }

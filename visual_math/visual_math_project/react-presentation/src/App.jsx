@@ -12,7 +12,7 @@ const App = () => {
     const [isSlideShowActive, setIsSlideShowActive] = useState(false); // Состояние для режима презентации
 
     const handleAddSlide = () => {
-        const newSlide = { type: null, content: '', image: null };
+        const newSlide = { id: Date.now(), type: null, content: '', image: null }; // добавляем id слайда
         setSlides([...slides, newSlide]);
         setSelectedSlideIndex(slides.length);
     };
@@ -47,7 +47,7 @@ const App = () => {
         const selectedSlide = slides[selectedSlideIndex];
 
         if (!selectedSlide.type) {
-            return <SlideTypeSelector onSelect={handleSlideTypeSelect} />;
+            return <SlideTypeSelector onSelect={handleSlideTypeSelect} selectedSlideIndex={selectedSlideIndex} />;
         }
 
         switch (selectedSlide.type) {
@@ -61,6 +61,7 @@ const App = () => {
                             setSlides(updatedSlides);
                         }}
                         onImageUpload={(image) => handleImageUpload(selectedSlideIndex, image)}
+                        slideId={selectedSlideIndex} // Передаем ID слайда в TextSlide
                     />
                 );
             case 'test':
