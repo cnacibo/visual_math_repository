@@ -11,11 +11,12 @@ const introduction = "<div style=\"display: flex; align-items: center; font-fami
     "Вы сможете участвовать в интерактивных лекциях, выполнять проверочные задания и тесты, чтобы " +
     "закрепить пройденное и оценить свой прогресс.";
 
-const footer = "<span style='color: red; font-weight: bold; font-size: 25px'>!</span>При " +
-    "регистрации не забудьте обязательно указать свой статус: <br> - Студент <br>- Преподаватель"
+const footer = "<span style='color: red; font-weight: bold; font-size: 28px'>!</span>  При " +
+    "регистрации пользователю автоматически присваивается статус <span style='font-weight: bold; font-size: 20px'>Студент</span>." +
+    "<br>Если хотите получить статус преподавателя, нажмите на кнопку <span style='font-weight: bold; font-size: 20px'>Вы преподаватель?</span>"
 
 document.getElementById("introduction-text").innerHTML = introduction;
-document.getElementById("footer").textContent = footer;
+document.getElementById("footer").innerHTML = footer;
 
 
 
@@ -48,3 +49,12 @@ document.querySelector('.signup-box').addEventListener('submit', function (e) {
         alert('Пожалуйста, выберите ваш статус!');
     }
 });
+
+function IsTeacher() {
+    alert(
+        "Пожалуйста, напишите на нашу почту: visualmathproject2024@gmail.com\n\n" +
+        "Не забудьте указать:\n" +
+        "- Ваше ФИО и название ВУЗа.\n" +
+        "- Имя пользователя аккаунта."
+    );
+}

@@ -437,3 +437,11 @@ footer a:hover {
     font-size: 14px;
     color: #666;
 }
+
+
+#nav-presentation{
+    display: flex;
+    justify-content: flex-end;  /* Выравнивание содержимого вправо */
+    gap: 10px;  /* Отступ между кнопками, можно настроить по желанию */
+    margin-bottom: 10px;
+}

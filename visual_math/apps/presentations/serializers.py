@@ -4,11 +4,11 @@ from .models import Presentation, Slide
 class SlideSerializer(serializers.ModelSerializer):
     class Meta:
         model = Slide
-        fields = ['id', 'content', 'order', 'presentation']
+        fields = ['id', 'slide_type', 'content', 'image']
 
 class PresentationSerializer(serializers.ModelSerializer):
-    slides = SlideSerializer(many=True, read_only=True)
+    slides = SlideSerializer(many=True)
 
     class Meta:
         model = Presentation
-        fields = ['id', 'title', 'user', 'slides']
+        fields = ['id', 'title', 'subject', 'slides']

@@ -7,12 +7,11 @@ from .serializers import PresentationSerializer, SlideSerializer
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 # Просмотр всех презентаций
-def presentation_list(request):
-    presentations = Presentation.objects.all()
-    return render(request, 'presentations/list.html', {'presentations': presentations})
 
 def create_new(request):
     if request.method == 'POST':
@@ -28,36 +27,16 @@ def create_new(request):
 
 # Создание новой презентации
 def create_presentation(request, presentation_id):
-    if request.method == 'POST':
-        form = PresentationForm(request.POST)
-        if form.is_valid():
-            presentation = form.save(commit=False)
-            presentation.user = request.user
-            presentation.save()
-            return redirect('presentation_detail')
-    else:
-        form = PresentationForm()
-    return render(request, 'presentations/create_presentation.html', {'form': form})
-
-# Детали презентации
-def presentation_detail(request, presentation_id):
-    presentation = get_object_or_404(Presentation, id=presentation_id)
-    slides = presentation.slides.all().order_by('order')
-    return render(request, 'presentations/presentation_detail.html', {'presentation': presentation, 'slides': slides})
-
-# Добавление слайда
-def add_slide(request, presentation_id):
-    presentation = get_object_or_404(Presentation, id=presentation_id)
-    if request.method == 'POST':
-        form = SlideForm(request.POST)
-        if form.is_valid():
-            slide = form.save(commit=False)
-            slide.presentation = presentation
-            slide.save()
-            return redirect('presentation_detail', presentation_id=presentation.id)
-    else:
-        form = SlideForm()
-    return render(request, 'presentations/add_slide.html', {'form': form, 'presentation': presentation})
+    presentation = Presentation.objects.get(id=presentation_id)
+    subject = presentation.subject
+    title = presentation.title
+    creation_date = presentation.created_at.strftime("%Y-%m-%d %H:%M:%S")
+    return render(request, 'presentations/create_presentation.html', {
+        'presentation_id': presentation_id,
+        'subject': subject,
+        'title': title,
+        'creation_date': creation_date,
+    })
 
 class PresentationViewSet(viewsets.ModelViewSet):
     queryset = Presentation.objects.all()
@@ -66,33 +45,6 @@ class PresentationViewSet(viewsets.ModelViewSet):
 class SlideViewSet(viewsets.ModelViewSet):
     queryset = Slide.objects.all()
     serializer_class = SlideSerializer
-
-def editor_view(request, presentation_id):
-    return render(request, 'presentations/editor.html', {'presentation_id': presentation_id})
-
-@csrf_exempt  # Отключает проверку CSRF для примера, не используйте в продакшене без осторожности!
-def slides_view(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            slide = Slide.objects.create(
-                presentation_id=data['presentation'],
-                order=data['order'],
-                content=data['content']
-            )
-            return JsonResponse({"status": "success", "slide_id": slide.id})
-        except json.JSONDecodeError:
-            return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
-    elif request.method == 'GET':
-        # Пример загрузки слайда с ID 1
-        try:
-            slide = Slide.objects.get(id=1)  # Замените на реальный ID
-            return JsonResponse({"content": slide.content})
-        except Slide.DoesNotExist:
-            return JsonResponse({"status": "error", "message": "Slide not found"}, status=404)
-    else:
-        return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
-
 
 @csrf_exempt
 def save_presentation(request):
@@ -117,3 +69,38 @@ def save_presentation(request):
             return JsonResponse({"success": False, "error": str(e)})
     else:
         return JsonResponse({"success": False, "error": "Invalid request method."})
+
+
+@csrf_exempt
+def delete_presentation(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            presentation_id = data.get("id")
+
+            if not presentation_id:
+                return JsonResponse({"success": False, "error": "Не указан ID презентации."}, status=400)
+
+            # Ищем презентацию, но только ту, что принадлежит пользователю
+            presentation = get_object_or_404(Presentation, id=presentation_id, creator=request.user)
+
+            # Удаляем презентацию
+            presentation.delete()
+
+            return JsonResponse({"success": True, "message": "Презентация успешно удалена."})
+
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "Ошибка в данных JSON."}, status=400)
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    return JsonResponse({"success": False, "error": "Неверный метод запроса."}, status=405)
+
+
+class PresentationView(APIView):
+    def post(self, request):
+        serializer = PresentationSerializer(data=request.data)
+        if serializer.is_valid():
+            presentation = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

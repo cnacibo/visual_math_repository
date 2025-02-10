@@ -20,21 +20,12 @@ class Presentation(models.Model):
         return self.title
 
 class Slide(models.Model):
-    TYPES = [
-        ('text', 'Text'),
-        ('image', 'Image'),
-        ('video', 'Video'),
-        ('graph', 'Graph'),
-    ]
-
-    presentation = models.ForeignKey(Presentation, on_delete=models.CASCADE, related_name='slides')  # Ссылка на презентацию
-    type = models.CharField(max_length=20, choices=TYPES, default= "text")  # Тип слайда (текст, изображение и т. д.)
-    content = models.JSONField(default=dict)  # Содержимое слайда, например, текст или путь к изображению. Для гибкости используем JSON.
-    position = models.JSONField(default=dict)  # Позиция и размер элементов на слайде (например, {'x': 100, 'y': 200, 'width': 400, 'height': 300})
-    created_at = models.DateTimeField(default=datetime.datetime.now)  # Дата создания слайда
-    updated_at = models.DateTimeField(default=datetime.datetime.now)  # Дата последнего обновления слайда
-    order = models.IntegerField(default=0)  # Порядок слайдов в презентации
-    # image = models.ImageField(upload_to='slides/images/', null=True, blank=True)
+    presentation = models.ForeignKey(Presentation, on_delete=models.CASCADE, related_name='slides')
+    slide_type = models.CharField(max_length=50,
+                                  choices=[('text', 'Текстовый'), ('test', 'Проверочный'), ('questionnaire', 'Вопросник')],
+                                  default='text')
+    content = models.TextField(blank=True)
+    image = models.ImageField(upload_to='slides/', null=True, blank=True)
 
     def __str__(self):
-        return f"Slide {self.id} of {self.presentation.title}"
+        return self.id
