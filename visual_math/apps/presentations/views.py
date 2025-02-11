@@ -26,17 +26,12 @@ def create_new(request):
     return render(request, 'presentations/create_new.html', {'form': form})
 
 # Создание новой презентации
-def create_presentation(request, presentation_id):
-    presentation = Presentation.objects.get(id=presentation_id)
-    subject = presentation.subject
-    title = presentation.title
-    creation_date = presentation.created_at.strftime("%Y-%m-%d %H:%M:%S")
-    return render(request, 'presentations/create_presentation.html', {
-        'presentation_id': presentation_id,
-        'subject': subject,
-        'title': title,
-        'creation_date': creation_date,
-    })
+def create_presentation(request):
+    # presentation = Presentation.objects.get(id=presentation_id)
+    # subject = presentation.subject
+    # title = presentation.title
+    # creation_date = presentation.created_at.strftime("%Y-%m-%d %H:%M:%S")
+    return render(request, 'presentations/create_presentation.html')
 
 class PresentationViewSet(viewsets.ModelViewSet):
     queryset = Presentation.objects.all()
@@ -46,30 +41,33 @@ class SlideViewSet(viewsets.ModelViewSet):
     queryset = Slide.objects.all()
     serializer_class = SlideSerializer
 
-@csrf_exempt
+@csrf_exempt  # Временно отключаем CSRF для тестов
 def save_presentation(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         try:
             data = json.loads(request.body)
+            title = data.get('title')
+            subject = data.get('subject')
+            slides = data.get('slides', [])
 
-            # Создаем новую или обновляем существующую презентацию
-            presentation_id = data.get("id")
-            if presentation_id:
-                presentation = Presentation.objects.get(id=presentation_id)
-            else:
-                presentation = Presentation(creator=request.user)
+            if not title or not subject:
+                return JsonResponse({'error': 'Название и предмет обязательны'}, status=400)
 
-            presentation.title = data["title"]
-            presentation.subject = data.get("subject", presentation.subject)
-            presentation.data = data.get("data", presentation.data)
-            presentation.save()
+            presentation = Presentation.objects.create(title=title, subject=subject)
 
-            return JsonResponse({"success": True, "id": presentation.id})
+            for slide in slides:
+                Slide.objects.create(
+                    presentation=presentation,
+                    slide_type=slide.get('slide_type', 'text'),
+                    content=slide.get('content', '')
+                )
+
+            return JsonResponse({'message': 'Презентация сохранена'}, status=201)
+
         except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
-    else:
-        return JsonResponse({"success": False, "error": "Invalid request method."})
+            return JsonResponse({'error': str(e)}, status=500)
 
+    return JsonResponse({'error': 'Метод не разрешен'}, status=405)  # Обработка неверного метода
 
 @csrf_exempt
 def delete_presentation(request):
