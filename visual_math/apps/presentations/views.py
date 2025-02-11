@@ -53,13 +53,17 @@ def save_presentation(request):
             if not title or not subject:
                 return JsonResponse({'error': 'Название и предмет обязательны'}, status=400)
 
-            presentation = Presentation.objects.create(title=title, subject=subject)
+            # Создаем новую презентацию
+            presentation = Presentation.objects.create(title=title, subject=subject, creator_id=request.user.id)
 
-            for slide in slides:
+            # Добавляем слайды с правильной нумерацией
+            for index, slide in enumerate(slides, start=1):  # start=1 чтобы номера шли от 1
                 Slide.objects.create(
                     presentation=presentation,
+                    slide_number=index,  # Присваиваем правильный номер
                     slide_type=slide.get('slide_type', 'text'),
-                    content=slide.get('content', '')
+                    content=slide.get('content', ''),
+                    image=slide.get('image', None)
                 )
 
             return JsonResponse({'message': 'Презентация сохранена'}, status=201)
@@ -67,8 +71,7 @@ def save_presentation(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
-    return JsonResponse({'error': 'Метод не разрешен'}, status=405)  # Обработка неверного метода
-
+    return JsonResponse({'error': 'Метод не разрешен'}, status=405)
 @csrf_exempt
 def delete_presentation(request):
     if request.method == "POST":

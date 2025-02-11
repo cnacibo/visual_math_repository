@@ -31,6 +31,7 @@ const App = () => {
         setSlides(updatedSlides);
     };
 
+
     const handleSelectSlide = (index) => {
         setSelectedSlideIndex(index);
     };
