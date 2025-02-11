@@ -31,6 +31,7 @@ const App = () => {
         setSlides(updatedSlides);
     };
 
+
     const handleSelectSlide = (index) => {
         setSelectedSlideIndex(index);
     };
@@ -72,6 +73,8 @@ const App = () => {
                 return null;
         }
     };
+
+
 
     return (
         <div style={{ display: 'flex' }}>

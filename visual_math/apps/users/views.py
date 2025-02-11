@@ -20,6 +20,7 @@ def register(request):
             reg_form = CustomUserCreationForm(request.POST)
             if reg_form.is_valid():
                 user = reg_form.save()
+                user.role = 'student'
                 login(request, user)  # Авторизуем пользователя сразу после регистрации
                 return redirect('home')  # Перенаправляем на главную страницу
             else:

@@ -26,6 +26,7 @@ class Slide(models.Model):
                                   default='text')
     content = models.TextField(blank=True)
     image = models.ImageField(upload_to='slides/', null=True, blank=True)
+    slide_number = models.PositiveIntegerField(editable=False, default=0)
 
     def __str__(self):
         return self.id
