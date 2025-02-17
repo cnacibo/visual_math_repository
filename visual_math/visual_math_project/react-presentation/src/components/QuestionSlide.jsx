@@ -113,7 +113,7 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
 
       {questionData.answers.map((answer, index) => (
         <div key={index}>
-          <input
+          <inputs
             type={isMultiple ? 'checkbox' : 'radio'}
             name="answer"
             value={answer}

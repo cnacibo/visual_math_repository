@@ -44,9 +44,9 @@ const App = () => {
         setSelectedSlideIndex(index);
     };
 
-    const handleImageUpload = (index, image) => {
+    const handleImageUpload = (index, imageUrl) => {
         const updatedSlides = [...slides];
-        updatedSlides[index].image = image;
+        updatedSlides[index].image = imageUrl;  // Сохраняем URL изображения
         setSlides(updatedSlides);
     };
 

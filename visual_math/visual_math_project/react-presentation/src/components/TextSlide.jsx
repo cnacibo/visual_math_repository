@@ -8,13 +8,27 @@ const TextSlide = ({ content, onChange, onImageUpload, slideId }) => {
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                onImageUpload(reader.result); // Передаем изображение в App
-            };
-            reader.readAsDataURL(file);
+            const formData = new FormData();
+            formData.append("image", file);
+            // Отправьте изображение на сервер
+            fetch("/presentations/upload-image/", {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.imageUrl) {
+                    onImageUpload(data.imageUrl);  // Передаем URL изображения
+                } else {
+                    alert('Ошибка загрузки изображения');
+                }
+            })
+            .catch(error => {
+                console.error("Ошибка загрузки изображения:", error);
+            });
         }
     };
+
 
     return (
         <div>

@@ -65,7 +65,7 @@ const SlideShow = ({ slides, onClose }) => {
                 {slides[currentSlideIndex]?.type === 'text' && (
                     <div className="text-slide">
                         <BlockMath>{slides[currentSlideIndex].content}</BlockMath>
-                        {slides[currentSlideIndex].image && (
+                        {slides[currentSlideIndex]?.image && (
                             <img
                                 src={slides[currentSlideIndex].image}
                                 alt="Иллюстрация"
