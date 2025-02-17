@@ -3,6 +3,8 @@ import SlideTypeSelector from './components/SlideTypeSelector';
 import TextSlide from './components/TextSlide';
 import SlideList from './components/SlideList';
 import SlideShow from './components/SlideShow';
+import QuestionSlide from './components/QuestionSlide';
+import CheckBlock from './components/CheckBlock';
 import './App.css';
 import './index.css';
 
@@ -12,7 +14,14 @@ const App = () => {
     const [isSlideShowActive, setIsSlideShowActive] = useState(false); // Состояние для режима презентации
 
     const handleAddSlide = () => {
-        const newSlide = { id: Date.now(), type: null, content: '', image: null }; // добавляем id слайда
+        const newSlide = {
+            id: Date.now(),
+            type: null,
+            content: '',
+            image: null,
+            questions: [],
+            answers: []
+        }; // добавляем id слайда
         setSlides([...slides, newSlide]);
         setSelectedSlideIndex(slides.length);
     };
@@ -66,9 +75,26 @@ const App = () => {
                     />
                 );
             case 'test':
-                return <div style={{ border: 'red' }}>Проверочный слайд (в разработке)</div>;
+                return <CheckBlock />;
             case 'questionnaire':
-                return <div>Вопросник (в разработке)</div>;
+                return (
+                    <QuestionSlide
+                        content={selectedSlide.content}
+                        questions={selectedSlide.questions}
+                        answers={selectedSlide.answers}
+                        onChange={(field, value) => {
+                            const updatedSlides = [...slides];
+                            const slide = updatedSlides[selectedSlideIndex];
+                            if (field === 'question'){
+                                slide.questions = [value];
+                            } else if (field === 'answers') {
+                                slide.answers = value;
+                            }
+                            setSlides(updatedSlides);
+                        }}
+                        slideId={selectedSlideIndex}
+                    />
+                );
             default:
                 return null;
         }

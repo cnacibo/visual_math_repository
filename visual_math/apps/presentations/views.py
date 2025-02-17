@@ -63,6 +63,8 @@ def save_presentation(request):
                     slide_number=index,  # Присваиваем правильный номер
                     slide_type=slide.get('slide_type', 'text'),
                     content=slide.get('content', ''),
+                    questions=slide.get('questions'),
+                    answers=slide.get('answers'),
                     image=slide.get('image', None)
                 )
 

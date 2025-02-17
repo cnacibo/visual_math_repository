@@ -28,5 +28,8 @@ class Slide(models.Model):
     image = models.ImageField(upload_to='slides/', null=True, blank=True)
     slide_number = models.PositiveIntegerField(editable=False, default=0)
 
+    questions = models.JSONField(default=list, blank=True)  # List of questions (text)
+    answers = models.JSONField(default=list, blank=True)  # List of answers (text)
+
     def __str__(self):
         return self.id
