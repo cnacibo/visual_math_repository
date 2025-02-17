@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 
-const QuestionSlide = ({ content, onChange, onImageUpload, slideId }) => {
-  const [question, setQuestion] = useState(content || ''); // Хранит сам вопрос
-  const [answers, setAnswers] = useState(['']); // Хранит ответы
+const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
+  const [questionData, setQuestionData] = useState({
+    question: content || '',
+    answers: [''], // Начальный массив ответов
+  });
   const [isMultiple, setIsMultiple] = useState(false); // Для чекбоксов (множество правильных ответов)
 
   const handleQuestionImageUpload = (e) => {
@@ -23,27 +25,46 @@ const QuestionSlide = ({ content, onChange, onImageUpload, slideId }) => {
     if (file) {
         const reader = new FileReader();
         reader.onloadend = () => {
-            onImageUpload(reader.result, 'answer-${index}'); // Передаем изображение для конкретного ответа
+            onImageUpload(reader.result, `answer-${index}`); // Передаем изображение для конкретного ответа
         };
         reader.readAsDataURL(file);
     }
   };
 
   const handleQuestionChange = (e) => {
-    const newQuestion = e.target.value;
-    setQuestion(newQuestion);
-    onChange('question', newQuestion);
+    const updatedQuestion = e.target.value;
+    setQuestionData((prev) => ({
+      ...prev,
+      question: updatedQuestion,
+    }));
+    onChange('questionData', {
+      ...questionData,
+      question: updatedQuestion,
+    });
   };
 
   const handleAnswerChange = (index, e) => {
-    const newAnswers = [...answers];
-    newAnswers[index] = e.target.value;
-    setAnswers(newAnswers);
-    onChange('answers', newAnswers);
+    const updatedAnswers = [...questionData.answers];
+    updatedAnswers[index] = e.target.value;
+
+    // Обновляем объект состояния
+    setQuestionData((prev) => ({
+      ...prev,
+      answers: updatedAnswers,
+    }));
+
+    // Сообщаем об изменении родительскому компоненту
+    onChange('questionData', {
+      ...questionData,
+      answers: updatedAnswers,
+    });
   };
 
   const addAnswerField = () => {
-    setAnswers([...answers, '']); // Добавляем новое поле для ответа
+    setQuestionData((prev) => ({
+      ...prev,
+      answers: [...prev.answers, ''], // Добавляем новое поле для ответа
+    }));
   };
 
   const handleAnswerTypeChange = (e) => {
@@ -54,13 +75,13 @@ const QuestionSlide = ({ content, onChange, onImageUpload, slideId }) => {
     <div>
       <h2>Слайд {slideId + 1} - вопрос</h2> {/* Здесь отображаем ID слайда */}
       <textarea
-        value={question}
+        value={questionData.question}
         onChange={handleQuestionChange}
         placeholder="Введите TeX код..."
       />
       <div>
       <h3>Предпросмотр вопроса:</h3>
-        <BlockMath>{question}</BlockMath>
+        <BlockMath>{questionData.question || ''}</BlockMath>
       </div>
 
       {/* Загрузка изображения для вопроса */}
@@ -90,7 +111,7 @@ const QuestionSlide = ({ content, onChange, onImageUpload, slideId }) => {
         </label>
       </div>
 
-      {answers.map((answer, index) => (
+      {questionData.answers.map((answer, index) => (
         <div key={index}>
           <input
             type={isMultiple ? 'checkbox' : 'radio'}

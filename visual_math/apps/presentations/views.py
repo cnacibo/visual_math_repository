@@ -58,13 +58,19 @@ def save_presentation(request):
 
             # Добавляем слайды с правильной нумерацией
             for index, slide in enumerate(slides, start=1):  # start=1 чтобы номера шли от 1
+                questions_data = slide.get('questions', [])
+
+                if questions_data:
+                    questions_data = questions_data
+                else:
+                    questions_data = []
+
                 Slide.objects.create(
                     presentation=presentation,
                     slide_number=index,  # Присваиваем правильный номер
-                    slide_type=slide.get('slide_type', 'text'),
+                    slide_type=slide.get('type', 'text'),
                     content=slide.get('content', ''),
-                    questions=slide.get('questions'),
-                    answers=slide.get('answers'),
+                    questions=questions_data,  # Сохраняем вопросы
                     image=slide.get('image', None)
                 )
 

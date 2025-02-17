@@ -19,8 +19,7 @@ const App = () => {
             type: null,
             content: '',
             image: null,
-            questions: [],
-            answers: []
+            questions: []
         }; // добавляем id слайда
         setSlides([...slides, newSlide]);
         setSelectedSlideIndex(slides.length);
@@ -65,6 +64,7 @@ const App = () => {
                 return (
                     <TextSlide
                         content={selectedSlide.content}
+                        questions={selectedSlide.questions}
                         onChange={(content) => {
                             const updatedSlides = [...slides];
                             updatedSlides[selectedSlideIndex].content = content;
@@ -75,21 +75,26 @@ const App = () => {
                     />
                 );
             case 'test':
-                return <CheckBlock />;
+                return (
+                    <CheckBlock
+                        questions={selectedSlide.questions}  // Передаем вопросы из слайда типа "test"
+                        onChange={(field, updatedQuestions) => {
+                            const updatedSlides = [...slides];
+                            updatedSlides[selectedSlideIndex].questions = updatedQuestions;  // Обновляем вопросы слайда
+                            setSlides(updatedSlides);
+                        }}
+                        slideId={selectedSlideIndex}  // Передаем ID слайда в CheckBlock
+                    />
+                );
             case 'questionnaire':
                 return (
                     <QuestionSlide
                         content={selectedSlide.content}
                         questions={selectedSlide.questions}
-                        answers={selectedSlide.answers}
                         onChange={(field, value) => {
                             const updatedSlides = [...slides];
                             const slide = updatedSlides[selectedSlideIndex];
-                            if (field === 'question'){
-                                slide.questions = [value];
-                            } else if (field === 'answers') {
-                                slide.answers = value;
-                            }
+                            slide.questions = value;
                             setSlides(updatedSlides);
                         }}
                         slideId={selectedSlideIndex}
