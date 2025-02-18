@@ -6,30 +6,48 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
   const [questionData, setQuestionData] = useState({
     question: content || '',
     answers: [{ text: '', isCorrect: false }], // Начальный массив ответов
+    questionImageUrl: '',
   });
   const [isMultiple, setIsMultiple] = useState(false); // Для чекбоксов (множество правильных ответов)
 
   const handleQuestionImageUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            onImageUpload(reader.result, 'question'); // Передаем изображение для вопроса
-        };
-        reader.readAsDataURL(file);
-    }
+        if (file) {
+            const formData = new FormData();
+            formData.append("image", file);
+            // Отправьте изображение на сервер
+            fetch("/presentations/upload-image/", {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.imageUrl) {
+                    setQuestionData((prev) => ({
+                      ...prev,
+                      questionImageUrl: data.imageUrl, // Сохраняем URL изображения
+                    }));
+                    onImageUpload(data.imageUrl, 'question'); // Передаем URL родительскому компоненту
+                } else {
+                    alert("Ошибка загрузки изображения");
+                }
+            })
+            .catch(error => {
+                console.error("Ошибка загрузки изображения:", error);
+            });
+        }
   };
 
-  const handleAnswerImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            onImageUpload(reader.result, `answer-${index}`); // Передаем изображение для конкретного ответа
-        };
-        reader.readAsDataURL(file);
-    }
-  };
+  // const handleAnswerImageUpload = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //       const reader = new FileReader();
+  //       reader.onloadend = () => {
+  //           onImageUpload(reader.result, `answer-${index}`); // Передаем изображение для конкретного ответа
+  //       };
+  //       reader.readAsDataURL(file);
+  //   }
+  // };
 
   const handleQuestionChange = (e) => {
     const updatedQuestion = e.target.value;
@@ -175,12 +193,6 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
           <div>
             <h3>Предпросмотр ответа {index + 1}:</h3>
             <BlockMath>{answer.text}</BlockMath>
-          </div>
-
-           {/* Загрузка изображения для ответа */}
-           <div>
-            <h3>Вставка изображения для ответа {index + 1}:</h3>
-            <input type="file" accept="image/*" onChange={(e) => handleAnswerImageUpload(index, e)} />
           </div>
         </div>
       ))}
