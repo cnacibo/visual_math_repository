@@ -3,6 +3,8 @@ import SlideTypeSelector from './components/SlideTypeSelector';
 import TextSlide from './components/TextSlide';
 import SlideList from './components/SlideList';
 import SlideShow from './components/SlideShow';
+import QuestionSlide from './components/QuestionSlide';
+import CheckBlock from './components/CheckBlock';
 import './App.css';
 import './index.css';
 
@@ -12,7 +14,13 @@ const App = () => {
     const [isSlideShowActive, setIsSlideShowActive] = useState(false); // Состояние для режима презентации
 
     const handleAddSlide = () => {
-        const newSlide = { id: Date.now(), type: null, content: '', image: null }; // добавляем id слайда
+        const newSlide = {
+            id: Date.now(),
+            type: null,
+            content: '',
+            image: null,
+            questions: []
+        }; // добавляем id слайда
         setSlides([...slides, newSlide]);
         setSelectedSlideIndex(slides.length);
     };
@@ -36,9 +44,9 @@ const App = () => {
         setSelectedSlideIndex(index);
     };
 
-    const handleImageUpload = (index, image) => {
+    const handleImageUpload = (index, imageUrl) => {
         const updatedSlides = [...slides];
-        updatedSlides[index].image = image;
+        updatedSlides[index].image = imageUrl;  // Сохраняем URL изображения
         setSlides(updatedSlides);
     };
 
@@ -56,6 +64,7 @@ const App = () => {
                 return (
                     <TextSlide
                         content={selectedSlide.content}
+                        questions={selectedSlide.questions}
                         onChange={(content) => {
                             const updatedSlides = [...slides];
                             updatedSlides[selectedSlideIndex].content = content;
@@ -66,9 +75,31 @@ const App = () => {
                     />
                 );
             case 'test':
-                return <div style={{ border: 'red' }}>Проверочный слайд (в разработке)</div>;
+                return (
+                    <CheckBlock
+                        questions={selectedSlide.questions}  // Передаем вопросы из слайда типа "test"
+                        onChange={(field, updatedQuestions) => {
+                            const updatedSlides = [...slides];
+                            updatedSlides[selectedSlideIndex].questions = updatedQuestions;  // Обновляем вопросы слайда
+                            setSlides(updatedSlides);
+                        }}
+                        slideId={selectedSlideIndex}  // Передаем ID слайда в CheckBlock
+                    />
+                );
             case 'questionnaire':
-                return <div>Вопросник (в разработке)</div>;
+                return (
+                    <QuestionSlide
+                        content={selectedSlide.content}
+                        questions={selectedSlide.questions}
+                        onChange={(field, value) => {
+                            const updatedSlides = [...slides];
+                            const slide = updatedSlides[selectedSlideIndex];
+                            slide.questions = value;
+                            setSlides(updatedSlides);
+                        }}
+                        slideId={selectedSlideIndex}
+                    />
+                );
             default:
                 return null;
         }

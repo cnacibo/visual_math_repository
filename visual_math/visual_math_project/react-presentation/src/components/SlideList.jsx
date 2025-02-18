@@ -36,7 +36,8 @@ const SlideList = ({ slides, onAddSlide, onRemoveSlide, onSelectSlide }) => {
             if (response.ok) {
                 alert('Презентация сохранена!');
             } else {
-                alert('Ошибка при сохранении презентации');
+                const errorResponse = await response.json();  // Читаем ответ сервера в формате JSON
+                alert(`Ошибка при сохранении презентации: ${errorResponse.error || response.statusText}`);
             }
         } catch (error) {
             console.error('Ошибка сохранения:', error);

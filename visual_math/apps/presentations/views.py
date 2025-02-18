@@ -10,6 +10,9 @@ import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import base64
 
 # Просмотр всех презентаций
 
@@ -58,11 +61,19 @@ def save_presentation(request):
 
             # Добавляем слайды с правильной нумерацией
             for index, slide in enumerate(slides, start=1):  # start=1 чтобы номера шли от 1
+                questions_data = slide.get('questions', [])
+
+                if questions_data:
+                    questions_data = questions_data
+                else:
+                    questions_data = []
+
                 Slide.objects.create(
                     presentation=presentation,
                     slide_number=index,  # Присваиваем правильный номер
-                    slide_type=slide.get('slide_type', 'text'),
+                    slide_type=slide.get('type', 'text'),
                     content=slide.get('content', ''),
+                    questions=questions_data,  # Сохраняем вопросы
                     image=slide.get('image', None)
                 )
 
@@ -96,6 +107,21 @@ def delete_presentation(request):
             return JsonResponse({"success": False, "error": str(e)}, status=500)
 
     return JsonResponse({"success": False, "error": "Неверный метод запроса."}, status=405)
+
+
+@csrf_exempt
+def upload_image(request):
+    if request.method == 'POST' and request.FILES.get('image'):
+        image_file = request.FILES['image']
+
+        # Сохраняем файл в папке media
+        file_path = default_storage.save(f'slides/{image_file.name}', image_file)
+
+        # Возвращаем путь к файлу в response
+        image_url = f'/media/{file_path}'  # Путь к файлу на сервере
+        return JsonResponse({'imageUrl': image_url})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 class PresentationView(APIView):
