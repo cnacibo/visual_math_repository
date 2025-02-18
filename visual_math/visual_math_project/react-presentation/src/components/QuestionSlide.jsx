@@ -5,7 +5,7 @@ import 'katex/dist/katex.min.css';
 const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
   const [questionData, setQuestionData] = useState({
     question: content || '',
-    answers: [''], // Начальный массив ответов
+    answers: [{ text: '', isCorrect: false }], // Начальный массив ответов
   });
   const [isMultiple, setIsMultiple] = useState(false); // Для чекбоксов (множество правильных ответов)
 
@@ -45,7 +45,7 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
 
   const handleAnswerChange = (index, e) => {
     const updatedAnswers = [...questionData.answers];
-    updatedAnswers[index] = e.target.value;
+    updatedAnswers[index].text = e.target.value;
 
     // Обновляем объект состояния
     setQuestionData((prev) => ({
@@ -63,13 +63,60 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
   const addAnswerField = () => {
     setQuestionData((prev) => ({
       ...prev,
-      answers: [...prev.answers, ''], // Добавляем новое поле для ответа
+      answers: [...prev.answers, { text: '', isCorrect: false }], // Добавляем новое поле для ответа
     }));
   };
 
   const handleAnswerTypeChange = (e) => {
-    setIsMultiple(e.target.value === 'checkbox'); // Выбор радиокнопки или чекбокса
+      const newIsMultiple = e.target.value === 'checkbox';
+      setIsMultiple(newIsMultiple);
+
+      // Если переключаемся с чекбоксов на радиокнопки, сбрасываем все флаги isCorrect
+      if (!newIsMultiple) {
+        const resetAnswers = questionData.answers.map((answer) => ({
+          ...answer,
+          isCorrect: false,
+        }));
+
+        // Сбрасываем состояние
+        setQuestionData((prev) => ({
+          ...prev,
+          answers: resetAnswers,
+        }));
+
+        onChange('questionData', {
+          ...questionData,
+          answers: resetAnswers,
+        });
+      }
+    };
+
+  const handleCorrectAnswerChange = (index) => {
+      
+    const updatedAnswers = questionData.answers.map((answer, i) => {
+      if (isMultiple) {
+        // Если чекбоксы, меняем только у текущего ответа
+        if (i === index) {
+          return { ...answer, isCorrect: !answer.isCorrect };
+        }
+        return answer;
+      } else {
+        // Если радиокнопки, делаем текущий ответ единственным правильным
+        return { ...answer, isCorrect: i === index };
+      }
+    });
+
+    setQuestionData((prev) => ({
+      ...prev,
+      answers: updatedAnswers,
+    }));
+
+    onChange('questionData', {
+      ...questionData,
+      answers: updatedAnswers,
+    });
   };
+
 
   return (
     <div>
@@ -113,20 +160,21 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
 
       {questionData.answers.map((answer, index) => (
         <div key={index}>
-          <inputs
+          <input
             type={isMultiple ? 'checkbox' : 'radio'}
             name="answer"
-            value={answer}
-            onChange={(e) => handleAnswerChange(index, e)}
+            value={answer.text}
+            checked={answer.isCorrect}
+            onChange={(e) => handleCorrectAnswerChange(index)}
           />
           <textarea
-            value={answer}
+            value={answer.text}
             onChange={(e) => handleAnswerChange(index, e)}
             placeholder={`Ответ ${index + 1} с TeX кодом...`}
           />
           <div>
             <h3>Предпросмотр ответа {index + 1}:</h3>
-            <BlockMath>{answer}</BlockMath>
+            <BlockMath>{answer.text}</BlockMath>
           </div>
 
            {/* Загрузка изображения для ответа */}
@@ -143,4 +191,4 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
   );
 };
 
-export default QuestionSlide;
+export default QuestionSlide
