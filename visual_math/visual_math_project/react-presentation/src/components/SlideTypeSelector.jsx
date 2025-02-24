@@ -1,4 +1,5 @@
-import React from 'react';
+// import React from 'react';
+import PropTypes from 'prop-types';
 
 const SlideTypeSelector = ({ onSelect, selectedSlideIndex }) => {
     return (
@@ -10,6 +11,11 @@ const SlideTypeSelector = ({ onSelect, selectedSlideIndex }) => {
             <button onClick={() => onSelect('questionnaire')}>Вопросник</button>
         </div>
     );
+};
+
+SlideTypeSelector.propTypes = {
+    onSelect: PropTypes.func.isRequired, // Функция выбора типа слайда
+    selectedSlideIndex: PropTypes.number.isRequired, // Индекс выбранного слайда
 };
 
 export default SlideTypeSelector;

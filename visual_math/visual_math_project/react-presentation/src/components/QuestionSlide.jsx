@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import PropTypes from 'prop-types';
 
 const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
   const [questionData, setQuestionData] = useState({
@@ -110,7 +111,7 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
     };
 
   const handleCorrectAnswerChange = (index) => {
-      
+
     const updatedAnswers = questionData.answers.map((answer, i) => {
       if (isMultiple) {
         // Если чекбоксы, меняем только у текущего ответа
@@ -183,7 +184,7 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
             name="answer"
             value={answer.text}
             checked={answer.isCorrect}
-            onChange={(e) => handleCorrectAnswerChange(index)}
+            onChange={() => handleCorrectAnswerChange(index)}
           />
           <textarea
             value={answer.text}
@@ -202,5 +203,10 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
     </div>
   );
 };
-
+QuestionSlide.propTypes = {
+  content: PropTypes.string, // Текущий контент вопроса
+  onChange: PropTypes.func.isRequired, // Обработчик изменения данных
+  onImageUpload: PropTypes.func.isRequired, // Обработчик загрузки изображения
+  slideId: PropTypes.number.isRequired, // ID слайда
+};
 export default QuestionSlide

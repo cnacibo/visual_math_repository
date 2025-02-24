@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import {useState } from 'react';
+import PropTypes from 'prop-types';
 import QuestionSlide from './QuestionSlide';
 
 const CheckBlock = ({ onChange, slideId }) => {
@@ -35,4 +36,9 @@ const CheckBlock = ({ onChange, slideId }) => {
     );
 };
 
+// Валидация типов для props
+CheckBlock.propTypes = {
+    onChange: PropTypes.func.isRequired, // Функция для обновления данных
+    slideId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired // Идентификатор слайда (строка или число)
+};
 export default CheckBlock;

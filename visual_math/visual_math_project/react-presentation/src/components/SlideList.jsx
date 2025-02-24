@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 
 const SlideList = ({ slides, onAddSlide, onRemoveSlide, onSelectSlide }) => {
     const [title, setTitle] = useState('');
@@ -93,5 +94,16 @@ const SlideList = ({ slides, onAddSlide, onRemoveSlide, onSelectSlide }) => {
         </div>
     );
 };
-
+SlideList.propTypes = {
+    slides: PropTypes.arrayOf(
+        PropTypes.shape({
+            type: PropTypes.string.isRequired, // Тип слайда
+            content: PropTypes.string, // Содержимое слайда
+            questions: PropTypes.array, // Вопросы (если есть)
+        })
+    ).isRequired, // Массив слайдов
+    onAddSlide: PropTypes.func.isRequired, // Добавление нового слайда
+    onRemoveSlide: PropTypes.func.isRequired, // Удаление слайда
+    onSelectSlide: PropTypes.func.isRequired, // Выбор слайда
+};
 export default SlideList;
