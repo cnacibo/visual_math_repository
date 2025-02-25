@@ -8,6 +8,11 @@
     <link href="{% static 'css/home.css' %}" rel="stylesheet">
     <script src="{% static 'js/home.js' %}" defer></script>
     <link rel="icon" type="image/x-icon" href="{% static 'images/icon.png' %}">
+     <!-- KaTeX для формул -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
 </head>
 <body>
 
@@ -96,6 +101,7 @@
                                 <h3>{{ el.title }}</h3>
                                 <p><strong>Предмет:</strong> {{ el.get_subject_display }}</p>
                                 <p><strong>Дата создания:</strong> {{ el.created_at|date:"d.m.Y H:i" }}</p>
+                                <button onclick="openPresentation({{ el.id }})" class="presentation-button">Показать лекцию</button>
                                 <button  onclick="deleteLecture({{ el.id }})"  class="link-button" >Удалить лекцию</button>
                             </div>
                         {% endfor %}

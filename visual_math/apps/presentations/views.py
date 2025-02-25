@@ -123,6 +123,27 @@ def upload_image(request):
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+def presentation_api(request, presentation_id):
+    print(f"Requested presentation ID: {presentation_id}")
+    presentation = get_object_or_404(Presentation, id=presentation_id)
+
+    print(f"User: {request.user}")
+    print(f"Found presentation: {presentation}")
+    presentation = get_object_or_404(Presentation, id=presentation_id)
+    slides = Slide.objects.filter(presentation=presentation).values(
+        'slide_type',
+        'content',
+        'image',
+        'questions'
+    )
+    result = {
+        'title': presentation.title,
+        'slides': list(slides)
+    }
+
+    print("Returning data:", result)  # Добавьте это
+    return JsonResponse(result)
+
 
 class PresentationView(APIView):
     def post(self, request):

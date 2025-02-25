@@ -236,3 +236,108 @@ async function deleteLecture(presentationId) {
         alert("Не удалось удалить презентацию. Проверьте соединение с сервером.");
     }
 }
+
+async function openPresentation(presentationId) {
+    try {
+        // Отправляем запрос на сервер для получения данных о презентации
+        const response = await fetch(`/presentations/api/${presentationId}/`);
+        console.log('URL:', `/presentations/api/${presentationId}/`);
+        console.log('Status:', response.status);
+        console.log('Response:', response);
+
+        // 2. Читаем данные ОДИН раз
+        const presentationData = await response.json();
+        console.log('Data:', presentationData);
+
+        // 3. Проверяем статус ответа
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error('Презентация не найдена');
+            } else {
+                throw new Error(`Ошибка загрузки презентации: ${response.status}`);
+            }
+        }
+
+        // 4. Проверяем наличие слайдов
+        if (!presentationData.slides || presentationData.slides.length === 0) {
+            alert('В этой презентации нет слайдов.');
+            return;
+        }
+
+        // Отображаем слайды
+        showSlideShow(presentationData.slides);
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert(`Не удалось загрузить презентацию: ${error.message}`);
+    }
+}
+
+// Функция для отображения слайдов
+function showSlideShow(slides) {
+    console.log('Received slides:', slides);
+    // Создаем контейнер для слайдов
+    const slideShowContainer = document.createElement('div');
+    slideShowContainer.id = 'slide-show-container';
+    slideShowContainer.innerHTML = `
+        <div id="slide-content"></div>
+        <button onclick="closeSlideShow()">Закрыть</button>
+        <button onclick="prevSlide()">Назад</button>
+        <button onclick="nextSlide()">Вперед</button>
+    `;
+
+    // Добавляем контейнер на страницу
+    document.body.appendChild(slideShowContainer);
+
+    // Отображаем первый слайд
+    let currentSlideIndex = 0;
+
+    function renderSlide(index) {
+        console.log(`Rendering slide ${index}`, slides[index]);
+        const slide = slides[index];
+        const slideContent = document.getElementById('slide-content');
+        if (!slideContent) {
+            console.error('Элемент slide-content не найден');
+            return;
+        }
+        // Замените двойные слеши на одинарные
+    const cleanedContent = slide.content.replace(/\\\\/g, '\\');
+        slideContent.innerHTML = `
+        <h2>Слайд ${index + 1}</h2>
+        <div class="math-content">${cleanedContent || "Нет текста"}</div>
+        ${slide.image ? `<img src="${slide.image}" alt="Изображение слайда">` : ''}
+    `;
+
+    // Рендерим формулы после вставки HTML
+    if (window.renderMathInElement) {
+        renderMathInElement(slideContent, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false}, // Для LaTeX-формул
+                {left: '\\[', right: '\\]', display: true}
+            ]
+        });
+    }
+    }
+    renderSlide(currentSlideIndex);
+
+    // Функции для навигации
+    window.prevSlide = () => {
+        if (currentSlideIndex > 0) {
+            currentSlideIndex--;
+            renderSlide(currentSlideIndex);
+        }
+    };
+
+    window.nextSlide = () => {
+        if (currentSlideIndex < slides.length - 1) {
+            currentSlideIndex++;
+            renderSlide(currentSlideIndex);
+        }
+    };
+
+    window.closeSlideShow = () => {
+        document.body.removeChild(slideShowContainer);
+    };
+
+}

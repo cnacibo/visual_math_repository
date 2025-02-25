@@ -4,27 +4,6 @@ import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 // import './SlideShow.css';
 
-
-// export const useSlideShow = () => {
-//   const [isSlideShowOpen, setIsSlideShowOpen] = useState(false);
-//   const [slides, setSlides] = useState([]);
-//
-//   const openPresentation = async (presentationId) => {
-//     try {
-//       const response = await fetch(`/presentations/api/${presentationId}/`);
-//       if (!response.ok) throw new Error('Ошибка загрузки');
-//       const data = await response.json();
-//       setSlides(data.slides || []);
-//       setIsSlideShowOpen(true);
-//     } catch (error) {
-//       console.error('Ошибка:', error);
-//       alert('Не удалось загрузить презентацию');
-//     }
-//   };
-//
-//   return { isSlideShowOpen, slides, openPresentation, setIsSlideShowOpen };
-// };
-
 const SlideShow = ({ slides, onClose, isStandalone = false }) => {
     const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
     const [isFullscreen] = useState(true);
