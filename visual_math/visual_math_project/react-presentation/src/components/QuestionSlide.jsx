@@ -2,6 +2,8 @@ import  { useState } from 'react';
 import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import PropTypes from 'prop-types';
+// import 'visual_math_project/react-presentation/src/components/QuestionSlied.css';
+import '../App.css';
 
 const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
   const [questionData, setQuestionData] = useState({
@@ -50,17 +52,28 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
   //   }
   // };
 
-  const handleQuestionChange = (e) => {
+  // const handleQuestionChange = (e) => {
+  //   const updatedQuestion = e.target.value;
+  //   setQuestionData((prev) => ({
+  //     ...prev,
+  //     question: updatedQuestion,
+  //   }));
+  //   onChange('questionData', {
+  //     ...questionData,
+  //     question: updatedQuestion,
+  //   });
+  // };
+    const handleQuestionChange = (e) => {
     const updatedQuestion = e.target.value;
-    setQuestionData((prev) => ({
-      ...prev,
-      question: updatedQuestion,
+    setQuestionData(prev => ({ ...prev, question: updatedQuestion }));
+
+    // Сериализуем весь объект вопроса
+    onChange('content', JSON.stringify({
+        ...questionData,
+        question: updatedQuestion
     }));
-    onChange('questionData', {
-      ...questionData,
-      question: updatedQuestion,
-    });
-  };
+    onChange('type', 'questionnaire');
+    };
 
   const handleAnswerChange = (index, e) => {
     const updatedAnswers = [...questionData.answers];
@@ -138,14 +151,14 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
 
 
   return (
-    <div>
+    <div className="question-slide">
       <h2>Слайд {slideId + 1} - вопрос</h2> {/* Здесь отображаем ID слайда */}
       <textarea
         value={questionData.question}
         onChange={handleQuestionChange}
         placeholder="Введите TeX код..."
       />
-      <div>
+      <div className="preview-container">
       <h3>Предпросмотр вопроса:</h3>
         <BlockMath>{questionData.question || ''}</BlockMath>
       </div>
@@ -156,7 +169,7 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
         <input type="file" accept="image/*" onChange={handleQuestionImageUpload} />
       </div>
 
-      <div>
+      <div className="answer-container input">
         <label>
           <input
             type="radio"
@@ -178,7 +191,7 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
       </div>
 
       {questionData.answers.map((answer, index) => (
-        <div key={index}>
+        <div key={index} className="answer-container">
           <input
             type={isMultiple ? 'checkbox' : 'radio'}
             name="answer"
@@ -191,7 +204,7 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
             onChange={(e) => handleAnswerChange(index, e)}
             placeholder={`Ответ ${index + 1} с TeX кодом...`}
           />
-          <div>
+          <div className="preview-container">
             <h3>Предпросмотр ответа {index + 1}:</h3>
             <BlockMath>{answer.text}</BlockMath>
           </div>

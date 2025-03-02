@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import SlideTypeSelector from './components/SlideTypeSelector';
 import TextSlide from './components/TextSlide';
 import SlideList from './components/SlideList';
 import SlideShow from './components/SlideShow';
 import QuestionSlide from './components/QuestionSlide';
 import CheckBlock from './components/CheckBlock';
+// import TestSlide from './components/TestSlide';
 import './App.css';
 import './index.css';
 

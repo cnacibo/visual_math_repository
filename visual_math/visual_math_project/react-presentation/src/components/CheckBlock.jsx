@@ -1,6 +1,7 @@
 import {useState } from 'react';
 import PropTypes from 'prop-types';
 import QuestionSlide from './QuestionSlide';
+// import 'visual_math_project/react-presentation/src/components/CheckBlock.css';
 
 const CheckBlock = ({ onChange, slideId }) => {
     const [questions, setQuestions] = useState([{}]); // Начальный список с одним пустым вопросом
@@ -17,10 +18,13 @@ const CheckBlock = ({ onChange, slideId }) => {
 
         // Передаем обновленные данные родительскому компоненту
         onChange('questions', updatedQuestions);
+        // Сериализуем вопросы в JSON
+        onChange('content', JSON.stringify(updatedQuestions));
+        onChange('type', 'test');
     };
 
     return (
-        <div>
+        <div className="check-block">
             <h2>Проверочный блок</h2>
             {questions.map((_, index) => (
                 <div key={index}>

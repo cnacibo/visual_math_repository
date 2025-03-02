@@ -271,18 +271,20 @@ async function openPresentation(presentationId) {
         alert(`Не удалось загрузить презентацию: ${error.message}`);
     }
 }
-
-// Функция для отображения слайдов
+//функция отображения слайдов
 function showSlideShow(slides) {
     console.log('Received slides:', slides);
+
     // Создаем контейнер для слайдов
     const slideShowContainer = document.createElement('div');
     slideShowContainer.id = 'slide-show-container';
     slideShowContainer.innerHTML = `
         <div id="slide-content"></div>
-        <button onclick="closeSlideShow()">Закрыть</button>
-        <button onclick="prevSlide()">Назад</button>
-        <button onclick="nextSlide()">Вперед</button>
+        <div class="slide-controls">
+            <button onclick="closeSlideShow()">Закрыть</button>
+            <button onclick="prevSlide()">Назад</button>
+            <button onclick="nextSlide()">Вперед</button>
+        </div>
     `;
 
     // Добавляем контейнер на страницу
@@ -291,6 +293,7 @@ function showSlideShow(slides) {
     // Отображаем первый слайд
     let currentSlideIndex = 0;
 
+    // Функция для рендеринга слайда
     function renderSlide(index) {
         console.log(`Rendering slide ${index}`, slides[index]);
         const slide = slides[index];
@@ -299,27 +302,138 @@ function showSlideShow(slides) {
             console.error('Элемент slide-content не найден');
             return;
         }
-        // Замените двойные слеши на одинарные
-    const cleanedContent = slide.content.replace(/\\\\/g, '\\');
-        slideContent.innerHTML = `
-        <h2>Слайд ${index + 1}</h2>
-        <div class="math-content">${cleanedContent || "Нет текста"}</div>
-        ${slide.image ? `<img src="${slide.image}" alt="Изображение слайда">` : ''}
-    `;
 
-    // Рендерим формулы после вставки HTML
-    if (window.renderMathInElement) {
-        renderMathInElement(slideContent, {
-            delimiters: [
-                {left: '$$', right: '$$', display: true},
-                {left: '$', right: '$', display: false},
-                {left: '\\(', right: '\\)', display: false}, // Для LaTeX-формул
-                {left: '\\[', right: '\\]', display: true}
-            ]
-        });
+        let slideHtml = '';
+        // const cleanedContent = slide.content
+        //     ? slide.content
+        //         .replace(/\\\\/g, '\\')
+        //         .replace(/\\text\{([^}]+)\}/g, '$1') // Удаление \\text{}
+        //         .replace(/\\\[([^\]]+)\\\]/g, '$1') // Упрощение \\[ ... \\]
+        //     : '';
+        const cleanedContent = slide.content || '';
+
+        // Обработка разных типов слайдов
+        switch (slide.slide_type) {
+            // case 'test': // Проверочный слайд
+            //     try {
+            //         // Если questions это строка "test", создаем пустой массив вопросов
+            //         const questionsData = slide.questions === "test" ? '[]' : slide.questions;
+            //         const questions = JSON.parse(questionsData || '[]'); // Парсим вопросы или используем пустой массив
+            //         slideHtml = `
+            //             <h2>Проверочный блок - Слайд ${index + 1}</h2>
+            //             ${renderQuestions(questions)}
+            //             ${slide.image ? `<img src="${slide.image}" class="slide-image">` : ''}
+            //         `;
+            //     } catch (e) {
+            //         slideHtml = `<div class="error">Ошибка: ${e.message}</div>`;
+            //     }
+            //     break;
+            case 'test': // Проверочный слайд
+                try {
+                    // Если questions это строка "test", создаем пустой массив вопросов
+                    const questionsData = slide.questions === "test" ? [] : slide.questions;
+                    const questions = Array.isArray(questionsData) ? questionsData : []; // Убедимся, что questions - это массив
+                    slideHtml = `
+                        <h2>Проверочный блок - Слайд ${index + 1}</h2>
+                        ${renderQuestions(questions)}
+                        ${slide.image ? `<img src="${slide.image}" class="slide-image">` : ''}
+                    `;
+                } catch (e) {
+                    slideHtml = `<div class="error">Ошибка: ${e.message}</div>`;
+                }
+                break;
+
+            case 'questionnaire': // Вопросник
+                try {
+                    const questionData = slide.questions;
+                    slideHtml = `
+                        <h2>Слайд ${index + 1} (Вопросник)</h2>
+                        <div class="questionnaire">
+                            <div class="question">
+                                <div class="math-content">${renderKatexInText(questionData.question || "Вопрос не указан")}</div>
+                            </div>
+                            <div class="answers">
+                                ${questionData.answers.map((answer, i) => `
+                                    <div class="answer">
+                                        <input
+                                            type="radio"
+                                            name="questionnaire-answer"
+                                            value="${i}"
+                                            ${answer.isCorrect ? 'checked' : ''}
+                                        >
+                                        <div class="math-content">${answer.text}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } catch (e) {
+                    console.error('Ошибка парсинга вопросника:', e);
+                    slideHtml = '<div class="error">Ошибка отображения вопросника</div>';
+                }
+                break;
+
+            case 'text': // Текстовый слайд
+            default:
+                slideHtml = `
+                    <h2>Слайд ${index + 1}</h2>
+                    <div class="math-content">${renderKatexInText(cleanedContent || "Нет текста")}</div>
+                    ${slide.image ? `<img src="${slide.image}" class="slide-image">` : ''}
+                `;
+        }
+
+        // Вставляем HTML в контейнер
+        slideContent.innerHTML = slideHtml;
+
+        // Рендерим формулы после вставки HTML
+        if (window.renderMathInElement) {
+            renderMathInElement(slideContent, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ]
+            });
+        }
     }
-    }
-    renderSlide(currentSlideIndex);
+
+    // Функция для рендеринга вопросов
+    // function renderQuestions(questions) {
+    //     return questions.map((q, qIndex) => `
+    //         <div class="question-block">
+    //             <h3>Вопрос ${qIndex + 1}</h3>
+    //             <div class="math-content">${q.question || ''}</div>
+    //             ${q.questionImageUrl ? `<img src="${q.questionImageUrl}" class="question-image">` : ''}
+    //             <div class="answers">
+    //                 ${q.answers.map((a, aIndex) => `
+    //                     <div class="answer ${a.isCorrect ? 'correct' : ''}">
+    //                         <div class="math-content">${a.text}</div>
+    //                     </div>
+    //                 `).join('')}
+    //             </div>
+    //         </div>
+    //     `).join('');
+    // }
+    function renderQuestions(questions) {
+    return questions.map((q, qIndex) => {
+        const questionData = q.questionData || {}; // Извлекаем questionData
+        return `
+            <div class="question-block">
+                <h3>Вопрос ${qIndex + 1}</h3>
+                <div class="math-content">${renderKatexInText(questionData.question || '')}</div>
+                ${questionData.questionImageUrl ? `<img src="${questionData.questionImageUrl}" class="question-image">` : ''}
+                <div class="answers">
+                    ${questionData.answers.map((answer, aIndex) => `
+                        <div class="answer ${answer.isCorrect ? 'correct' : ''}">
+                            <div class="math-content">${renderKatexInText(answer.text)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
     // Функции для навигации
     window.prevSlide = () => {
@@ -340,4 +454,37 @@ function showSlideShow(slides) {
         document.body.removeChild(slideShowContainer);
     };
 
+    // Рендерим первый слайд
+    renderSlide(currentSlideIndex);
+}
+
+/**
+ * Функция для автоматического парсинга и рендеринга формул KaTeX в тексте.
+ * @param {string} text - Текст, содержащий формулы KaTeX.
+ * @returns {string} - Текст с отрендеренными формулами.
+ */
+function renderKatexInText(text) {
+    // Регулярное выражение для поиска формул KaTeX
+    const katexRegex = /(\$\$[^$]+\$\$|\$[^$]+\$|\\\([^]+\\\)|\\\[[^]+\\\])/g;
+
+    // Разделяем текст на части: обычный текст и формулы
+    const parts = text.split(katexRegex);
+
+    // Проходим по всем частям и рендерим формулы
+    return parts.map(part => {
+        if (katexRegex.test(part)) {
+            // Если часть текста - это формула, рендерим её с помощью KaTeX
+            try {
+                return katex.renderToString(part, {
+                    throwOnError: false, // Не выбрасывать ошибку при неудачном рендеринге
+                });
+            } catch (e) {
+                console.error('Ошибка рендеринга формулы:', e);
+                return part; // Возвращаем исходный текст, если рендеринг не удался
+            }
+        } else {
+            // Если часть текста - это обычный текст, возвращаем его как есть
+            return part;
+        }
+    }).join(''); // Собираем все части обратно в одну строку
 }
