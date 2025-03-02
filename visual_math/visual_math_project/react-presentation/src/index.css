@@ -29,17 +29,30 @@
 }
 
 /* Стили для режима презентации */
+/*.slide-show {*/
+/*    position: fixed;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    width: 30%;*/
+/*    height: 50%;*/
+/*    background: #1a1a1a;*/
+/*    color: white;*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    z-index: 1000;*/
+/*}*/
+
 .slide-show {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #1a1a1a;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    z-index: 1000;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    box-sizing: border-box;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform-origin: center center;
 }
 
 .slide-nav {
@@ -131,6 +144,7 @@
     padding: 0.5rem 1rem;
     border-radius: 5px;
     cursor: pointer;
+    justify-content: right;
 }
 
 /* Анимации */
@@ -167,7 +181,7 @@ textarea {
 /* Основные стили */
 .app-container {
     height: 100vh;
-    display: flex;
+    /*display: flex;*/
     flex-direction: column;
 }
 
@@ -175,7 +189,7 @@ textarea {
     background: #2c3e50;
     color: white;
     padding: 1rem;
-    display: flex;
+    /*display: flex;*/
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -194,20 +208,6 @@ textarea {
     overflow-y: auto;
 }
 
-/* Стили для режима презентации */
-.slide-show {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #1a1a1a;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    z-index: 1000;
-}
-
 .slide-nav {
     padding: 1rem;
     background: rgba(0,0,0,0.5);
@@ -224,6 +224,7 @@ textarea {
     padding: 2rem;
 }
 
+
 .text-slide {
     background: white;
     color: #333;
@@ -231,10 +232,22 @@ textarea {
     border-radius: 10px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     max-width: 800px;
-    width: 90%;
+    width: 70%;
     min-height: 500px;
     position: relative;
 }
+
+/*.test-slide, .question-slide {*/
+/*    background: white;*/
+/*    color: #333;*/
+/*    padding: 2rem;*/
+/*    border-radius: 10px;*/
+/*    box-shadow: 0 10px 30px rgba(0,0,0,0.3);*/
+/*    max-width: 800px;*/
+/*    width: 70%;*/
+/*    min-height: 500px;*/
+/*    position: relative;*/
+/*}*/
 
 .slide-image {
     position: absolute;
@@ -315,13 +328,25 @@ body.slide-show-active {
 }
 
 /* В App.css измените стили для режима презентации */
-.slide-show .text-slide {
+.text-slide {
     width: 800px; /* Уменьшенный размер */
     height: 600px;
     padding: 20px;
 }
+.fullscreen {
+    position: fixed; /* Фиксированное позиционирование */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Темная заливка для фона */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Убедитесь, что слайдер находится поверх других элементов */
+}
 
-.slide-show .slide-image {
+.slide-image {
     max-width: 150px; /* Уменьшенное изображение */
     bottom: 10px;
     right: 10px;
@@ -352,4 +377,175 @@ body.slide-show-active {
 
 .slide-show .text-slide p {
     margin-bottom: 1rem;
+}
+
+.question-slide, .test-slide {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    max-width: 800px;
+    width: 90%;
+}
+
+.questions-list, .answers {
+    margin-top: 1.5rem;
+}
+
+.question-item, .test-question {
+    margin: 1rem 0;
+    padding: 1rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.answer {
+    padding: 0.5rem;
+    margin: 0.3rem 0;
+    border-left: 3px solid #ddd;
+}
+
+.answer.correct {
+    border-left-color: #27ae60;
+    background: #e8f6ef;
+}
+
+/*check block*/
+.check-block {
+    width: 1024px;
+    min-height: 768px;
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.check-block h2 {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.question-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.add-question-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.add-question-btn:hover {
+    background: #2980b9;
+}
+/*question slide*/
+.question-slide {
+    width: 1024px;
+    height: 768px;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+.question-slide h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.question-textarea {
+    width: 100%;
+    height: 120px;
+    font-size: 16px;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    resize: none;
+}
+
+.answers-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.answer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.answer textarea {
+    flex-grow: 1;
+    height: 50px;
+}
+
+.answer input[type="radio"],
+.answer input[type="checkbox"] {
+    transform: scale(1.2);
+}
+
+.upload-image {
+    text-align: center;
+    margin-top: 10px;
+}
+/*text slide*/
+.text-slide {
+    width: 1024px;
+    height: 768px;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.text-slide h2 {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.text-slide textarea {
+    width: 100%;
+    height: 200px;
+    font-size: 16px;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    resize: none;
+}
+
+.preview-container {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    min-height: 50px;
+}
+
+.image-upload-container {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.image-upload-container input {
+    display: block;
+    margin: 0 auto;
 }

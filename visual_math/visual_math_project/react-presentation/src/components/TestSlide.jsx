@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
+// import SlideList from "./SlideList.jsx";
 
 const TestSlide = ({ type, style, onUpdateStyle, onDelete }) => {
-    const [isResizing, setIsResizing] = useState(false);
+    // const [isResizing, setIsResizing] = useState(false);
     const [isMoving, setIsMoving] = useState(false);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
 
@@ -59,6 +61,19 @@ const TestSlide = ({ type, style, onUpdateStyle, onDelete }) => {
             {type}
         </div>
     );
+};
+
+TestSlide.propTypes = {
+    type: PropTypes.oneOf(['circle', 'triangle', 'line']).isRequired, // <button class="citation-flag" data-index="1"><button class="citation-flag" data-index="7">
+    style: PropTypes.shape({ // <button class="citation-flag" data-index="1"><button class="citation-flag" data-index="6">
+        left: PropTypes.number.isRequired,
+        top: PropTypes.number.isRequired,
+        width: PropTypes.number.isRequired,
+        height: PropTypes.number.isRequired,
+        backgroundColor: PropTypes.string.isRequired
+    }).isRequired,
+    onUpdateStyle: PropTypes.func.isRequired, // <button class="citation-flag" data-index="4"><button class="citation-flag" data-index="7">
+    onDelete: PropTypes.func.isRequired // <button class="citation-flag" data-index="4"><button class="citation-flag" data-index="7">
 };
 
 export default TestSlide;
