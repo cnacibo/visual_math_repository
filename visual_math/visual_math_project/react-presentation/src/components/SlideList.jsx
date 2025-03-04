@@ -21,7 +21,15 @@ const SlideList = ({ slides, onAddSlide, onRemoveSlide, onSelectSlide }) => {
             title,
             subject,
             slides,
+            // slides: slides.map(slide => ({
+            // slide_type: slide.slide_type,
+            // content: slide.content || '', // Сериализованные данные вопросов
+            // image: slide.image || '',
+            // questions: [] // Пустой массив для слайдов типа "test"
+        // }))
         };
+
+        console.log("Данные для отправки:", presentationData);
 
         try {
             const response = await fetch('/presentations/api/', {

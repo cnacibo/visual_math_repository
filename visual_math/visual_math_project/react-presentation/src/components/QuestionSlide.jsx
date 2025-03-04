@@ -2,7 +2,6 @@ import  { useState } from 'react';
 import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import PropTypes from 'prop-types';
-// import 'visual_math_project/react-presentation/src/components/QuestionSlied.css';
 import '../App.css';
 
 const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
@@ -63,17 +62,29 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
   //     question: updatedQuestion,
   //   });
   // };
+  //   const handleQuestionChange = (e) => {
+  //   const updatedQuestion = e.target.value;
+  //   setQuestionData(prev => ({ ...prev, question: updatedQuestion }));
+  //
+  //   // Сериализуем весь объект вопроса
+  //   onChange('content', JSON.stringify({
+  //       ...questionData,
+  //       question: updatedQuestion
+  //   }));
+  //   onChange('type', 'questionnaire');
+  //   };
+
     const handleQuestionChange = (e) => {
     const updatedQuestion = e.target.value;
-    setQuestionData(prev => ({ ...prev, question: updatedQuestion }));
-
-    // Сериализуем весь объект вопроса
-    onChange('content', JSON.stringify({
-        ...questionData,
-        question: updatedQuestion
+    setQuestionData((prev) => ({
+      ...prev,
+      question: updatedQuestion,
     }));
-    onChange('type', 'questionnaire');
-    };
+    onChange('questionData', {
+      ...questionData,
+      question: updatedQuestion,
+    });
+  };
 
   const handleAnswerChange = (index, e) => {
     const updatedAnswers = [...questionData.answers];
