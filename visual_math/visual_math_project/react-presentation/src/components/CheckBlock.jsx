@@ -4,10 +4,18 @@ import QuestionSlide from './QuestionSlide';
 // import 'visual_math_project/react-presentation/src/components/CheckBlock.css';
 
 const CheckBlock = ({ onChange, slideId }) => {
-    const [questions, setQuestions] = useState([{}]); // Начальный список с одним пустым вопросом
+    const [questions, setQuestions] =
+        useState([{
+            question: "",
+            answers: [{ text: "", isCorrect: false }],
+            questionImageUrl: ""}]); // Начальный список с одним пустым вопросом
 
     const addQuestionField = () => {
-        setQuestions([...questions, {}]); // Добавляем новый вопрос
+        setQuestions([...questions, {
+            question: "",
+            answers: [{ text: "", isCorrect: false }],
+            questionImageUrl: ""
+        }]); // Добавляем новый вопрос
     };
 
     // Обработчик изменения вопроса
@@ -19,14 +27,15 @@ const CheckBlock = ({ onChange, slideId }) => {
         // Передаем обновленные данные родительскому компоненту
         onChange('questions', updatedQuestions);
         // Сериализуем вопросы в JSON
-        onChange('content', JSON.stringify(updatedQuestions));
-        onChange('type', 'test');
+        // onChange('content', JSON.stringify(updatedQuestions));
+        // onChange('content', updatedQuestions);
+        // onChange('type', 'test');
     };
 
     return (
         <div className="check-block">
             <h2>Проверочный блок</h2>
-            {questions.map((_, index) => (
+            {questions.map((question, index) => (
                 <div key={index}>
                     <QuestionSlide
                         content={questions[index].question || ''}  // Передаем текущее содержание вопроса

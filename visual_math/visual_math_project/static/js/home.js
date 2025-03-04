@@ -289,7 +289,6 @@ function showSlideShow(slides) {
 
     // Добавляем контейнер на страницу
     document.body.appendChild(slideShowContainer);
-
     // Отображаем первый слайд
     let currentSlideIndex = 0;
 
@@ -314,20 +313,6 @@ function showSlideShow(slides) {
 
         // Обработка разных типов слайдов
         switch (slide.slide_type) {
-            // case 'test': // Проверочный слайд
-            //     try {
-            //         // Если questions это строка "test", создаем пустой массив вопросов
-            //         const questionsData = slide.questions === "test" ? '[]' : slide.questions;
-            //         const questions = JSON.parse(questionsData || '[]'); // Парсим вопросы или используем пустой массив
-            //         slideHtml = `
-            //             <h2>Проверочный блок - Слайд ${index + 1}</h2>
-            //             ${renderQuestions(questions)}
-            //             ${slide.image ? `<img src="${slide.image}" class="slide-image">` : ''}
-            //         `;
-            //     } catch (e) {
-            //         slideHtml = `<div class="error">Ошибка: ${e.message}</div>`;
-            //     }
-            //     break;
             case 'test': // Проверочный слайд
                 try {
                     // Если questions это строка "test", создаем пустой массив вопросов
@@ -342,7 +327,6 @@ function showSlideShow(slides) {
                     slideHtml = `<div class="error">Ошибка: ${e.message}</div>`;
                 }
                 break;
-
             case 'questionnaire': // Вопросник
                 try {
                     const questionData = slide.questions;
@@ -398,23 +382,6 @@ function showSlideShow(slides) {
         }
     }
 
-    // Функция для рендеринга вопросов
-    // function renderQuestions(questions) {
-    //     return questions.map((q, qIndex) => `
-    //         <div class="question-block">
-    //             <h3>Вопрос ${qIndex + 1}</h3>
-    //             <div class="math-content">${q.question || ''}</div>
-    //             ${q.questionImageUrl ? `<img src="${q.questionImageUrl}" class="question-image">` : ''}
-    //             <div class="answers">
-    //                 ${q.answers.map((a, aIndex) => `
-    //                     <div class="answer ${a.isCorrect ? 'correct' : ''}">
-    //                         <div class="math-content">${a.text}</div>
-    //                     </div>
-    //                 `).join('')}
-    //             </div>
-    //         </div>
-    //     `).join('');
-    // }
     function renderQuestions(questions) {
     return questions.map((q, qIndex) => {
         const questionData = q.questionData || {}; // Извлекаем questionData
@@ -434,6 +401,7 @@ function showSlideShow(slides) {
         `;
     }).join('');
 }
+
 
     // Функции для навигации
     window.prevSlide = () => {
