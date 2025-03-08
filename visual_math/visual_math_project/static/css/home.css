@@ -629,3 +629,36 @@ footer a:hover {
     padding: 15px;
     border: 2px solid #030404;
 }
+
+#join-form {
+    background-color: #0066cc; /* Темно-серый с холодным оттенком */
+    border-radius: 10px; /* Скругленные углы */
+    padding: 15px; /* Отступы внутри элемента */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Легкая тень для глубины */
+    border: solid #0056b3;
+    border-left-width: 4px ;
+}
+
+/*<script type="module">*/
+/*  // Import the functions you need from the SDKs you need*/
+/*  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";*/
+/*  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";*/
+/*  // TODO: Add SDKs for Firebase products that you want to use*/
+/*  // https://firebase.google.com/docs/web/setup#available-libraries*/
+
+/*  // Your web app's Firebase configuration*/
+/*  // For Firebase JS SDK v7.20.0 and later, measurementId is optional*/
+/*  const firebaseConfig = {*/
+/*    apiKey: "AIzaSyA-BhSxtY2S5eZaUBshRe2kHFr3fMi9T-Y",*/
+/*    authDomain: "visual-math-2d6f6.firebaseapp.com",*/
+/*    projectId: "visual-math-2d6f6",*/
+/*    storageBucket: "visual-math-2d6f6.firebasestorage.app",*/
+/*    messagingSenderId: "861576823267",*/
+/*    appId: "1:861576823267:web:b9b8a14e5f0b29956ba0d6",*/
+/*    measurementId: "G-NW5QC5S1J4"*/
+/*  };*/
+
+/*  // Initialize Firebase*/
+/*  const app = initializeApp(firebaseConfig);*/
+/*  const analytics = getAnalytics(app);*/
+/*</script>*/

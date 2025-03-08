@@ -236,9 +236,30 @@ async function deleteLecture(presentationId) {
         alert("Не удалось удалить презентацию. Проверьте соединение с сервером.");
     }
 }
+let ws;
 
 async function openPresentation(presentationId) {
     try {
+        ws = new WebSocket("wss://yourserver.com/ws/presentation/" + presentationId + "/");
+
+        ws.onopen = () => {
+            console.log("WebSocket подключен");
+            ws.send(JSON.stringify({ event: "presentation_started", id: presentationId }));
+        };
+
+        ws.onmessage = (event) => {
+            console.log("WebSocket сообщение:", event.data);
+            // Здесь можно обрабатывать сообщения с сервера
+        };
+
+        ws.onerror = (error) => {
+            console.error("WebSocket ошибка:", error);
+        };
+
+        ws.onclose = () => {
+            console.log("WebSocket соединение закрыто");
+        };
+
         // Отправляем запрос на сервер для получения данных о презентации
         const response = await fetch(`/presentations/api/${presentationId}/`);
         console.log('URL:', `/presentations/api/${presentationId}/`);
@@ -380,6 +401,9 @@ function showSlideShow(slides) {
                 ]
             });
         }
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ event: "slide_changed", slide: index + 1 }));
+        }
     }
 
     function renderQuestions(questions) {
@@ -408,6 +432,7 @@ function showSlideShow(slides) {
         if (currentSlideIndex > 0) {
             currentSlideIndex--;
             renderSlide(currentSlideIndex);
+            ws.send(JSON.stringify({ action: "change_slide", slide: currentSlideIndex }));
         }
     };
 
@@ -415,11 +440,16 @@ function showSlideShow(slides) {
         if (currentSlideIndex < slides.length - 1) {
             currentSlideIndex++;
             renderSlide(currentSlideIndex);
+            ws.send(JSON.stringify({ action: "change_slide", slide: currentSlideIndex }));
         }
     };
 
     window.closeSlideShow = () => {
         document.body.removeChild(slideShowContainer);
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ event: "presentation_ended" }));
+            ws.close();
+        }
     };
 
     // Рендерим первый слайд
@@ -455,4 +485,74 @@ function renderKatexInText(text) {
             return part;
         }
     }).join(''); // Собираем все части обратно в одну строку
+}
+
+let studentWs;
+
+function showJoinForm() {
+    document.getElementById("join-form").classList.remove("hidden");
+}
+
+function closeJoinForm() {
+    document.getElementById("join-form").classList.add("hidden");
+}
+
+function joinPresentation() {
+    const presentationId = document.getElementById("presentation-id").value.trim();
+    if (!presentationId) {
+        alert("Введите ID презентации!");
+        return;
+    }
+
+
+    fetch(`/presentations/check_presentation/${presentationId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.exists) {
+                alert("Презентация с таким ID не существует!");
+                return;
+            }
+
+            if (!data.is_active) {
+                alert("Преподаватель еще не начал показывать эту презентацию.");
+                return;
+            }
+
+            // Если все проверки прошли успешно, подключаем WebSocket
+            studentWs = new WebSocket(`wss://yourserver.com/ws/presentation/${presentationId}/`);
+
+            studentWs.onopen = () => {
+                console.log("WebSocket открыт: Студент");
+                document.getElementById("join-form").classList.add("hidden");
+                document.getElementById("student-slide-show").classList.remove("hidden");
+            };
+
+            studentWs.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.action === "change_slide") {
+                    renderStudentSlide(data.slide);
+                } else if (data.action === "end_presentation") {
+                    alert("Презентация завершена!");
+                    studentWs.close();
+                    document.getElementById("student-slide-show").classList.add("hidden");
+                }
+            };
+
+            studentWs.onerror = (error) => console.error("WebSocket ошибка:", error);
+            studentWs.onclose = () => console.log("WebSocket закрыт");
+        })
+
+        .catch(error => {
+            console.error("Ошибка проверки презентации:", error);
+            alert("Не удалось проверить презентацию." + error);
+        });
+
+}
+
+function renderStudentSlide(index) {
+    document.getElementById("student-slide-content").innerHTML = `
+        <h2>Слайд ${index + 1}</h2>
+        <p>${slides[index].content}</p>
+        ${slides[index].image ? `<img src="${slides[index].image}" class="slide-image">` : ""}
+    `;
 }

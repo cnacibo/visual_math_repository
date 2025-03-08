@@ -17,5 +17,6 @@ urlpatterns = [
     path("delete-presentation/", views.delete_presentation, name="delete-presentation"),
     path('api/', views.save_presentation, name="save_presentation"),
     path('upload-image/', views.upload_image, name='upload_image'),
-    path('api/<int:presentation_id>/', presentation_api, name='presentation_api')
+    path('api/<int:presentation_id>/', presentation_api, name='presentation_api'),
+    path('check_presentation/<str:presentation_id>/', views.check_presentation, name='check_presentation')
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
