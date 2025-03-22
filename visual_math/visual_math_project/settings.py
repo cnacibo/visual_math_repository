@@ -9,7 +9,7 @@ DEBUG = os.getenv('DEBUG') == 'True' if os.getenv('DEBUG') is not None else Fals
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-ALLOWED_HOSTS=[]
+ALLOWED_HOSTS=['172.20.10.11', '127.0.0.1', 'localhost', '192.168.1.39', '192.168.1.30']
 
 INSTALLED_APPS = [
     'apps.presentations',
