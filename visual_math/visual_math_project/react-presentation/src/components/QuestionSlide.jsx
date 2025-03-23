@@ -15,29 +15,29 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
   const handleQuestionImageUpload = (e) => {
     const file = e.target.files[0];
         if (file) {
-            const formData = new FormData();
-            formData.append("image", file);
-            // Отправьте изображение на сервер
-            fetch("/presentations/upload-image/", {
-                method: "POST",
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.imageUrl) {
-                    setQuestionData((prev) => ({
-                      ...prev,
-                      questionImageUrl: data.imageUrl, // Сохраняем URL изображения
-                    }));
-                    onImageUpload(data.imageUrl, 'question'); // Передаем URL родительскому компоненту
-                } else {
-                    alert("Ошибка загрузки изображения");
-                }
-            })
-            .catch(error => {
-                console.error("Ошибка загрузки изображения:", error);
-            });
-        }
+             const formData = new FormData();
+             formData.append("image", file);
+             // Отправьте изображение на сервер
+             fetch("/presentations/upload-image/", {
+                 method: "POST",
+                 body: formData,
+             })
+             .then(response => response.json())
+             .then(data => {
+                 if (data.imageUrl) {
+                     setQuestionData((prev) => ({
+                       ...prev,
+                       questionImageUrl: data.imageUrl, // Сохраняем URL изображения
+                     }));
+                     onImageUpload(data.imageUrl, 'question'); // Передаем URL родительскому компоненту
+                 } else {
+                     alert("Ошибка загрузки изображения");
+                 }
+             })
+             .catch(error => {
+                 console.error("Ошибка загрузки изображения:", error);
+             });
+         }
   };
 
   // const handleAnswerImageUpload = (e) => {
@@ -75,16 +75,16 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
   //   };
 
     const handleQuestionChange = (e) => {
-    const updatedQuestion = e.target.value;
-    setQuestionData((prev) => ({
-      ...prev,
-      question: updatedQuestion,
-    }));
-    onChange('questionData', {
-      ...questionData,
-      question: updatedQuestion,
-    });
-  };
+        const updatedQuestion = e.target.value;
+        setQuestionData((prev) => ({
+          ...prev,
+          question: updatedQuestion,
+        }));
+        onChange('questionData', {
+          ...questionData,
+          question: updatedQuestion,
+        });
+    };
 
   const handleAnswerChange = (index, e) => {
     const updatedAnswers = [...questionData.answers];
@@ -227,10 +227,10 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
     </div>
   );
 };
-QuestionSlide.propTypes = {
-  content: PropTypes.string, // Текущий контент вопроса
-  onChange: PropTypes.func.isRequired, // Обработчик изменения данных
-  onImageUpload: PropTypes.func.isRequired, // Обработчик загрузки изображения
-  slideId: PropTypes.number.isRequired, // ID слайда
-};
+// QuestionSlide.propTypes = {
+//   content: PropTypes.string, // Текущий контент вопроса
+//   onChange: PropTypes.func.isRequired, // Обработчик изменения данных
+//   onImageUpload: PropTypes.func.isRequired, // Обработчик загрузки изображения
+//   slideId: PropTypes.number.isRequired, // ID слайда
+// };
 export default QuestionSlide

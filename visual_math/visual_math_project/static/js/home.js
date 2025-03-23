@@ -59,7 +59,7 @@ function loadLectures() {
     const lectureSelect = document.getElementById("lecture-search");
 
     // Очищаем список перед загрузкой
-    lectureSelect.innerHTML = '<option value="">-- Выберите лекцию --</option>';
+    lectureSelect.innerHTML ='<option value="">-- Выберите лекцию --</option>';
 
     // Добавляем лекции в выпадающий список
     lectures.forEach(lecture => {
@@ -376,7 +376,7 @@ function showSlideShow(slides, isTeacher = true) {
                     slideHtml = `
                         <h2>Проверочный блок - Слайд ${index + 1}</h2>
                         ${renderQuestions(questions)}
-                        ${slide.image ? `<img src="${slide.image}" class="slide-image">` : ''}
+                        ${slide.questions.questionImageUrl ? `<img src="${slide.questions.questionImageUrl}" class="slide-image">` : ''}
                     `;
                 } catch (e) {
                     slideHtml = `<div class="error">Ошибка: ${e.message}</div>`;
@@ -405,6 +405,7 @@ function showSlideShow(slides, isTeacher = true) {
                                 `).join('')}
                             </div>
                         </div>
+                        ${slide.questions.questionImageUrl ? `<img src="${slide.questions.questionImageUrl}" class="slide-image">` : ''}
                     `;
                 } catch (e) {
                     console.error('Ошибка парсинга вопросника:', e);
@@ -657,7 +658,14 @@ function renderStudentSlide(index) {
     const slide = globalSlides[safeIndex];
 
     // Исправляем путь к изображению
-    const imageUrl = slide.image ? slide.image : '';
+    //const imageUrl = slide.image ? slide.image : '';
+
+    const serverUrl = "http://192.168.1.137:8000";
+    let imageUrl = slide.image;
+    if (imageUrl.startsWith('/media')) {
+        imageUrl = imageUrl.slice(6); // Убираем '/media' из начала пути
+    }
+
 
     let slideHtml = '';
 
@@ -667,10 +675,11 @@ function renderStudentSlide(index) {
             try {
                 const questionsData = slide.questions === "test" ? [] : slide.questions;
                 const questions = Array.isArray(questionsData) ? questionsData : [];
+                const imageUrl = serverUrl + slide.questions.questionImageUrl;
                 slideHtml = `
                     <h2>Проверочный блок - Слайд ${safeIndex + 1}</h2>
                     ${render_Questions(questions)}
-                    ${slide.image ? `<img src="${imageUrl}" class="slide-image">` : ''}
+                    ${slide.questions.questionImageUrl ? `<img src="${imageUrl}" class="slide-image">` : ''}
                 `;
             } catch (e) {
                 slideHtml = `<div class="error">Ошибка: ${e.message}</div>`;
@@ -680,6 +689,7 @@ function renderStudentSlide(index) {
         case 'questionnaire': // Вопросник
             try {
                 const questionData = slide.questions;
+                const imageUrl = serverUrl + slide.questions.questionImageUrl;
                 slideHtml = `
                     <h2>Слайд ${safeIndex + 1} (Вопросник)</h2>
                     <div class="questionnaire">
@@ -700,6 +710,7 @@ function renderStudentSlide(index) {
                             `).join('')}
                         </div>
                     </div>
+                    ${slide.questions.questionImageUrl ? `<img src="${imageUrl}" class="slide-image">` : ''}
                 `;
             } catch (e) {
                 console.error('Ошибка парсинга вопросника:', e);
@@ -708,12 +719,21 @@ function renderStudentSlide(index) {
             break;
 
         case 'text': // Текстовый слайд
-        default:
+            const imageUrltext = serverUrl + imageUrl;
+            console.log('Image URL:', imageUrltext);
             slideHtml = `
                 <h2>Слайд ${safeIndex + 1}</h2>
                 <div class="math-content">${renderKatexInText(slide.content || "Нет текста")}</div>
-                ${slide.image ? `<img src="${imageUrl}" class="slide-image">` : ''}
+                ${imageUrl ? `<img src="${imageUrltext}" class="slide-image">` : 'Изображение не доступно'}
             `;
+            break;
+
+        default:
+           slideHtml = `
+                <h2>Слайд ${safeIndex + 1}</h2>
+                <div class="math-content">${renderKatexInText(slide.content || "Нет текста")}</div>
+           `;
+           break;
     }
 
     document.getElementById("student-slide-content").innerHTML = slideHtml;

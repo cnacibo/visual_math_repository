@@ -639,6 +639,13 @@ footer a:hover {
     border-left-width: 4px ;
 }
 
+.slide-image {
+    max-width: 70%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
 /*<script type="module">*/
 /*  // Import the functions you need from the SDKs you need*/
 /*  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";*/
