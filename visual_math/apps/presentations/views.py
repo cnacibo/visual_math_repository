@@ -13,6 +13,7 @@ from rest_framework import status
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import base64
+from django.core.cache import cache
 
 # Просмотр всех презентаций
 
@@ -124,11 +125,11 @@ def upload_image(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def presentation_api(request, presentation_id):
-    print(f"Requested presentation ID: {presentation_id}")
+    #print(f"Requested presentation ID: {presentation_id}")
     presentation = get_object_or_404(Presentation, id=presentation_id)
 
-    print(f"User: {request.user}")
-    print(f"Found presentation: {presentation}")
+    #print(f"User: {request.user}")
+    #print(f"Found presentation: {presentation}")
     presentation = get_object_or_404(Presentation, id=presentation_id)
     slides = Slide.objects.filter(presentation=presentation).values(
         'slide_type',
@@ -141,7 +142,7 @@ def presentation_api(request, presentation_id):
         'slides': list(slides)
     }
 
-    print("Returning data:", result)  # Добавьте это
+    #print("Returning data:", result)  # Добавьте это
     return JsonResponse(result)
 
 
@@ -154,14 +155,33 @@ class PresentationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# def check_presentation(request, presentation_id):
+#     try:
+#         # Получаем презентацию по ID
+#         presentation = Presentation.objects.get(id=presentation_id)
+#
+#
+#         # Проверяем, если презентация активна (например, поле `is_active` в модели)
+#         is_active = presentation.is_active
+#         return JsonResponse({"exists": True, "is_active": is_active})
+#     except:
+#         return JsonResponse({"exists": False, "is_active": False})
+
+
 def check_presentation(request, presentation_id):
     try:
-        # Получаем презентацию по ID
         presentation = Presentation.objects.get(id=presentation_id)
+        cache_key = f"presentation_{presentation_id}"
+        presentation_state = cache.get(cache_key, {
+            'is_active': False,
+            'current_slide': 0,
+            'slides': []
+        })
 
-
-        # Проверяем, если презентация активна (например, поле `is_active` в модели)
-        is_active = presentation.is_active
-        return JsonResponse({"exists": True, "is_active": is_active})
-    except:
-        return JsonResponse({"exists": False, "is_active": False})
+        return JsonResponse({
+            'exists': True,
+            'is_active': presentation_state['is_active'],
+            'slides': presentation_state['slides']
+        })
+    except Presentation.DoesNotExist:
+        return JsonResponse({'exists': False})

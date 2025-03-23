@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'corsheaders',
     'rest_framework',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -110,6 +111,9 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Разрешаем React-фронтенд
+    "http://127.0.0.1:8000",
+    "http://192.168.1.39:8000",
+    "http://172.20.10.11:8000",
 ]
 CORS_ALLOW_CREDENTIALS = True  # Разрешаем cookies
 
@@ -123,7 +127,9 @@ CHANNEL_LAYERS = {
     "default": {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',  # В продакшене лучше использовать Redis
         'CONFIG': {
-                    "hosts": [('127.0.0.1', 6379)],
+                    "hosts": [('127.0.0.1', 6379), ('192.168.1.39', 6379)],
+                    # Для Docker Compose используйте имя сервиса "redis"
+                    # "hosts": [("redis", 6379)],
                 },
     },
 }

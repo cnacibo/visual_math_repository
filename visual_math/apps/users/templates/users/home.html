@@ -6,6 +6,7 @@
     {% load static %}
     <!-- Подключаем CSS файл -->
     <link href="{% static 'css/home.css' %}" rel="stylesheet">
+    <link href="{% static 'css/Showslides_students.css' %}" rel="stylesheet">
     <script src="{% static 'js/home.js' %}" defer></script>
     <link rel="icon" type="image/x-icon" href="{% static 'images/icon.png' %}">
      <!-- KaTeX для формул -->
@@ -29,6 +30,7 @@
 <main>
     <!-- Боковая панель -->
     <article class="side-nav">
+        <div id="resizer"></div>
     <!-- Панель информации об аккаунте -->
         <div id="sidebar" class="sidebar">
             <button class="close-btn" onclick="closeSidebar()">
@@ -152,6 +154,10 @@
         </div>
     </div>
 </footer>
-
+<div id="slide-show-container" class="hidden"></div>
+<div id="student-slide-show" class="hidden">
+    <button class="close-slide-btn" onclick="closeStudentPresentation()">Закрыть</button>
+    <div id="student-slide-content"></div>
+</div>
 </body>
 </html>
