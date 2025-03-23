@@ -1,4 +1,9 @@
 // for students and teacher html
+// let globalSlides = [];
+// let currentPresentationId = null;
+// let ws = null;
+// let studentWs = null;
+
 
 function openSidebar() {
     const sidebar = document.getElementById('sidebar');
@@ -237,8 +242,32 @@ async function deleteLecture(presentationId) {
     }
 }
 
+let globalSlides = [];
+let currentPresentationId = null;
+let ws = null;
+let studentWs = null;
 async function openPresentation(presentationId) {
+    //let ws;
     try {
+        // ws = new WebSocket("wss://yourserver.com/ws/presentation/" + presentationId + "/");
+        ws = new WebSocket("ws://" + window.location.host + "/ws/presentation/" + presentationId + "/");
+        ws.onopen = () => {
+            console.log("WebSocket подключен");
+            ws.send(JSON.stringify({ event: "presentation_started", id: presentationId }));
+        };
+        ws.onerror = (error) => {
+            console.error("WebSocket error:", error);
+            alert("Ошибка подключения к презентации");
+        };
+
+        ws.onmessage = (event) => {
+            console.log("WebSocket сообщение:", event.data);
+            // Здесь можно обрабатывать сообщения с сервера
+        };
+        ws.onclose = () => {
+            console.log("WebSocket соединение закрыто");
+        };
+
         // Отправляем запрос на сервер для получения данных о презентации
         const response = await fetch(`/presentations/api/${presentationId}/`);
         console.log('URL:', `/presentations/api/${presentationId}/`);
@@ -263,21 +292,46 @@ async function openPresentation(presentationId) {
             alert('В этой презентации нет слайдов.');
             return;
         }
+        globalSlides = presentationData.slides || [];
+        currentPresentationId = presentationId;
+
+        // Отображаем слайды с учетом роли
+        const isTeacher = true; // Предполагаем, что это преподаватель
+        showSlideShow(globalSlides, isTeacher);
 
         // Отображаем слайды
-        showSlideShow(presentationData.slides);
+        //showSlideShow(globalSlides);
+
+
     } catch (error) {
         console.error('Ошибка:', error);
         alert(`Не удалось загрузить презентацию: ${error.message}`);
+        // Добавьте проверку перед закрытием
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.close();
+        }
+        ws.close();
     }
 }
 //функция отображения слайдов
-function showSlideShow(slides) {
+function showSlideShow(slides, isTeacher = true) {
+
+    globalSlides = slides;
     console.log('Received slides:', slides);
+
 
     // Создаем контейнер для слайдов
     const slideShowContainer = document.createElement('div');
     slideShowContainer.id = 'slide-show-container';
+    // slideShowContainer.style.zIndex = '10000'; // Высокий z-index
+    // slideShowContainer.style.position = 'fixed';
+    // slideShowContainer.style.top = '60px'; // Отступ сверху
+    // slideShowContainer.style.left = '0';
+    // slideShowContainer.style.width = '100%';
+    // slideShowContainer.style.height = 'calc(100% - 60px)';
+    // slideShowContainer.style.overflowY = 'auto';
+    slideShowContainer.classList.add(isTeacher ? 'teacher-slides' : 'student-slides'); // Добавляем класс в зависимости от роли
+
     slideShowContainer.innerHTML = `
         <div id="slide-content"></div>
         <div class="slide-controls">
@@ -289,6 +343,7 @@ function showSlideShow(slides) {
 
     // Добавляем контейнер на страницу
     document.body.appendChild(slideShowContainer);
+    document.body.style.overflow = 'hidden';
     // Отображаем первый слайд
     let currentSlideIndex = 0;
 
@@ -380,6 +435,9 @@ function showSlideShow(slides) {
                 ]
             });
         }
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ event: "slide_changed", slide: index + 1 }));
+        }
     }
 
     function renderQuestions(questions) {
@@ -408,6 +466,13 @@ function showSlideShow(slides) {
         if (currentSlideIndex > 0) {
             currentSlideIndex--;
             renderSlide(currentSlideIndex);
+            if (ws && ws.readyState === WebSocket.OPEN) {
+            // Отправляем АБСОЛЮТНЫЙ индекс слайда
+            ws.send(JSON.stringify({
+                action: "change_slide",
+                slide: currentSlideIndex
+            }));
+        }
         }
     };
 
@@ -415,12 +480,33 @@ function showSlideShow(slides) {
         if (currentSlideIndex < slides.length - 1) {
             currentSlideIndex++;
             renderSlide(currentSlideIndex);
+            if (ws && ws.readyState === WebSocket.OPEN) {
+            // Отправляем АБСОЛЮТНЫЙ индекс слайда
+                ws.send(JSON.stringify({
+                    action: "change_slide",
+                    slide: currentSlideIndex
+                }));
+            }
         }
     };
 
+
     window.closeSlideShow = () => {
+    // Отправляем сообщение о завершении презентации
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            action: "end_presentation"
+        }));
+        ws.close();
+    }
+
+    // Закрываем презентацию локально
+    const slideShowContainer = document.getElementById('slide-show-container');
+    if (slideShowContainer) {
         document.body.removeChild(slideShowContainer);
-    };
+    }
+    document.body.style.overflow = 'auto';
+};
 
     // Рендерим первый слайд
     renderSlide(currentSlideIndex);
@@ -455,4 +541,223 @@ function renderKatexInText(text) {
             return part;
         }
     }).join(''); // Собираем все части обратно в одну строку
+}
+
+function showJoinForm() {
+    document.getElementById("join-form").classList.remove("hidden");
+}
+
+function closeJoinForm() {
+    document.getElementById("join-form").classList.add("hidden");
+    if (studentWs) {
+        studentWs.close();
+    }
+}
+
+function joinPresentation() {
+    // let studentWs;
+    const presentationId = document.getElementById("presentation-id").value.trim();
+    currentPresentationId = presentationId;
+    if (!presentationId) {
+        alert("Введите ID презентации!");
+        return;
+    }
+
+    fetch(`/presentations/check_presentation/${presentationId}/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Http error! status: ${response.status}`)
+            }
+            return response.json();
+        })
+        .then(presentationData => {
+            if (!presentationData.exists) {
+                alert("Презентация с таким ID не существует!");
+                return;
+            }
+
+            if (!presentationData.is_active) {
+                alert("Преподаватель еще не начал показывать эту презентацию.");
+                return;
+            }
+            // 2. Сохраняем слайды в глобальную переменную
+            globalSlides = presentationData.slides;
+
+            studentWs = new WebSocket(`ws://${window.location.host}/ws/presentation/${presentationId}/`);
+
+            // Удалите второй обработчик onmessage и оставьте только этот:
+            studentWs.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log("WebSocket message received:", data);
+
+                if (data.type === 'init') {
+                    globalSlides = data.slides || [];
+                    renderStudentSlide(data.current_slide);
+                }
+                else if (data.action === 'slide_changed') {
+                    globalSlides = data.slides || []; // Обновляем слайды
+                    renderStudentSlide(data.current_slide);
+
+                    console.log("Current slide index:", data.current_slide);
+                    console.log("Total slides:", data.total_slides);
+                }
+                else if (data.action === 'end_presentation') {
+                    closeStudentPresentation();
+                }
+            };
+
+
+            studentWs.onopen = () => {
+                console.log("WebSocket открыт: Студент");
+                document.getElementById("join-form").classList.add("hidden");
+                document.getElementById("student-slide-show").classList.remove("hidden");
+            };
+
+            studentWs.onerror = (error) => {
+                console.error("WebSocket error:", error);
+                alert("Ошибка подключения к презентации");
+            };
+
+            studentWs.onerror = (error) => console.error("WebSocket ошибка:", error);
+            studentWs.onclose = () => console.log("WebSocket закрыт");
+        })
+
+        .catch(error => {
+            console.error("Ошибка проверки презентации:", error);
+            // Формируем безопасное сообщение об ошибке
+            const errorMessage = error instanceof Error ? error.message : "Неизвестная ошибка";
+            alert("Не удалось проверить презентацию: " + errorMessage);
+
+            // Добавляем проверку перед закрытием
+            if (studentWs && studentWs.readyState === WebSocket.OPEN) {
+                studentWs.close();
+            }
+        });
+
+}
+
+function closeStudentPresentation() {
+    const slideShow = document.getElementById('student-slide-show');
+    if (slideShow) {
+        slideShow.classList.add('hidden');
+    }
+    if (studentWs && studentWs.readyState === WebSocket.OPEN) {
+        studentWs.close();
+    }
+    document.body.style.overflow = 'auto'; // Восстанавливаем скролл
+}
+
+function renderStudentSlide(index) {
+    if (!Array.isArray(globalSlides) || globalSlides.length === 0) {
+        console.error("Слайды не загружены");
+        return;
+    }
+
+    const safeIndex = Math.max(0, Math.min(index, globalSlides.length - 1));
+    const slide = globalSlides[safeIndex];
+
+    // Исправляем путь к изображению
+    const imageUrl = slide.image ? slide.image : '';
+
+    let slideHtml = '';
+
+    // Обработка разных типов слайдов
+    switch (slide.slide_type) {
+        case 'test': // Проверочный слайд
+            try {
+                const questionsData = slide.questions === "test" ? [] : slide.questions;
+                const questions = Array.isArray(questionsData) ? questionsData : [];
+                slideHtml = `
+                    <h2>Проверочный блок - Слайд ${safeIndex + 1}</h2>
+                    ${render_Questions(questions)}
+                    ${slide.image ? `<img src="${imageUrl}" class="slide-image">` : ''}
+                `;
+            } catch (e) {
+                slideHtml = `<div class="error">Ошибка: ${e.message}</div>`;
+            }
+            break;
+
+        case 'questionnaire': // Вопросник
+            try {
+                const questionData = slide.questions;
+                slideHtml = `
+                    <h2>Слайд ${safeIndex + 1} (Вопросник)</h2>
+                    <div class="questionnaire">
+                        <div class="question">
+                            <div class="math-content">${renderKatexInText(questionData.question || "Вопрос не указан")}</div>
+                        </div>
+                        <div class="answers">
+                            ${questionData.answers.map((answer, i) => `
+                                <div class="answer">
+                                    <input
+                                        type="radio"
+                                        name="questionnaire-answer"
+                                        value="${i}"
+                                        ${answer.isCorrect ? 'checked' : ''}
+                                    >
+                                    <div class="math-content">${answer.text}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } catch (e) {
+                console.error('Ошибка парсинга вопросника:', e);
+                slideHtml = '<div class="error">Ошибка отображения вопросника</div>';
+            }
+            break;
+
+        case 'text': // Текстовый слайд
+        default:
+            slideHtml = `
+                <h2>Слайд ${safeIndex + 1}</h2>
+                <div class="math-content">${renderKatexInText(slide.content || "Нет текста")}</div>
+                ${slide.image ? `<img src="${imageUrl}" class="slide-image">` : ''}
+            `;
+    }
+
+    document.getElementById("student-slide-content").innerHTML = slideHtml;
+
+    // Рендер математических формул
+    if (window.renderMathInElement) {
+        renderMathInElement(document.getElementById("student-slide-content"), {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ]
+        });
+    }
+}
+
+function render_Questions(questions) {
+    return questions.map((q, qIndex) => {
+        const questionData = q.questionData || {};
+        return `
+            <div class="question-block">
+                <h3>Вопрос ${qIndex + 1}</h3>
+                <div class="math-content">${renderKatexInText(questionData.question || '')}</div>
+                ${questionData.questionImageUrl ? `<img src="${questionData.questionImageUrl}" class="question-image">` : ''}
+                <div class="answers">
+                    ${questionData.answers.map((answer, aIndex) => `
+                        <div class="answer" onclick="handleAnswerSelection(${qIndex}, ${aIndex})">
+                            <div class="math-content">${renderKatexInText(answer.text)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function handleAnswerSelection(questionIndex, answerIndex) {
+    if (studentWs && studentWs.readyState === WebSocket.OPEN) {
+        studentWs.send(JSON.stringify({
+            action: "submit_answer",
+            presentation_id: currentPresentationId,
+            question_index: questionIndex,
+            answer_index: answerIndex
+        }));
+    }
 }

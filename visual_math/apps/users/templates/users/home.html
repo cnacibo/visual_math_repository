@@ -6,6 +6,7 @@
     {% load static %}
     <!-- Подключаем CSS файл -->
     <link href="{% static 'css/home.css' %}" rel="stylesheet">
+    <link href="{% static 'css/Showslides_students.css' %}" rel="stylesheet">
     <script src="{% static 'js/home.js' %}" defer></script>
     <link rel="icon" type="image/x-icon" href="{% static 'images/icon.png' %}">
      <!-- KaTeX для формул -->
@@ -29,6 +30,7 @@
 <main>
     <!-- Боковая панель -->
     <article class="side-nav">
+        <div id="resizer"></div>
     <!-- Панель информации об аккаунте -->
         <div id="sidebar" class="sidebar">
             <button class="close-btn" onclick="closeSidebar()">
@@ -48,8 +50,19 @@
         </div>
         <!-- Кнопка открытия панели -->
         <button id="account" class="open-btn" onclick="openSidebar()">☰ Аккаунт</button>
+        {% if user.role == 'teacher' %}
         <!-- Навигация -->
             <button class="butt" onclick="showContent('library')">Библиотека лекций</button>
+        {% endif %}
+        {% if user.role == 'student' %}
+            <button class="butt" onclick="showJoinForm()">Зайти на презентацию</button>
+        {% endif %}
+
+        <div id="join-form" class="hidden">
+            <input type="text" id="presentation-id" placeholder="Введите ID презентации">
+            <button onclick="joinPresentation()">Присоединиться</button>
+            <button onclick="closeJoinForm()">Закрыть</button>
+        </div>
     </article>
 
     <!-- Основной контент -->
@@ -68,12 +81,19 @@
                     <li><p>Данный раздел доступен только преподавателям для создания учебных модулей (конкретно изучаемой области математики)</p></li>
                     <li><p>Преподаватель может структурировать материал, добавлять новые лекции, редактировать, удалять существующие.</p></li>
                </ul>
-                 {% endif %}
                 <h3>Библиотека лекций</h3>
                 <ul>
                     <li><p>В этом разделе хранятся все созданные преподавателем лекции.</p></li>
                     <li><p>Возможна сортировка по названию лекции / по модулю лекции.</p></li>
                </ul>
+                {% endif %}
+                {% if user.role == 'student' %}
+                <h3>Зайти на презентацию</h3>
+                <ul>
+                    <li><p>Перейдя по этой ссылке вы можете попасть на показ презентации.</p></li>
+                    <li><p>Чтобы зайти на нуную лекцию необходимо ввести id презентации.</p></li>
+               </ul>
+                {% endif %}
             </div>
             <h3 class="show-role">Ваша роль: <b class="role">{{ user.get_role_display }}</b></h3>
         </article>
@@ -134,6 +154,10 @@
         </div>
     </div>
 </footer>
-
+<div id="slide-show-container" class="hidden"></div>
+<div id="student-slide-show" class="hidden">
+    <button class="close-slide-btn" onclick="closeStudentPresentation()">Закрыть</button>
+    <div id="student-slide-content"></div>
+</div>
 </body>
 </html>

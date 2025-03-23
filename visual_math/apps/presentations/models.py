@@ -16,6 +16,8 @@ class Presentation(models.Model):
     created_at = models.DateTimeField(default=datetime.datetime.now)
     updated_at = models.DateTimeField(default=datetime.datetime.now)
     data = JSONField(default=dict)  # Сохраняет структуру JSON в базе данных
+    #current_slide = models.PositiveIntegerField(default=0) #??
+    is_active = models.BooleanField(default=False)
     def __str__(self):
         return self.title
 
