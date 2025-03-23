@@ -1,7 +1,6 @@
 import {useState } from 'react';
 import PropTypes from 'prop-types';
 import QuestionSlide from './QuestionSlide';
-// import 'visual_math_project/react-presentation/src/components/CheckBlock.css';
 
 const CheckBlock = ({ onChange, slideId }) => {
     const [questions, setQuestions] =
@@ -31,6 +30,7 @@ const CheckBlock = ({ onChange, slideId }) => {
         // onChange('content', updatedQuestions);
         // onChange('type', 'test');
     };
+
 
     return (
         <div className="check-block">

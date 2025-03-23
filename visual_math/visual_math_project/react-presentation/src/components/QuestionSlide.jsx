@@ -3,6 +3,7 @@ import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import PropTypes from 'prop-types';
 import '../App.css';
+import katex from 'katex';
 
 const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
   const [questionData, setQuestionData] = useState({
@@ -11,6 +12,23 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
     questionImageUrl: '',
   });
   const [isMultiple, setIsMultiple] = useState(false); // Для чекбоксов (множество правильных ответов)
+
+  const renderKatexInText = (text) => {
+        const katexRegex = /\$\$([^$]+)\$\$|\$([^$]+)\$/g;
+
+        return text.replace(katexRegex, (match, blockFormula, inlineFormula) => {
+            try {
+                if (blockFormula) {
+                    return katex.renderToString(blockFormula, { displayMode: true });
+                } else if (inlineFormula) {
+                    return katex.renderToString(inlineFormula, { displayMode: false });
+                }
+            } catch (e) {
+                console.error('Ошибка рендеринга формулы:', e);
+                return match;
+            }
+        });
+    };
 
   const handleQuestionImageUpload = (e) => {
     const file = e.target.files[0];
@@ -39,40 +57,6 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
             });
         }
   };
-
-  // const handleAnswerImageUpload = (e) => {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //       const reader = new FileReader();
-  //       reader.onloadend = () => {
-  //           onImageUpload(reader.result, `answer-${index}`); // Передаем изображение для конкретного ответа
-  //       };
-  //       reader.readAsDataURL(file);
-  //   }
-  // };
-
-  // const handleQuestionChange = (e) => {
-  //   const updatedQuestion = e.target.value;
-  //   setQuestionData((prev) => ({
-  //     ...prev,
-  //     question: updatedQuestion,
-  //   }));
-  //   onChange('questionData', {
-  //     ...questionData,
-  //     question: updatedQuestion,
-  //   });
-  // };
-  //   const handleQuestionChange = (e) => {
-  //   const updatedQuestion = e.target.value;
-  //   setQuestionData(prev => ({ ...prev, question: updatedQuestion }));
-  //
-  //   // Сериализуем весь объект вопроса
-  //   onChange('content', JSON.stringify({
-  //       ...questionData,
-  //       question: updatedQuestion
-  //   }));
-  //   onChange('type', 'questionnaire');
-  //   };
 
     const handleQuestionChange = (e) => {
     const updatedQuestion = e.target.value;
@@ -159,7 +143,7 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
       answers: updatedAnswers,
     });
   };
-
+  const renderedContentq = renderKatexInText(questionData.question);
 
   return (
     <div className="question-slide">
@@ -169,13 +153,14 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
         onChange={handleQuestionChange}
         placeholder="Введите TeX код..."
       />
-      <div className="preview-container">
-      <h3>Предпросмотр вопроса:</h3>
-        <BlockMath>{questionData.question || ''}</BlockMath>
-      </div>
+        <div className="preview-container">
+            <h3>Предпросмотр вопроса:</h3>
+            {/*<BlockMath>{questionData.question || ''}</BlockMath>*/}
+            <div dangerouslySetInnerHTML={{__html: renderedContentq}}/>
+        </div>
 
-      {/* Загрузка изображения для вопроса */}
-      <div>
+        {/* Загрузка изображения для вопроса */}
+        <div>
         <h3>Вставка изображения для вопроса:</h3>
         <input type="file" accept="image/*" onChange={handleQuestionImageUpload} />
       </div>
@@ -215,14 +200,14 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
             onChange={(e) => handleAnswerChange(index, e)}
             placeholder={`Ответ ${index + 1} с TeX кодом...`}
           />
-          <div className="preview-container">
-            <h3>Предпросмотр ответа {index + 1}:</h3>
-            <BlockMath>{answer.text}</BlockMath>
-          </div>
+            <div className="preview-container">
+                <h3>Предпросмотр ответа {index + 1}:</h3>
+                <BlockMath>{answer.text}</BlockMath>
+            </div>
         </div>
       ))}
 
-      <button onClick={addAnswerField}>Добавить ответ</button>
+        <button onClick={addAnswerField}>Добавить ответ</button>
 
     </div>
   );

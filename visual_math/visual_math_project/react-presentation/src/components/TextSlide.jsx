@@ -1,12 +1,31 @@
 import { useState } from 'react';
-import { BlockMath } from 'react-katex';
 import PropTypes from 'prop-types';
+import { BlockMath } from 'react-katex';
+import katex from 'katex';
 import 'katex/dist/katex.min.css';
-// import 'visual_math_project/react-presentation/src/components/TextSlied.css';
 import '../App.css';
 
+
+BlockMath.propTypes = {children: PropTypes.node};
 const TextSlide = ({ content, onChange, onImageUpload, slideId }) => {
     const [texInput, setTexInput] = useState(content || '');
+
+    const renderKatexInText = (text) => {
+        const katexRegex = /\$\$([^$]+)\$\$|\$([^$]+)\$/g;
+
+        return text.replace(katexRegex, (match, blockFormula, inlineFormula) => {
+            try {
+                if (blockFormula) {
+                    return katex.renderToString(blockFormula, { displayMode: true });
+                } else if (inlineFormula) {
+                    return katex.renderToString(inlineFormula, { displayMode: false });
+                }
+            } catch (e) {
+                console.error('Ошибка рендеринга формулы:', e);
+                return match;
+            }
+        });
+    };
 
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
@@ -31,10 +50,10 @@ const TextSlide = ({ content, onChange, onImageUpload, slideId }) => {
             });
         }
     };
-
+    const renderedContent = renderKatexInText(texInput);
 
     return (
-        <div  className="text_slide">
+        <div className="text_slide">
             <h2>Слайд {slideId + 1} - текстовый</h2> {/* Здесь отображаем ID слайда */}
             <textarea
                 value={texInput}
@@ -42,15 +61,15 @@ const TextSlide = ({ content, onChange, onImageUpload, slideId }) => {
                     setTexInput(e.target.value);
                     onChange(e.target.value);
                 }}
-                placeholder="Введите TeX код..."
+                placeholder="Введите LaTeX код..."
             />
             <div className="preview-container">
                 <h3>Предпросмотр:</h3>
-                <BlockMath>{texInput}</BlockMath>
+                <div dangerouslySetInnerHTML={{__html: renderedContent}}/>
             </div>
             <div>
                 <h3>Вставка изображения:</h3>
-                <input type="file" accept="image/*" onChange={handleImageUpload} />
+                <input type="file" accept="image/*" onChange={handleImageUpload}/>
             </div>
         </div>
     );

@@ -142,7 +142,7 @@ def presentation_api(request, presentation_id):
         'slides': list(slides)
     }
 
-    #print("Returning data:", result)  # Добавьте это
+    print("Returning data:", result)  # Добавьте это
     return JsonResponse(result)
 
 
@@ -153,20 +153,6 @@ class PresentationView(APIView):
             presentation = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# def check_presentation(request, presentation_id):
-#     try:
-#         # Получаем презентацию по ID
-#         presentation = Presentation.objects.get(id=presentation_id)
-#
-#
-#         # Проверяем, если презентация активна (например, поле `is_active` в модели)
-#         is_active = presentation.is_active
-#         return JsonResponse({"exists": True, "is_active": is_active})
-#     except:
-#         return JsonResponse({"exists": False, "is_active": False})
-
 
 def check_presentation(request, presentation_id):
     try:
