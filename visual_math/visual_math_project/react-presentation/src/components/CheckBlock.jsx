@@ -4,17 +4,18 @@ import QuestionSlide from './QuestionSlide';
 // import 'visual_math_project/react-presentation/src/components/CheckBlock.css';
 
 const CheckBlock = ({ onChange, slideId }) => {
-    const [questions, setQuestions] =
-        useState([{
-            question: "",
-            answers: [{ text: "", isCorrect: false }],
-            questionImageUrl: ""}]); // Начальный список с одним пустым вопросом
+    const [questions, setQuestions] = useState([{}]);
+        // useState([{
+        //     question: "",
+        //     answers: [{ text: "", isCorrect: false }],
+        //     questionImageUrl: ""}]); // Начальный список с одним пустым вопросом
 
     const addQuestionField = () => {
         setQuestions([...questions, {
             question: "",
             answers: [{ text: "", isCorrect: false }],
-            questionImageUrl: ""
+            questionImageUrl: "",
+            isMultiple: false,
         }]); // Добавляем новый вопрос
     };
 

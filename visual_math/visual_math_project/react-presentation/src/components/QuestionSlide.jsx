@@ -9,8 +9,9 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
     question: content || '',
     answers: [{ text: '', isCorrect: false }], // Начальный массив ответов
     questionImageUrl: '',
+    isMultiple: false,
   });
-  const [isMultiple, setIsMultiple] = useState(false); // Для чекбоксов (множество правильных ответов)
+  //const [isMultiple, setIsMultiple] = useState(false); // Для чекбоксов (множество правильных ответов)
 
   const handleQuestionImageUpload = (e) => {
     const file = e.target.files[0];
@@ -111,33 +112,30 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
   };
 
   const handleAnswerTypeChange = (e) => {
-      const newIsMultiple = e.target.value === 'checkbox';
-      setIsMultiple(newIsMultiple);
+    const newIsMultiple = e.target.value === 'checkbox';
 
-      // Если переключаемся с чекбоксов на радиокнопки, сбрасываем все флаги isCorrect
-      if (!newIsMultiple) {
-        const resetAnswers = questionData.answers.map((answer) => ({
-          ...answer,
-          isCorrect: false,
-        }));
+    setQuestionData((prev) => {
+        const resetAnswers = newIsMultiple ? prev.answers : prev.answers.map(a => ({ ...a, isCorrect: false }));
 
-        // Сбрасываем состояние
-        setQuestionData((prev) => ({
-          ...prev,
-          answers: resetAnswers,
-        }));
+        return {
+            ...prev,
+            isMultiple: newIsMultiple,
+            answers: resetAnswers,
+        };
+    });
 
-        onChange('questionData', {
-          ...questionData,
-          answers: resetAnswers,
-        });
-      }
-    };
+    onChange('questionData', {
+        ...questionData,
+        isMultiple: newIsMultiple,
+        answers: newIsMultiple ? questionData.answers : questionData.answers.map(a => ({ ...a, isCorrect: false })),
+    });
+  };
+
 
   const handleCorrectAnswerChange = (index) => {
 
     const updatedAnswers = questionData.answers.map((answer, i) => {
-      if (isMultiple) {
+      if (questionData.isMultiple) {
         // Если чекбоксы, меняем только у текущего ответа
         if (i === index) {
           return { ...answer, isCorrect: !answer.isCorrect };
@@ -185,7 +183,7 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
           <input
             type="radio"
             value="radio"
-            checked={!isMultiple}
+            checked={!questionData.isMultiple}
             onChange={handleAnswerTypeChange}
           />
           Радиокнопки
@@ -194,7 +192,7 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
           <input
             type="radio"
             value="checkbox"
-            checked={isMultiple}
+            checked={questionData.isMultiple}
             onChange={handleAnswerTypeChange}
           />
           Чекбоксы
@@ -204,7 +202,7 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
       {questionData.answers.map((answer, index) => (
         <div key={index} className="answer-container">
           <input
-            type={isMultiple ? 'checkbox' : 'radio'}
+            type={questionData.isMultiple ? 'checkbox' : 'radio'}
             name="answer"
             value={answer.text}
             checked={answer.isCorrect}

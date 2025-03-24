@@ -246,6 +246,7 @@ let globalSlides = [];
 let currentPresentationId = null;
 let ws = null;
 let studentWs = null;
+let answerStats = {}; // { slideIndex: { questionIndex: { answers: [] } } }
 async function openPresentation(presentationId) {
     //let ws;
     try {
@@ -253,7 +254,9 @@ async function openPresentation(presentationId) {
         ws = new WebSocket("ws://" + window.location.host + "/ws/presentation/" + presentationId + "/");
         ws.onopen = () => {
             console.log("WebSocket подключен");
-            ws.send(JSON.stringify({ event: "presentation_started", id: presentationId }));
+            ws.send(JSON.stringify({
+                event: "presentation_started", id: presentationId
+            }));
         };
         ws.onerror = (error) => {
             console.error("WebSocket error:", error);
@@ -263,6 +266,7 @@ async function openPresentation(presentationId) {
         ws.onmessage = (event) => {
             console.log("WebSocket сообщение:", event.data);
             // Здесь можно обрабатывать сообщения с сервера
+
         };
         ws.onclose = () => {
             console.log("WebSocket соединение закрыто");
@@ -296,6 +300,7 @@ async function openPresentation(presentationId) {
         currentPresentationId = presentationId;
 
         // Отображаем слайды с учетом роли
+        alert("Начало показа презентации с id = " + presentationId + "!\n\nНе забудьте сообщить данный id студентам, чтобы они смогли зайти на вашу лекцию!")
         const isTeacher = true; // Предполагаем, что это преподаватель
         showSlideShow(globalSlides, isTeacher);
 
@@ -318,6 +323,7 @@ function showSlideShow(slides, isTeacher = true) {
 
     globalSlides = slides;
     console.log('Received slides:', slides);
+
 
 
     // Создаем контейнер для слайдов
@@ -357,6 +363,14 @@ function showSlideShow(slides, isTeacher = true) {
             return;
         }
 
+         if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                action: "slide_changed",
+                current_slide: index, // Текущий индекс слайда
+                total_slides: slides.length,
+            }));
+        }
+
         let slideHtml = '';
         // const cleanedContent = slide.content
         //     ? slide.content
@@ -370,13 +384,16 @@ function showSlideShow(slides, isTeacher = true) {
         switch (slide.slide_type) {
             case 'test': // Проверочный слайд
                 try {
+
                     // Если questions это строка "test", создаем пустой массив вопросов
                     const questionsData = slide.questions === "test" ? [] : slide.questions;
                     const questions = Array.isArray(questionsData) ? questionsData : []; // Убедимся, что questions - это массив
+                    const exportButtonHtml = isTeacher ? `<button onclick="exportStatsToCSV()">Экспорт в CSV</button>` : '';
                     slideHtml = `
-                        <h2>Проверочный блок - Слайд ${index + 1}</h2>
+                        <h2>Слайд ${index + 1} - Проверочный блок</h2>
+                        ${exportButtonHtml}
                         ${renderQuestions(questions)}
-                        ${slide.questions.questionImageUrl ? `<img src="${slide.questions.questionImageUrl}" class="slide-image">` : ''}
+                        ${slide.questions.questionImageUrl ? `<img src="${slide.questions.questionImageUrl}" class="slide-image">` : ''}        
                     `;
                 } catch (e) {
                     slideHtml = `<div class="error">Ошибка: ${e.message}</div>`;
@@ -385,22 +402,19 @@ function showSlideShow(slides, isTeacher = true) {
             case 'questionnaire': // Вопросник
                 try {
                     const questionData = slide.questions;
+                    const statsButtonHtml = isTeacher ? `<button onclick="showQuestionnaireStats(${index})">Статистика ответов</button> 
+                    <div id="questionnaire-stats-${index}" class="stats-container" style="display:none;"></div>` : '';
                     slideHtml = `
-                        <h2>Слайд ${index + 1} (Вопросник)</h2>
+                        <h2>Слайд ${index + 1} - Вопросник</h2>
+                        ${statsButtonHtml}
                         <div class="questionnaire">
                             <div class="question">
                                 <div class="math-content">${renderKatexInText(questionData.question || "Вопрос не указан")}</div>
                             </div>
                             <div class="answers">
                                 ${questionData.answers.map((answer, i) => `
-                                    <div class="answer">
-                                        <input
-                                            type="radio"
-                                            name="questionnaire-answer"
-                                            value="${i}"
-                                            ${answer.isCorrect ? 'checked' : ''}
-                                        >
-                                        <div class="math-content">${answer.text}</div>
+                                    <div class="answer ${answer.isCorrect ? 'correct' : ''}">
+                                        <div class="math-content">${renderKatexInText(answer.text)}</div>
                                     </div>
                                 `).join('')}
                             </div>
@@ -513,6 +527,87 @@ function showSlideShow(slides, isTeacher = true) {
     renderSlide(currentSlideIndex);
 }
 
+function exportStatsToCSV() {
+    // Преобразуем статистику в CSV
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Слайд,Вопрос,Вариант ответа,Количество ответов\n";
+
+    Object.entries(answerStats).forEach(([slideIndex, questions]) => {
+        Object.entries(questions).forEach(([questionIndex, answers]) => {
+            Object.entries(answers.answers).forEach(([answerIndex, count]) => {
+                csvContent += `${slideIndex},${questionIndex},${answerIndex},${count}\n`;
+            });
+        });
+    });
+
+    // Создаем ссылку для скачивания
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `presentation_${currentPresentationId}_stats.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function showQuestionnaireStats(slideIndex) {
+    const container = document.getElementById(`questionnaire-stats-${slideIndex}`);
+    container.style.display = container.style.display === 'none' ? 'block' : 'none';
+
+    if (container.style.display === 'block') {
+        fetchQuestionnaireStats(slideIndex);
+    }
+}
+
+function fetchQuestionnaireStats(slideIndex) {
+    ws.send(JSON.stringify({
+        action: "get_questionnaire_stats",
+        presentation_id: currentPresentationId,
+        slide_index: slideIndex
+    }));
+}
+
+// Обработчик обновлений статистики
+ws.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+
+    if (data.action === 'questionnaire_stats_update') {
+        renderQuestionnaireStats(data.slide_index, data.stats);
+    }
+};
+
+function renderQuestionnaireStats(slideIndex, stats) {
+    const container = document.getElementById(`questionnaire-stats-${slideIndex}`);
+    if (!container) return;
+
+    container.innerHTML = `
+        <h3>Статистика ответов</h3>
+        <div class="stats-grid">
+            ${Object.entries(stats.questions).map(([qIndex, question]) => `
+                <div class="question-stats">
+                    <h4>Вопрос ${parseInt(qIndex) + 1}</h4>
+                    <div class="answers-stats">
+                        ${question.answers.map((count, aIndex) => {
+                            const percentage = question.totalAnswers > 0 
+                                ? Math.round((count / question.totalAnswers) * 100) 
+                                : 0;
+                            return `
+                                <div class="answer-stat">
+                                    <span>Вариант ${aIndex + 1}:</span>
+                                    <progress value="${percentage}" max="100"></progress>
+                                    <span>${percentage}% (${count}/${question.totalAnswers})</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+
+
 /**
  * Функция для автоматического парсинга и рендеринга формул KaTeX в тексте.
  * @param {string} text - Текст, содержащий формулы KaTeX.
@@ -593,7 +688,7 @@ function joinPresentation() {
 
                 if (data.type === 'init') {
                     globalSlides = data.slides || [];
-                    renderStudentSlide(data.current_slide);
+                    renderStudentSlide(data.current_slid || 0);
                 }
                 else if (data.action === 'slide_changed') {
                     globalSlides = data.slides || []; // Обновляем слайды
@@ -607,9 +702,9 @@ function joinPresentation() {
                 }
             };
 
-
             studentWs.onopen = () => {
                 console.log("WebSocket открыт: Студент");
+                //studentWs.send(JSON.stringify({ action: "get_current_slide" }));
                 document.getElementById("join-form").classList.add("hidden");
                 document.getElementById("student-slide-show").classList.remove("hidden");
             };
@@ -638,15 +733,17 @@ function joinPresentation() {
 }
 
 function closeStudentPresentation() {
+    if (studentWs && studentWs.readyState === WebSocket.OPEN) {
+        studentWs.close();
+    }
     const slideShow = document.getElementById('student-slide-show');
     if (slideShow) {
         slideShow.classList.add('hidden');
     }
-    if (studentWs && studentWs.readyState === WebSocket.OPEN) {
-        studentWs.close();
-    }
     document.body.style.overflow = 'auto'; // Восстанавливаем скролл
+    //alert("Презентация завершена.");
 }
+
 
 function renderStudentSlide(index) {
     if (!Array.isArray(globalSlides) || globalSlides.length === 0) {
@@ -659,6 +756,9 @@ function renderStudentSlide(index) {
 
     // Исправляем путь к изображению
     //const imageUrl = slide.image ? slide.image : '';
+
+    // const slideShowContainerStudent = document.createElement('div');
+    // slideShowContainerStudent.id = 'slide-show-container';
 
     const serverUrl = "http://192.168.1.137:8000";
     let imageUrl = slide.image;
@@ -677,8 +777,8 @@ function renderStudentSlide(index) {
                 const questions = Array.isArray(questionsData) ? questionsData : [];
                 const imageUrl = serverUrl + slide.questions.questionImageUrl;
                 slideHtml = `
-                    <h2>Проверочный блок - Слайд ${safeIndex + 1}</h2>
-                    ${render_Questions(questions)}
+                    <h2>Слайд ${safeIndex + 1} - Проверочный блок</h2>
+                    ${render_Questions(safeIndex, questions, 'test')}
                     ${slide.questions.questionImageUrl ? `<img src="${imageUrl}" class="slide-image">` : ''}
                 `;
             } catch (e) {
@@ -691,19 +791,18 @@ function renderStudentSlide(index) {
                 const questionData = slide.questions;
                 const imageUrl = serverUrl + slide.questions.questionImageUrl;
                 slideHtml = `
-                    <h2>Слайд ${safeIndex + 1} (Вопросник)</h2>
+                    <h2>Слайд ${safeIndex + 1} - Вопросник</h2>
                     <div class="questionnaire">
                         <div class="question">
                             <div class="math-content">${renderKatexInText(questionData.question || "Вопрос не указан")}</div>
                         </div>
                         <div class="answers">
                             ${questionData.answers.map((answer, i) => `
-                                <div class="answer">
+                                <div class="answer" onclick="handleAnswerSelection(${safeIndex}, 0, ${i}, ${questionData.isMultipleChoice || false})">
                                     <input
-                                        type="radio"
+                                        type="${questionData.isMultiple ? 'checkbox' : 'radio'}"
                                         name="questionnaire-answer"
                                         value="${i}"
-                                        ${answer.isCorrect ? 'checked' : ''}
                                     >
                                     <div class="math-content">${answer.text}</div>
                                 </div>
@@ -724,7 +823,7 @@ function renderStudentSlide(index) {
             slideHtml = `
                 <h2>Слайд ${safeIndex + 1}</h2>
                 <div class="math-content">${renderKatexInText(slide.content || "Нет текста")}</div>
-                ${imageUrl ? `<img src="${imageUrltext}" class="slide-image">` : 'Изображение не доступно'}
+                ${imageUrl ? `<img src="${imageUrltext}" class="slide-image">` : ''}
             `;
             break;
 
@@ -751,7 +850,7 @@ function renderStudentSlide(index) {
     }
 }
 
-function render_Questions(questions) {
+function render_Questions(slideIndex, questions, type) {
     return questions.map((q, qIndex) => {
         const questionData = q.questionData || {};
         return `
@@ -761,7 +860,12 @@ function render_Questions(questions) {
                 ${questionData.questionImageUrl ? `<img src="${questionData.questionImageUrl}" class="question-image">` : ''}
                 <div class="answers">
                     ${questionData.answers.map((answer, aIndex) => `
-                        <div class="answer" onclick="handleAnswerSelection(${qIndex}, ${aIndex})">
+                        <div class="answer" onclick="handleAnswerSelection(${slideIndex}, ${qIndex}, ${aIndex}, ${questionData.isMultipleChoice || false})">
+                            <input
+                                type="${questionData.isMultiple ? 'checkbox' : 'radio'}"
+                                name="question-${qIndex}-answer"
+                                value="${aIndex}"
+                            >
                             <div class="math-content">${renderKatexInText(answer.text)}</div>
                         </div>
                     `).join('')}
@@ -771,13 +875,88 @@ function render_Questions(questions) {
     }).join('');
 }
 
-function handleAnswerSelection(questionIndex, answerIndex) {
+
+function handleAnswerSelection(slideIndex, questionIndex, answerIndex, isMultipleChoice = false) {
+    // Инициализация структуры данных
+    if (!answerStats[slideIndex]) {
+        answerStats[slideIndex] = {
+            slide_type: 'questionnaire',
+            questions: {}
+        };
+    }
+
+    if (!answerStats[slideIndex].questions[questionIndex]) {
+        answerStats[slideIndex].questions[questionIndex] = {
+            answers: [],
+            totalAnswers: 0
+        };
+    }
+
+    // Обработка выбора
+    if (!isMultipleChoice) {
+        // Для одиночного выбора
+        answerStats[slideIndex].questions[questionIndex].answers = Array(
+            answerStats[slideIndex].questions[questionIndex].answers.length
+        ).fill(0);
+        answerStats[slideIndex].questions[questionIndex].answers[answerIndex] = 1;
+        answerStats[slideIndex].questions[questionIndex].totalAnswers = 1;
+    } else {
+        // Для множественного выбора
+        if (!answerStats[slideIndex].questions[questionIndex].answers[answerIndex]) {
+            answerStats[slideIndex].questions[questionIndex].answers[answerIndex] = 0;
+        }
+        answerStats[slideIndex].questions[questionIndex].answers[answerIndex]++;
+        answerStats[slideIndex].questions[questionIndex].totalAnswers++;
+    }
+
+    sendAnswerStats(slideIndex);
+}
+
+function sendAnswerStats(slideIndex) {
     if (studentWs && studentWs.readyState === WebSocket.OPEN) {
         studentWs.send(JSON.stringify({
-            action: "submit_answer",
+            action: "update_questionnaire_stats",
             presentation_id: currentPresentationId,
-            question_index: questionIndex,
-            answer_index: answerIndex
+            slide_index: slideIndex,
+            stats: answerStats[slideIndex]
         }));
     }
 }
+
+// Функция для отображения статистики ответов
+function renderRealTimeStats(stats) {
+    const statsContainer = document.getElementById('real-time-stats');
+    if (!statsContainer) return;
+
+    // Очищаем контейнер
+    statsContainer.innerHTML = '';
+
+    // Создаем таблицу для отображения статистики
+    const table = document.createElement('table');
+    table.innerHTML = `
+        <thead>
+            <tr>
+                <th>Вопрос</th>
+                <th>Вариант ответа</th>
+                <th>Количество ответов</th>
+                <th>Процент ответов</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${stats.map((question, questionIndex) => `
+                ${question.answers.map((answer, answerIndex) => `
+                    <tr>
+                        <td>Вопрос ${questionIndex + 1}</td>
+                        <td>Вариант ${answerIndex + 1}</td>
+                        <td>${answer.count || 0}</td>
+                        <td>${answer.percentage || 0}%</td>
+                    </tr>
+                `).join('')}
+            `).join('')}
+        </tbody>
+    `;
+
+    // Добавляем таблицу в контейнер
+    statsContainer.appendChild(table);
+}
+
