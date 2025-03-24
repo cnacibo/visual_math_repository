@@ -2,6 +2,7 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from apps.presentations.models import Presentation
 from django.core.cache import cache
+from channels.layers import get_channel_layer
 
 
 class PresentationConsumer(AsyncWebsocketConsumer):
@@ -26,6 +27,7 @@ class PresentationConsumer(AsyncWebsocketConsumer):
                     'slides': await self.get_slides_data(presentation),
                     'current_slide': presentation_state['current_slide']
                 })
+                cache.set(f"teacher_channel_{self.presentation_id}", self.channel_name)
 
             cache.set(cache_key, presentation_state, 3600)
 
@@ -95,6 +97,10 @@ class PresentationConsumer(AsyncWebsocketConsumer):
             #         }
             #     )
             data = json.loads(text_data)
+            print(f"Received data: {data}")
+            # if 'action' not in data:
+            #     print("Missing 'action' key in message")
+            #     return
             cache_key = f"presentation_{self.presentation_id}"
             presentation_state = cache.get(cache_key)
 
@@ -120,8 +126,69 @@ class PresentationConsumer(AsyncWebsocketConsumer):
                     }
                 )
 
+            if data.get('action') == 'update_questionnaire_stats':
+                stats = data['stats']
+                slide_index = data['slide_index']
+
+                # Отправка статистики преподавателю
+                await self.send_to_teacher(slide_index, stats)
+
+            if data.get('action') == 'end_presentation':
+                cache_key = f"presentation_{self.presentation_id}"
+                presentation_state = cache.get(cache_key, {})
+
+                # Обновляем состояние - презентация больше не активна
+                presentation_state['is_active'] = False
+                presentation_state['current_slide'] = 0  # Сбрасываем на первый слайд
+
+                # Сохраняем обновленное состояние
+                cache.set(cache_key, presentation_state, 3600)
+
+                # Отправляем сообщение о завершении всем участникам
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'broadcast.message',
+                        'data': {
+                            'action': 'presentation_ended',
+                            'message': 'Презентация завершена'
+                        }
+                    }
+                )
+
+                # Очищаем канал преподавателя (опционально)
+                # cache.delete(f"teacher_channel_{self.presentation_id}")
+
+
         except Exception as e:
             print(f"Receive error: {str(e)}")
 
+
     async def broadcast_message(self, event):
+        await self.send(text_data=json.dumps(event['data']))
+
+    async def send_to_teacher(self, slide_index, stats):
+        # Получаем канал преподавателя из кеша
+        teacher_channel = cache.get(f"teacher_channel_{self.presentation_id}")
+
+        data_to_send = {
+            'type': 'update_questionnaire_stats',  # Этот тип должен быть обработан
+            'data': {  # Add the 'data' key
+                'action': 'update_questionnaire_stats',
+                'slide_index': slide_index,
+                'stats': stats
+            }
+        }
+
+        print("Отправляемые данные:", data_to_send)
+
+        if teacher_channel:
+            # Отправляем данные на канал преподавателя
+            await self.channel_layer.send(
+                teacher_channel,
+                data_to_send
+            )
+
+    async def update_questionnaire_stats(self, event):
+        # Это обработчик для типа 'update_questionnaire_stats'
         await self.send(text_data=json.dumps(event['data']))

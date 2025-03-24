@@ -246,14 +246,14 @@ let globalSlides = [];
 let currentPresentationId = null;
 let ws = null;
 let studentWs = null;
-let answerStats = {}; // { slideIndex: { questionIndex: { answers: [] } } }
+let answerStats = {}; // { slideIndex: { questionIndex: { answers: [] } } } хранение статистики ответов
 async function openPresentation(presentationId) {
     //let ws;
     try {
         // ws = new WebSocket("wss://yourserver.com/ws/presentation/" + presentationId + "/");
         ws = new WebSocket("ws://" + window.location.host + "/ws/presentation/" + presentationId + "/");
         ws.onopen = () => {
-            console.log("WebSocket подключен");
+            console.log("WebSocket подключен!!");
             ws.send(JSON.stringify({
                 event: "presentation_started", id: presentationId
             }));
@@ -264,8 +264,18 @@ async function openPresentation(presentationId) {
         };
 
         ws.onmessage = (event) => {
-            console.log("WebSocket сообщение:", event.data);
-            // Здесь можно обрабатывать сообщения с сервера
+             const data = JSON.parse(event.data);
+             console.log("WebSocket message received:", data);
+
+             if (data.action === 'update_questionnaire_stats') {
+                 console.log("сообщение о статистике");
+                 try {
+                     const message = JSON.parse(event.data);
+                     updateQuestionnaireStats(message.slide_index, message.stats);
+                 } catch (error) {
+                     console.error("Ошибка обработки сообщения WebSocket:", error);
+                 }
+             }
 
         };
         ws.onclose = () => {
@@ -403,7 +413,7 @@ function showSlideShow(slides, isTeacher = true) {
                 try {
                     const questionData = slide.questions;
                     const statsButtonHtml = isTeacher ? `<button onclick="showQuestionnaireStats(${index})">Статистика ответов</button> 
-                    <div id="questionnaire-stats-${index}" class="stats-container" style="display:none;"></div>` : '';
+                    <div id="questionnaire-stats-${index}" class="stats-container" style="display:none;"></div>` : 'Не удалось загрузить статистику';
                     slideHtml = `
                         <h2>Слайд ${index + 1} - Вопросник</h2>
                         ${statsButtonHtml}
@@ -551,30 +561,154 @@ function exportStatsToCSV() {
 }
 
 function showQuestionnaireStats(slideIndex) {
-    const container = document.getElementById(`questionnaire-stats-${slideIndex}`);
-    container.style.display = container.style.display === 'none' ? 'block' : 'none';
+    const statsContainer = document.getElementById(`questionnaire-stats-${slideIndex}`);
 
-    if (container.style.display === 'block') {
-        fetchQuestionnaireStats(slideIndex);
+    if (!statsContainer) {
+        console.error(`Не найден контейнер статистики для слайда ${slideIndex}`);
+        return;
     }
+    console.log("Статистика:", JSON.stringify(answerStats, null, 2));
+
+    if (!answerStats[slideIndex]) {
+        statsContainer.innerHTML = "<p>Нет данных</p>";
+        statsContainer.style.display = "block";
+        return;
+    }
+
+    // Получаем статистику по вопросам для слайда
+    const slideStats = answerStats[slideIndex].questions;
+    let html = "<h3>Статистика ответов</h3>";
+
+    Object.keys(slideStats).forEach((questionIndex) => {
+        const question = slideStats[questionIndex];
+
+        // Подсчитываем количество каждого ответа по всем студентам
+        const answerCounts = new Array(question.answers.length).fill(0);  // Массив для подсчета голосов для каждого ответа
+
+        // Перебираем всех студентов для подсчета ответов
+        Object.keys(answerStats[slideIndex].students).forEach((userId) => {
+            const userStat = answerStats[slideIndex].students[userId];
+
+            if (userStat.questions[questionIndex]) {
+                const userAnswer = userStat.questions[questionIndex].answers;
+                userAnswer.forEach((answer, index) => {
+                    if (answer === 1) {
+                        answerCounts[index] += 1;  // Увеличиваем счетчик для выбранного ответа
+                    }
+                });
+            }
+        });
+
+        // Формируем HTML для отображения статистики ответов на этот вопрос
+        html += `<div class="question-stat"><strong>Вопрос ${parseInt(questionIndex) + 1}:</strong><ul>`;
+        answerCounts.forEach((count, index) => {
+            const answerText = count === 1 ? 'голос' : (count > 1 ? 'голосов' : 'голосов');
+            html += `<li>Ответ ${index + 1}: ${count} ${answerText}</li>`;
+        });
+        html += "</ul></div>";
+    });
+
+    statsContainer.innerHTML = html;
+    statsContainer.style.display = "block";
 }
 
-function fetchQuestionnaireStats(slideIndex) {
-    ws.send(JSON.stringify({
-        action: "get_questionnaire_stats",
-        presentation_id: currentPresentationId,
-        slide_index: slideIndex
-    }));
+
+function updateQuestionnaireStats(slideIndex, stat) {
+    console.log(`📊 Обновление статистики для слайда ${slideIndex}:`, stat);
+
+    // Если для этого слайда еще нет записи в answerStats, создаем новый объект
+    if (!answerStats[slideIndex]) {
+        answerStats[slideIndex] = {
+            questions: {},  // Вопросы для этого слайда
+            students: {}    // Статистика по студентам
+        };
+    }
+
+    // Обновляем вопросы из полученной статистики
+    if (stat.questions) {
+        answerStats[slideIndex].questions = stat.questions;
+    }
+
+    // Обновляем статистику студентов
+    if (stat.students) {
+        Object.keys(stat.students).forEach((userId) => {
+            // Если у студента есть данные по вопросам
+            if (stat.students[userId].questions) {
+                answerStats[slideIndex].students[userId] = stat.students[userId];
+            }
+        });
+    }
+
+    // Выводим обновленную статистику
+    console.log("Обновленная статистика:", JSON.stringify(answerStats, null, 2));
+
+    // const statsContainer = document.getElementById(`stats-slide-${slideIndex}`);
+    // if (!statsContainer) {
+    //     console.warn(`⚠️ Контейнер для статистики слайда ${slideIndex} не найден!`);
+    //     return;
+    // }
+
+    // Формируем HTML для отображения статистики
+    let html = "<h3>Статистика ответов:</h3>";
+
+    // Проверяем, есть ли вопросы для отображения
+    if (Object.keys(answerStats[slideIndex].questions).length === 0) {
+        html += "<p>Нет данных о вопросах</p>";
+    } else {
+        // Перебираем все вопросы
+        Object.keys(answerStats[slideIndex].questions).forEach((questionIndex) => {
+            const question = answerStats[slideIndex].questions[questionIndex];
+            html += `<p><b>Вопрос ${parseInt(questionIndex) + 1}</b></p>`;
+
+            // Подсчитываем количество каждого ответа
+            const answerCounts = new Array(question.answers.length).fill(0);
+
+            // Перебираем всех студентов для подсчета ответов
+            Object.keys(answerStats[slideIndex].students).forEach((userId) => {
+                const userStat = answerStats[slideIndex].students[userId];
+                if (userStat.questions && userStat.questions[questionIndex]) {
+                    const userAnswer = userStat.questions[questionIndex].answers;
+                    userAnswer.forEach((answer, index) => {
+                        if (answer === 1) {
+                            answerCounts[index] += 1;
+                        }
+                    });
+                }
+            });
+
+            // Формируем HTML для статистики
+            html += "<ul>";
+            answerCounts.forEach((count, index) => {
+                const votesText = count === 1 ? 'голос' : (count > 1 && count < 5 ? 'голоса' : 'голосов');
+                html += `<li>Ответ ${index + 1}: <b>${count}</b> ${votesText}</li>`;
+            });
+            html += "</ul>";
+        });
+    }
+
+    // Обновляем контейнер
+    // statsContainer.innerHTML = html;
 }
 
-// Обработчик обновлений статистики
-ws.onmessage = function(event) {
-    const data = JSON.parse(event.data);
 
-    if (data.action === 'questionnaire_stats_update') {
-        renderQuestionnaireStats(data.slide_index, data.stats);
-    }
-};
+
+
+// function fetchQuestionnaireStats(slideIndex) {
+//     ws.send(JSON.stringify({
+//         action: "get_questionnaire_stats",
+//         presentation_id: currentPresentationId,
+//         slide_index: slideIndex
+//     }));
+// }
+//
+// // Обработчик обновлений статистики
+// ws.onmessage = function(event) {
+//     const data = JSON.parse(event.data);
+//
+//     if (data.action === 'questionnaire_stats_update') {
+//         renderQuestionnaireStats(data.slide_index, data.stats);
+//     }
+// };
 
 function renderQuestionnaireStats(slideIndex, stats) {
     const container = document.getElementById(`questionnaire-stats-${slideIndex}`);
@@ -650,7 +784,7 @@ function closeJoinForm() {
     }
 }
 
-function joinPresentation() {
+function joinPresentation(studentId) {
     // let studentWs;
     const presentationId = document.getElementById("presentation-id").value.trim();
     currentPresentationId = presentationId;
@@ -688,17 +822,24 @@ function joinPresentation() {
 
                 if (data.type === 'init') {
                     globalSlides = data.slides || [];
-                    renderStudentSlide(data.current_slid || 0);
+                    renderStudentSlide(0, studentId);
                 }
                 else if (data.action === 'slide_changed') {
                     globalSlides = data.slides || []; // Обновляем слайды
-                    renderStudentSlide(data.current_slide);
+                    renderStudentSlide(data.current_slide, studentId);
 
                     console.log("Current slide index:", data.current_slide);
                     console.log("Total slides:", data.total_slides);
                 }
                 else if (data.action === 'end_presentation') {
+                    alert("Презентация завершена!");
                     closeStudentPresentation();
+                } else if (data.action === 'presentation_ended') {
+                    // Закрываем презентацию или показываем сообщение
+                    alert('Презентация завершена преподавателем!');
+                    // Дополнительные действия, например:
+                    window.location.href = '/home/'; // Перенаправление
+                    // Или скрытие интерфейса презентации
                 }
             };
 
@@ -745,7 +886,7 @@ function closeStudentPresentation() {
 }
 
 
-function renderStudentSlide(index) {
+function renderStudentSlide(index, studentId) {
     if (!Array.isArray(globalSlides) || globalSlides.length === 0) {
         console.error("Слайды не загружены");
         return;
@@ -798,7 +939,7 @@ function renderStudentSlide(index) {
                         </div>
                         <div class="answers">
                             ${questionData.answers.map((answer, i) => `
-                                <div class="answer" onclick="handleAnswerSelection(${safeIndex}, 0, ${i}, ${questionData.isMultipleChoice || false})">
+                                <div class="answer" onclick="handleAnswerSelection(${safeIndex}, 0, ${i}, ${questionData.isMultiple || false}, ${questionData.answers.length}, ${studentId})">
                                     <input
                                         type="${questionData.isMultiple ? 'checkbox' : 'radio'}"
                                         name="questionnaire-answer"
@@ -860,7 +1001,7 @@ function render_Questions(slideIndex, questions, type) {
                 ${questionData.questionImageUrl ? `<img src="${questionData.questionImageUrl}" class="question-image">` : ''}
                 <div class="answers">
                     ${questionData.answers.map((answer, aIndex) => `
-                        <div class="answer" onclick="handleAnswerSelection(${slideIndex}, ${qIndex}, ${aIndex}, ${questionData.isMultipleChoice || false})">
+                        <div class="answer" onclick="handleAnswerSelection(${slideIndex}, ${qIndex}, ${aIndex}, ${questionData.isMultiple || false})">
                             <input
                                 type="${questionData.isMultiple ? 'checkbox' : 'radio'}"
                                 name="question-${qIndex}-answer"
@@ -876,8 +1017,7 @@ function render_Questions(slideIndex, questions, type) {
 }
 
 
-function handleAnswerSelection(slideIndex, questionIndex, answerIndex, isMultipleChoice = false) {
-    // Инициализация структуры данных
+function handleAnswerSelection(slideIndex, questionIndex, answerIndex, isMultipleChoice = false, answersNumber, studentId) {
     if (!answerStats[slideIndex]) {
         answerStats[slideIndex] = {
             slide_type: 'questionnaire',
@@ -887,39 +1027,59 @@ function handleAnswerSelection(slideIndex, questionIndex, answerIndex, isMultipl
 
     if (!answerStats[slideIndex].questions[questionIndex]) {
         answerStats[slideIndex].questions[questionIndex] = {
-            answers: [],
+            answers: new Array(answersNumber).fill(0),
             totalAnswers: 0
         };
     }
+    const questionData = answerStats[slideIndex].questions[questionIndex];
 
-    // Обработка выбора
-    if (!isMultipleChoice) {
-        // Для одиночного выбора
-        answerStats[slideIndex].questions[questionIndex].answers = Array(
-            answerStats[slideIndex].questions[questionIndex].answers.length
-        ).fill(0);
-        answerStats[slideIndex].questions[questionIndex].answers[answerIndex] = 1;
-        answerStats[slideIndex].questions[questionIndex].totalAnswers = 1;
+    if (isMultipleChoice) {
+        // Переключаем состояние конкретного ответа
+        questionData.answers[answerIndex] = questionData.answers[answerIndex] ? 0 : 1;
+        console.log(questionData.answers[answerIndex] ? "Студент выбрал multiple ответ " + answerIndex: "Студент убрал выбор multiple ответа " + answerIndex);
     } else {
-        // Для множественного выбора
-        if (!answerStats[slideIndex].questions[questionIndex].answers[answerIndex]) {
-            answerStats[slideIndex].questions[questionIndex].answers[answerIndex] = 0;
-        }
-        answerStats[slideIndex].questions[questionIndex].answers[answerIndex]++;
-        answerStats[slideIndex].questions[questionIndex].totalAnswers++;
+        // Делаем текущий ответ единственно выбранным
+        questionData.answers = questionData.answers.map(() => 0);
+        questionData.answers[answerIndex] = 1;
+        console.log(questionData.answers[answerIndex] ? "Студент выбрал radio ответ " + answerIndex: "Студент убрал radio выбор ответа " + answerIndex);
     }
+
+    // Обновляем общее количество ответов
+    questionData.totalAnswers = questionData.answers.reduce((sum, val) => sum + val, 0);
+    console.log("общее количество ответов: " + questionData.totalAnswers);
+    //console.log("Статистика:", JSON.stringify(answerStats, null, 2));
+
+    if (!answerStats[slideIndex].students) {
+        answerStats[slideIndex].students = {};
+    }
+
+    if (!answerStats[slideIndex].students[studentId]) {
+        answerStats[slideIndex].students[studentId] = {
+            questions: {}
+        };
+    }
+
+    // Обновляем данные для конкретного студента
+    answerStats[slideIndex].students[studentId].questions[questionIndex] = {
+        answers: [...questionData.answers],
+        totalAnswers: questionData.totalAnswers
+    };
 
     sendAnswerStats(slideIndex);
 }
 
+
 function sendAnswerStats(slideIndex) {
     if (studentWs && studentWs.readyState === WebSocket.OPEN) {
+        console.log("отправление статистики ");
         studentWs.send(JSON.stringify({
             action: "update_questionnaire_stats",
             presentation_id: currentPresentationId,
             slide_index: slideIndex,
             stats: answerStats[slideIndex]
         }));
+    } else {
+        console.log("не удалось отправить");
     }
 }
 
