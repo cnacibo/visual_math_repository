@@ -164,8 +164,9 @@ ul {
     list-style-type: none;
     padding: 0;
 }
+
 .text-slide {
-    border: red 20px;
+    border: 2px solid black; /* Правильный синтаксис для границы */
 }
 button {
     margin: 5px;
@@ -549,3 +550,7 @@ body.slide-show-active {
 /*    display: block;*/
 /*    margin: 0 auto;*/
 /*}*/
+/* В любой из CSS-файлов */
+.katex, .katex * {
+    color: black !important; /* Переопределяет цвет формул */
+}

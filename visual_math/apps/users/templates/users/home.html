@@ -55,7 +55,7 @@
             <button class="butt" onclick="showContent('library')">Библиотека лекций</button>
         {% endif %}
         {% if user.role == 'student' %}
-            <button class="butt" onclick="showJoinForm()">Зайти на презентацию</button>
+            <button class="butt-shows" onclick="showJoinForm()">Зайти на презентацию</button>
         {% endif %}
 
         <div id="join-form" class="hidden">

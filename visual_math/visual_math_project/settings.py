@@ -9,7 +9,8 @@ DEBUG = os.getenv('DEBUG') == 'True' if os.getenv('DEBUG') is not None else Fals
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-ALLOWED_HOSTS=['172.20.10.11', '127.0.0.1', 'localhost', '192.168.1.39', '192.168.1.30', '192.168.1.223']
+ALLOWED_HOSTS=['172.20.10.11', '127.0.0.1', 'localhost', '192.168.1.39', '192.168.1.30', '192.168.1.223', '*' ,
+               '170.20,10.2']
 
 INSTALLED_APPS = [
     "daphne",
@@ -128,7 +129,7 @@ CHANNEL_LAYERS = {
     "default": {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',  # В продакшене лучше использовать Redis
         'CONFIG': {
-                    "hosts": [('127.0.0.1', 6379), ('192.168.1.39', 6379), ('192.168.1.223', 6379)],
+                    "hosts": [('127.0.0.1', 6379), ('192.168.1.39', 6379), ('192.168.1.223', 6379), ("redis", 6379)]
                     # Для Docker Compose используйте имя сервиса "redis"
                     # "hosts": [("redis", 6379)],
                 },

@@ -142,7 +142,7 @@ def presentation_api(request, presentation_id):
         'slides': list(slides)
     }
 
-    print("Returning data:", result)  # Добавьте это
+    #print("Returning data:", result)  # Добавьте это
     return JsonResponse(result)
 
 
