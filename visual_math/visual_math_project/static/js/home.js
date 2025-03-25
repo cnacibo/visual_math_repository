@@ -398,7 +398,7 @@ function showSlideShow(slides, isTeacher = true) {
                     // Если questions это строка "test", создаем пустой массив вопросов
                     const questionsData = slide.questions === "test" ? [] : slide.questions;
                     const questions = Array.isArray(questionsData) ? questionsData : []; // Убедимся, что questions - это массив
-                    const exportButtonHtml = isTeacher ? `<button onclick="exportStatsToCSV()">Экспорт в CSV</button>` : '';
+                    const exportButtonHtml = isTeacher ? `<button onclick="exportStatsToCSV(${index}, ${JSON.stringify(slide.questions).replace(/"/g, '&quot;')})">Экспорт в CSV</button>` : '';
                     slideHtml = `
                         <h2>Слайд ${index + 1} - Проверочный блок</h2>
                         ${exportButtonHtml}
@@ -536,28 +536,140 @@ function showSlideShow(slides, isTeacher = true) {
     // Рендерим первый слайд
     renderSlide(currentSlideIndex);
 }
-
-function exportStatsToCSV() {
-    // Преобразуем статистику в CSV
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Слайд,Вопрос,Вариант ответа,Количество ответов\n";
-
-    Object.entries(answerStats).forEach(([slideIndex, questions]) => {
-        Object.entries(questions).forEach(([questionIndex, answers]) => {
-            Object.entries(answers.answers).forEach(([answerIndex, count]) => {
-                csvContent += `${slideIndex},${questionIndex},${answerIndex},${count}\n`;
-            });
-        });
+function getCorrectAnswers(questionsData) {
+    const correctAnswersMap = {};
+    questionsData.forEach((questionObj, questionIndex) => {
+        const question = questionObj.questionData || questionObj;
+        if (question.answers) {
+            correctAnswersMap[questionIndex] = question.answers
+                .map((answer, idx) => answer.isCorrect ? idx : -1)
+                .filter(idx => idx !== -1);
+        }
     });
+    return correctAnswersMap;
+}
+
+async function exportStatsToCSV(slideIndex, questionsData) {
+    // Проверяем существование данных для указанного слайда
+    if (!answerStats[slideIndex] || !answerStats[slideIndex].students) {
+        console.error(`Нет данных для слайда ${slideIndex}`);
+        return;
+    }
+     const correctAnswersData = getCorrectAnswers(questionsData);
+
+    // Получаем вопросы только для этого слайда
+    const allQuestions = answerStats[slideIndex].questions
+        ? Object.keys(answerStats[slideIndex].questions).sort((a, b) => parseInt(a) - parseInt(b))
+        : [];
+
+    // Создаем заголовки CSV
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "№,Студент";
+    allQuestions.forEach((qIndex, i) => {
+        csvContent += `,Ответ на вопрос ${i+1},Верный ответ`;
+    });
+    csvContent += ",Процент верных\n";
+
+    let rowNumber = 0;
+    const namePromises = [];
+    const slideData = answerStats[slideIndex];
+
+    // Обрабатываем только студентов текущего слайда
+    Object.entries(slideData.students).forEach(([studentId, studentData]) => {
+        if (!studentId || studentId === 'undefined') {
+            const row = buildStudentRow(rowNumber, 'Неизвестный студент', studentData, allQuestions, correctAnswersData);
+            namePromises.push(Promise.resolve(row));
+        } else {
+            const rowPromise = getStudentNameById(studentId)
+                .then(name => buildStudentRow(rowNumber, name, studentData, allQuestions))
+                .catch(() => buildStudentRow(rowNumber, `Студент ${studentId}`, studentData, allQuestions, correctAnswersData));
+            namePromises.push(rowPromise);
+        }
+        rowNumber++;
+    });
+
+    // Дожидаемся всех промисов
+    const rows = await Promise.all(namePromises);
+    csvContent += rows.join('\n');
 
     // Создаем ссылку для скачивания
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `presentation_${currentPresentationId}_stats.csv`);
+    link.setAttribute("download", `presentation${currentPresentationId}_slide${slideIndex + 1}_test_${new Date().toISOString().slice(0,10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+// Вспомогательная функция для построения строки
+function buildStudentRow(rowNumber, studentName, studentData, allQuestions, correctAnswersData) {
+    let row = `${rowNumber},${studentName}`;
+    let correctAnswers = 0;
+    let totalQuestions = 0;
+
+    allQuestions.forEach(questionIndex => {
+        let answerStr = "Нет ответа";
+        let correctnessFlag = "";
+
+        if (studentData.questions?.[questionIndex]) {
+            const studentAnswers = studentData.questions[questionIndex].answers;
+            const selectedIndices = studentAnswers
+                .map((val, idx) => val === 1 ? idx : null)
+                .filter(val => val !== null);
+
+            answerStr = selectedIndices.join(', ') || "Нет";
+
+            // Проверка правильности
+            if (correctAnswersData[questionIndex]) {
+                const required = correctAnswersData[questionIndex];
+                const isMultiple = required.length > 1;
+
+                const isCorrect = isMultiple
+                    ? required.every(idx => studentAnswers[idx] === 1) &&
+                      selectedIndices.length === required.length
+                    : selectedIndices.length === 1 &&
+                      required.includes(selectedIndices[0]);
+
+                correctnessFlag = isCorrect ? "да" : "нет";
+                if (isCorrect) correctAnswers++;
+                totalQuestions++;
+            }
+        }
+
+        row += `,"${answerStr}",${correctnessFlag}`;
+    });
+
+    const percentCorrect = totalQuestions > 0
+        ? Math.round((correctAnswers / totalQuestions) * 100)
+        : 0;
+    row += `,${percentCorrect}%`;
+
+    return row;
+}
+
+const studentNameCache = {};
+
+async function getStudentNameById(studentId) {
+    // Проверяем кэш
+    if (studentNameCache[studentId]) {
+        return studentNameCache[studentId];
+    }
+
+    try {
+        const response = await fetch(`/presentations/students/${encodeURIComponent(studentId)}/`);
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const data = await response.json();
+        if (data.status === 'success') {
+            studentNameCache[studentId] = data.name;
+            return data.name;
+        }
+        throw new Error('Student not found');
+    } catch (error) {
+        console.error('Error fetching student name:', error);
+        return `Студент ${studentId}`;
+    }
 }
 
 function showQuestionnaireStats(slideIndex) {
@@ -606,6 +718,23 @@ function showQuestionnaireStats(slideIndex) {
             html += `<li>Ответ ${index + 1}: ${count} ${answerText}</li>`;
         });
         html += "</ul></div>";
+
+        //const total = answerCounts.reduce((a, b) => a + b, 0);
+        const totalRespondents = Object.keys(answerStats[slideIndex].students).length;
+        html += `<div class="pie-chart-container" style="display: flex; flex-wrap: wrap; gap: 20px;">`;
+        answerCounts.forEach((count, index) => {
+            //const percentage = total > 0 ? (count / total) * 100 : 0;
+            const percentage = totalRespondents > 0 ? (count / totalRespondents) * 100 : 0;
+            const roundedPercentage = Math.round(percentage * 10) / 10;
+            html += `
+            <div class="pie-chart-wrapper">
+                <div class="pie-chart" style="--percentage: ${percentage}">
+                    <span class="pie-value">${roundedPercentage}%</span>
+                </div>
+                <div class="pie-label">Ответ ${index + 1}</div>
+            </div>`;
+        });
+        html += `</div>`;
     });
 
     statsContainer.innerHTML = html;
@@ -677,12 +806,25 @@ function updateQuestionnaireStats(slideIndex, stat) {
             });
 
             // Формируем HTML для статистики
-            html += "<ul>";
+            // html += "<ul>";
+            // answerCounts.forEach((count, index) => {
+            //     const votesText = count === 1 ? 'голос' : (count > 1 && count < 5 ? 'голоса' : 'голосов');
+            //     html += `<li>Ответ ${index + 1}: <b>${count}</b> ${votesText}</li>`;
+            // });
+            // html += "</ul>";
+            // html += `<div class="pie-chart-container" style="display: flex; flex-wrap: wrap; gap: 20px;">`;
+
             answerCounts.forEach((count, index) => {
-                const votesText = count === 1 ? 'голос' : (count > 1 && count < 5 ? 'голоса' : 'голосов');
-                html += `<li>Ответ ${index + 1}: <b>${count}</b> ${votesText}</li>`;
+                const percentage = (count / answerCounts.reduce((a, b) => a + b, 1)) * 100 || 0;
+                html += `
+                <div class="pie-chart-wrapper">
+                    <div class="pie-chart" style="--percentage: ${percentage}">
+                        <span class="pie-value">${Math.round(percentage)}%</span>
+                    </div>
+                    <div class="pie-label">Ответ ${index + 1}</div>
+                </div>`;
             });
-            html += "</ul>";
+            html += `</div>`;
         });
     }
 
@@ -919,7 +1061,7 @@ function renderStudentSlide(index, studentId) {
                 const imageUrl = serverUrl + slide.questions.questionImageUrl;
                 slideHtml = `
                     <h2>Слайд ${safeIndex + 1} - Проверочный блок</h2>
-                    ${render_Questions(safeIndex, questions, 'test')}
+                    ${render_Questions(safeIndex, questions, 'test', studentId)}
                     ${slide.questions.questionImageUrl ? `<img src="${imageUrl}" class="slide-image">` : ''}
                 `;
             } catch (e) {
@@ -991,7 +1133,7 @@ function renderStudentSlide(index, studentId) {
     }
 }
 
-function render_Questions(slideIndex, questions, type) {
+function render_Questions(slideIndex, questions, type, studentId) {
     return questions.map((q, qIndex) => {
         const questionData = q.questionData || {};
         return `
@@ -1001,7 +1143,7 @@ function render_Questions(slideIndex, questions, type) {
                 ${questionData.questionImageUrl ? `<img src="${questionData.questionImageUrl}" class="question-image">` : ''}
                 <div class="answers">
                     ${questionData.answers.map((answer, aIndex) => `
-                        <div class="answer" onclick="handleAnswerSelection(${slideIndex}, ${qIndex}, ${aIndex}, ${questionData.isMultiple || false})">
+                        <div class="answer" onclick="handleAnswerSelection(${slideIndex}, ${qIndex}, ${aIndex}, ${questionData.isMultiple || false}, ${questionData.answers.length}, ${studentId})">
                             <input
                                 type="${questionData.isMultiple ? 'checkbox' : 'radio'}"
                                 name="question-${qIndex}-answer"

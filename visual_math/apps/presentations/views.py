@@ -14,6 +14,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import base64
 from django.core.cache import cache
+from apps.users.models import User
 
 # Просмотр всех презентаций
 
@@ -185,3 +186,18 @@ def check_presentation(request, presentation_id):
         })
     except Presentation.DoesNotExist:
         return JsonResponse({'exists': False})
+
+
+def get_student_name(request, student_id):
+    try:
+        student = User.objects.get(id=student_id)
+        return JsonResponse({
+            'id': student.id,
+            'name': f"{student.username}",  # Или ваш формат имени
+            'status': 'success'
+        })
+    except User.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Student not found'
+        }, status=404)

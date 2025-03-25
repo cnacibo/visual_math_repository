@@ -20,4 +20,5 @@ urlpatterns = [
     path('api/<int:presentation_id>/', presentation_api, name='presentation_api'),
     path('check_presentation/<str:presentation_id>/', views.check_presentation, name='check_presentation'),
     path('upload-image/', views.upload_image, name='upload_image'),
+    path('students/<int:student_id>/', views.get_student_name, name='get_student_name'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

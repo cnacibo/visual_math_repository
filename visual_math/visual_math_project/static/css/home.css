@@ -735,3 +735,62 @@ footer a:hover {
     flex-grow: 1;
 }
 
+
+/*.chart-container {*/
+/*    width: 100%;*/
+/*    max-width: 500px;*/
+/*}*/
+/*.chart-row {*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    margin-bottom: 8px;*/
+/*}*/
+/*.chart-label {*/
+/*    width: 80px;*/
+/*    font-weight: bold;*/
+/*}*/
+/*.chart-bar-container {*/
+/*    flex-grow: 1;*/
+/*    position: relative;*/
+/*    height: 30px;*/
+/*    background: #f0f0f0;*/
+/*    border-radius: 4px;*/
+/*    overflow: hidden;*/
+/*}*/
+/*.chart-bar {*/
+/*    height: 100%;*/
+/*    background: #4CAF50;*/
+/*    transition: width 0.5s ease;*/
+/*}*/
+/*.chart-value {*/
+/*    position: absolute;*/
+/*    right: 10px;*/
+/*    top: 50%;*/
+/*    transform: translateY(-50%);*/
+/*    color: #333;*/
+/*}*/
+
+.pie-chart-container {
+    margin: 20px 0;
+}
+.pie-chart-wrapper {
+    text-align: center;
+    width: 80px;
+}
+.pie-chart {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: conic-gradient(#4CAF50 var(--percentage), #f0f0f0 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 5px;
+}
+.pie-value {
+    font-size: 12px;
+    font-weight: bold;
+}
+.pie-label {
+    font-size: 12px;
+}
