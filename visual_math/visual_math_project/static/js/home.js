@@ -550,14 +550,12 @@ function getCorrectAnswers(questionsData) {
 }
 
 async function exportStatsToCSV(slideIndex, questionsData) {
-    // Проверяем существование данных для указанного слайда
-    if (!answerStats[slideIndex] || !answerStats[slideIndex].students) {
+    if (!answerStats[slideIndex]?.students) {
         console.error(`Нет данных для слайда ${slideIndex}`);
         return;
     }
-     const correctAnswersData = getCorrectAnswers(questionsData);
 
-    // Получаем вопросы только для этого слайда
+    const correctAnswersData = getCorrectAnswers(questionsData);
     const allQuestions = answerStats[slideIndex].questions
         ? Object.keys(answerStats[slideIndex].questions).sort((a, b) => parseInt(a) - parseInt(b))
         : [];
@@ -570,36 +568,47 @@ async function exportStatsToCSV(slideIndex, questionsData) {
     });
     csvContent += ",Процент верных\n";
 
-    let rowNumber = 0;
+    let rowNumber = 1;
     const namePromises = [];
-    const slideData = answerStats[slideIndex];
 
-    // Обрабатываем только студентов текущего слайда
-    Object.entries(slideData.students).forEach(([studentId, studentData]) => {
-        if (!studentId || studentId === 'undefined') {
-            const row = buildStudentRow(rowNumber, 'Неизвестный студент', studentData, allQuestions, correctAnswersData);
+    // Обрабатываем студентов с улучшенной обработкой ошибок
+    for (const [studentId, studentData] of Object.entries(answerStats[slideIndex].students)) {
+        try {
+            const name = await getStudentNameById(studentId)
+                          .catch(() => `Студент ${studentId}`);
+
+            const row = buildStudentRow(
+                rowNumber++,
+                name,
+                studentData,
+                allQuestions,
+                correctAnswersData
+            );
             namePromises.push(Promise.resolve(row));
-        } else {
-            const rowPromise = getStudentNameById(studentId)
-                .then(name => buildStudentRow(rowNumber, name, studentData, allQuestions))
-                .catch(() => buildStudentRow(rowNumber, `Студент ${studentId}`, studentData, allQuestions, correctAnswersData));
-            namePromises.push(rowPromise);
+        } catch (error) {
+            console.error(`Ошибка обработки студента ${studentId}:`, error);
+            const row = buildStudentRow(
+                rowNumber++,
+                `Студент ${studentId}`,
+                studentData,
+                allQuestions,
+                correctAnswersData
+            );
+            namePromises.push(Promise.resolve(row));
         }
-        rowNumber++;
-    });
+    }
 
-    // Дожидаемся всех промисов
     const rows = await Promise.all(namePromises);
     csvContent += rows.join('\n');
 
     // Создаем ссылку для скачивания
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `presentation${currentPresentationId}_slide${slideIndex + 1}_test_${new Date().toISOString().slice(0,10)}.csv`);
+    link.href = encodedUri;
+    link.download = `presentation_${currentPresentationId}_slide_${slideIndex + 1}_${new Date().toISOString().slice(0,10)}.csv`;
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    link.remove();
 }
 
 // Вспомогательная функция для построения строки
@@ -1081,12 +1090,12 @@ function renderStudentSlide(index, studentId) {
                         </div>
                         <div class="answers">
                             ${questionData.answers.map((answer, i) => `
-                                <div class="answer" onclick="handleAnswerSelection(${safeIndex}, 0, ${i}, ${questionData.isMultiple || false}, ${questionData.answers.length}, ${studentId})">
-                                    <input
-                                        type="${questionData.isMultiple ? 'checkbox' : 'radio'}"
-                                        name="questionnaire-answer"
-                                        value="${i}"
-                                    >
+                                <div class="answer" 
+                                     onclick="handleAnswerSelection(${safeIndex}, 0, ${i}, ${questionData.isMultiple || false}, ${questionData.answers.length}, ${studentId})"
+                                     data-selected="false"
+                                     data-index="${i}"
+                                     data-slide="${safeIndex}"
+                                     data-question="0">
                                     <div class="math-content">${answer.text}</div>
                                 </div>
                             `).join('')}
@@ -1136,22 +1145,27 @@ function renderStudentSlide(index, studentId) {
 function render_Questions(slideIndex, questions, type, studentId) {
     return questions.map((q, qIndex) => {
         const questionData = q.questionData || {};
+        const isMultiple = questionData.isMultiple || false;
         return `
             <div class="question-block">
                 <h3>Вопрос ${qIndex + 1}</h3>
                 <div class="math-content">${renderKatexInText(questionData.question || '')}</div>
                 ${questionData.questionImageUrl ? `<img src="${questionData.questionImageUrl}" class="question-image">` : ''}
                 <div class="answers">
-                    ${questionData.answers.map((answer, aIndex) => `
-                        <div class="answer" onclick="handleAnswerSelection(${slideIndex}, ${qIndex}, ${aIndex}, ${questionData.isMultiple || false}, ${questionData.answers.length}, ${studentId})">
-                            <input
-                                type="${questionData.isMultiple ? 'checkbox' : 'radio'}"
-                                name="question-${qIndex}-answer"
-                                value="${aIndex}"
-                            >
+                    ${(questionData.answers || []).map((answer, aIndex) => {
+                        // Проверяем был ли ответ уже выбран
+                        const isSelected = answerStats[slideIndex]?.questions?.[qIndex]?.answers?.[aIndex] === 1;
+                        return `
+                        <div class="answer" 
+                             onclick="handleAnswerSelection(${slideIndex}, ${qIndex}, ${aIndex}, ${isMultiple}, ${questionData.answers.length}, '${studentId}')"
+                             data-selected="${isSelected}"
+                             data-index="${aIndex}"
+                             data-slide="${slideIndex}"
+                             data-question="${qIndex}">
                             <div class="math-content">${renderKatexInText(answer.text)}</div>
                         </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `;
@@ -1167,6 +1181,9 @@ function handleAnswerSelection(slideIndex, questionIndex, answerIndex, isMultipl
         };
     }
 
+    // Более точный селектор с учетом slideIndex и questionIndex
+    const answerElement = document.querySelector(`.answer[data-slide="${slideIndex}"][data-question="${questionIndex}"][data-index="${answerIndex}"]`);
+
     if (!answerStats[slideIndex].questions[questionIndex]) {
         answerStats[slideIndex].questions[questionIndex] = {
             answers: new Array(answersNumber).fill(0),
@@ -1174,34 +1191,40 @@ function handleAnswerSelection(slideIndex, questionIndex, answerIndex, isMultipl
         };
     }
     const questionData = answerStats[slideIndex].questions[questionIndex];
+    const isSelected = answerElement.getAttribute('data-selected') === 'true';
 
     if (isMultipleChoice) {
-        // Переключаем состояние конкретного ответа
-        questionData.answers[answerIndex] = questionData.answers[answerIndex] ? 0 : 1;
-        console.log(questionData.answers[answerIndex] ? "Студент выбрал multiple ответ " + answerIndex: "Студент убрал выбор multiple ответа " + answerIndex);
+        // Для множественного выбора - переключаем только текущий ответ
+        answerElement.setAttribute('data-selected', !isSelected);
+        answerElement.classList.toggle('multiple');
     } else {
-        // Делаем текущий ответ единственно выбранным
-        questionData.answers = questionData.answers.map(() => 0);
-        questionData.answers[answerIndex] = 1;
-        console.log(questionData.answers[answerIndex] ? "Студент выбрал radio ответ " + answerIndex: "Студент убрал radio выбор ответа " + answerIndex);
+        // Для одиночного выбора - снимаем выделение только в текущем вопросе
+        document.querySelectorAll(`.answer[data-slide="${slideIndex}"][data-question="${questionIndex}"]`).forEach(el => {
+            el.setAttribute('data-selected', 'false');
+            el.classList.remove('multiple');
+        });
+        answerElement.setAttribute('data-selected', 'true');
     }
 
-    // Обновляем общее количество ответов
+    // Остальная логика остается без изменений
+    if (isMultipleChoice) {
+        questionData.answers[answerIndex] = isSelected ? 0 : 1;
+    } else {
+        questionData.answers.fill(0);
+        questionData.answers[answerIndex] = 1;
+    }
+
     questionData.totalAnswers = questionData.answers.reduce((sum, val) => sum + val, 0);
-    console.log("общее количество ответов: " + questionData.totalAnswers);
-    //console.log("Статистика:", JSON.stringify(answerStats, null, 2));
 
     if (!answerStats[slideIndex].students) {
         answerStats[slideIndex].students = {};
     }
-
     if (!answerStats[slideIndex].students[studentId]) {
         answerStats[slideIndex].students[studentId] = {
             questions: {}
         };
     }
 
-    // Обновляем данные для конкретного студента
     answerStats[slideIndex].students[studentId].questions[questionIndex] = {
         answers: [...questionData.answers],
         totalAnswers: questionData.totalAnswers

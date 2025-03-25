@@ -794,3 +794,22 @@ footer a:hover {
 .pie-label {
     font-size: 12px;
 }
+
+.answer[data-selected="true"] {
+    background-color: #E8F9FF !important;
+    border-color: #C4D9FF;
+    /*box-shadow: 0 2px 5px rgba(76, 175, 80, 0.3);*/
+}
+
+.answer[data-selected="false"] {
+    background-color: white !important;
+}
+
+.answer.multiple[data-selected="true"] {
+   background-color: #E8F9FF !important;
+    border-color: #C4D9FF;
+}
+
+.answer.multiple[data-selected="false"] {
+    background-color: white !important;
+}
