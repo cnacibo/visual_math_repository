@@ -122,11 +122,11 @@ const App = () => {
                 ) : (
                     <div>Выберите слайд или добавьте новый</div>
                 )}
-                {slides.length > 0 && (
-                    <button onClick={() => setIsSlideShowActive(true)} style={{ marginTop: '20px' }}>
-                        Показать презентацию
-                    </button>
-                )}
+                {/*{slides.length > 0 && (*/}
+                {/*    <button onClick={() => setIsSlideShowActive(true)} style={{ marginTop: '20px' }}>*/}
+                {/*        Показать презентацию*/}
+                {/*    </button>*/}
+                {/*)}*/}
             </div>
             {isSlideShowActive && (
                 <SlideShow slides={slides} onClose={() => setIsSlideShowActive(false)} />

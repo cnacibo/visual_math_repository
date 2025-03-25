@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { BlockMath } from 'react-katex';
 import PropTypes from 'prop-types';
 import 'katex/dist/katex.min.css';
+import katex from 'katex';
 // import 'visual_math_project/react-presentation/src/components/TextSlied.css';
 import '../App.css';
 
@@ -32,6 +33,25 @@ const TextSlide = ({ content, onChange, onImageUpload, slideId }) => {
         }
     };
 
+    const renderKatexInText = (text) => {
+        const katexRegex = /\$\$([^$]+)\$\$|\$([^$]+)\$/g;
+
+        return text.replace(katexRegex, (match, blockFormula, inlineFormula) => {
+            try {
+                if (blockFormula) {
+                    return katex.renderToString(blockFormula, { displayMode: true });
+                } else if (inlineFormula) {
+                    return katex.renderToString(inlineFormula, { displayMode: false });
+                }
+            } catch (e) {
+                console.error('Ошибка рендеринга формулы:', e);
+                return match;
+            }
+        });
+    };
+
+    const renderedContent = renderKatexInText(texInput);
+
 
     return (
         <div  className="text_slide">
@@ -46,7 +66,7 @@ const TextSlide = ({ content, onChange, onImageUpload, slideId }) => {
             />
             <div className="preview-container">
                 <h3>Предпросмотр:</h3>
-                <BlockMath>{texInput}</BlockMath>
+                <div dangerouslySetInnerHTML={{__html: renderedContent}}/>
             </div>
             <div>
                 <h3>Вставка изображения:</h3>

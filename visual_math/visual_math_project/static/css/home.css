@@ -553,25 +553,30 @@ footer a:hover {
     min-width: 80%;
     /*width: 100% !important;*/
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3) !important;
+    /*position: relative !important;*/
 }
 
 #student-slide-content img {
-    justify-self: center; /* Центрируем по горизонтали */
-    max-width: 200px !important; /* Ограничиваем размер картинки */
+    /* justify-self: center; Центрируем по горизонтали */
+    max-width: 400px !important; /* Ограничиваем размер картинки */
+    max-height: 300px !important;
     /*width: 100%; !* Картинка будет масштабироваться в пределах ширины 200px *!*/
     /*margin: 20px auto 0; !* Центрируем картинку по горизонтали и отступ сверху *!*/
     border-radius: 8px; /* Округленные углы */
     margin-top: 30px;
+    margin-bottom: 15px;
 }
 
 
 #slide-content img {
-    justify-self: center; /* Центрируем по горизонтали */
-    max-width: 200px; /* Ограничиваем размер картинки */
+    /*justify-self: center;  Центрируем по горизонтали */
+    max-width: 400px; /* Ограничиваем размер картинки */
+    max-height: 300px !important;
     width: 100%; /* Картинка будет масштабироваться в пределах ширины 200px */
     /*margin: 20px auto 0; !* Центрируем картинку по горизонтали и отступ сверху *!*/
     border-radius: 8px; /* Округленные углы */
     margin-top: 30px;
+    margin-bottom: 15px;
 }
 
 #slide-show-container {
@@ -598,6 +603,7 @@ footer a:hover {
     min-width: 80%;
     /*width: 100% !important;*/
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3) !important;
+    /*position: relative;*/
 }
 
 .slide-controls {

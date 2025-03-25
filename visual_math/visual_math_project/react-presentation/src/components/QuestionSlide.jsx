@@ -1,6 +1,7 @@
 import  { useState } from 'react';
 import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import katex from 'katex';
 import PropTypes from 'prop-types';
 import '../App.css';
 
@@ -158,6 +159,26 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
     });
   };
 
+  const renderKatexInText = (text) => {
+        const katexRegex = /\$\$([^$]+)\$\$|\$([^$]+)\$/g;
+
+        return text.replace(katexRegex, (match, blockFormula, inlineFormula) => {
+            try {
+                if (blockFormula) {
+                    return katex.renderToString(blockFormula, { displayMode: true });
+                } else if (inlineFormula) {
+                    return katex.renderToString(inlineFormula, { displayMode: false });
+                }
+            } catch (e) {
+                console.error('Ошибка рендеринга формулы:', e);
+                return match;
+            }
+        });
+    };
+
+const renderedContentq = renderKatexInText(questionData.question);
+
+
 
   return (
     <div className="question-slide">
@@ -168,8 +189,9 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
         placeholder="Введите TeX код..."
       />
       <div className="preview-container">
-      <h3>Предпросмотр вопроса:</h3>
-        <BlockMath>{questionData.question || ''}</BlockMath>
+            <h3>Предпросмотр вопроса:</h3>
+            {/*<BlockMath>{questionData.question || ''}</BlockMath>*/}
+            <div dangerouslySetInnerHTML={{__html: renderedContentq}}/>
       </div>
 
       {/* Загрузка изображения для вопроса */}
@@ -213,10 +235,15 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
             onChange={(e) => handleAnswerChange(index, e)}
             placeholder={`Ответ ${index + 1} с TeX кодом...`}
           />
-          <div className="preview-container">
-            <h3>Предпросмотр ответа {index + 1}:</h3>
-            <BlockMath>{answer.text}</BlockMath>
+           <div className="preview-container">
+                <h3>Предпросмотр ответа {index + 1}:</h3>
+                {/*<BlockMath>{questionData.question || ''}</BlockMath>*/}
+                <div dangerouslySetInnerHTML={{__html: renderKatexInText(answer.text)}}/>
           </div>
+          {/*<div className="preview-container">*/}
+          {/*  <h3>Предпросмотр ответа {index + 1}:</h3>*/}
+          {/*  <BlockMath>{answer.text}</BlockMath>*/}
+          {/*</div>*/}
         </div>
       ))}
 
