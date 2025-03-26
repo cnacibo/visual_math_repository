@@ -3,17 +3,24 @@
 <head>
     <title>Главная страница</title>
     <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
     <!-- Подключаем CSS файл -->
     <link href="{% static 'css/home.css' %}" rel="stylesheet">
-    <link href="{% static 'css/Showslides_students.css' %}" rel="stylesheet">
+    <link href="{% static 'css/show_slides_students.css' %}" rel="stylesheet">
+    <link href="{% static 'css/show_slides.css' %}" rel="stylesheet">
+    <link href="{% static 'css/instruction.css' %}" rel="stylesheet">
+    <link href="{% static 'css/sidebar.css' %}" rel="stylesheet">
     <script src="{% static 'js/home.js' %}" defer></script>
+    <script src="{% static 'js/student_slides.js' %}" defer></script>
+    <script src="{% static 'js/show_slides.js' %}" defer></script>
+    <script src="{% static 'js/show_slides_stats.js' %}" defer></script>
+    <script src="{% static 'js/teacher_slides.js' %}" defer></script>
     <link rel="icon" type="image/x-icon" href="{% static 'images/icon.png' %}">
      <!-- KaTeX для формул -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-
 </head>
 <body>
 
@@ -23,9 +30,7 @@
         <span>to</span>
         <span>VisualMath</span>
     </h1>
-</div>
 </header>
-
 
 <main>
     <!-- Боковая панель -->
