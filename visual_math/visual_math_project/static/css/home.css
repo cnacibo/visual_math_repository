@@ -46,144 +46,6 @@ span:nth-child(2) {
     }
 }
 
-/* SIDEBAR */
-
-/* Стили для панели */
-.sidebar {
-    position: absolute;
-    top: 5px;
-    left: 50%; /* Центрируем по горизонтали */
-    width: 80%;
-    height: 50%;
-    max-height: 400px;
-    background-color: white;
-    overflow: hidden;
-    transition: transform 0.3s ease, height 0.3s ease; /* Плавные переходы для transform и height */
-    transform: translateX(-50%) scaleY(0); /* Панель скрыта при закрытии */
-    transform-origin: top; /* Центрируем анимацию по верхнему краю */
-    border-radius: 10px;
-    z-index: 1000;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin: 10px auto;
-    border: solid black;
-    padding: 1rem; /* Фиксированные отступы */
-}
-
-.sidebar a:hover {
-    background-color: #f1f1f1;
-}
-
-.sidebar h3 {
-    margin-top: 3px;
-    line-height: 1.2;
-    text-align: center;
-    color: black;
-}
-.sidebar p {
-    line-height: 1rem;
-    text-align: left;
-    margin-left: 3px;
-    color: black;
-}
-.sidebar.open {
-    display: block;
-    height: calc(50%);    /* Высота открытой панели */
-    /*overflow-y: auto; !* Добавляем прокрутку, если контент не помещается *!*/
-    transform: translateX(-50%); /* Центрируем по горизонтали */
-    padding: 1rem; /* Внутренние отступы */
-    overflow-y: auto;
-
-}
-.open-btn {
-    margin-bottom: 1rem;
-    font-size: 18px;
-    border-radius: 20px;
-    /*background-color: #faf1df;*/
-    color: #ffffff;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-}
-
-/* Стили для кнопки закрытия панели */
-.close-btn {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    font-size: 24px;
-    color: #05000c;
-    cursor: pointer;
-    background: none; /* Убираем фон */
-    border: none; /* Убираем границы */
-    padding: 0; /* Убираем отступы */
-}
-.close-btn img {
-    width: 20px; /* Задаем размер изображения */
-    height: 20px;
-}
-
-.btn-logout, .btn-delete, .btn-values {
-    background-color: #4d87f6;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-    width: 80%;
-    margin-top: 0.5rem;
-}
-
-.btn-logout:hover, .btn-delete:hover {
-    background-color: #9150ff;
-}
-
-.side-nav {
-    z-index: 0;
-    position: relative; /* Для позиционирования панели внутри */
-    background-color: #007bff;
-    padding: 1.5rem;
-    border-radius: 10px;
-    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.3);
-    transition: padding-top 0.3s ease; /* Анимация для смещения вниз */
-    left: 0;
-    width: 15%;
-    margin-right: 10px;
-    border: 7px double #8CBA80;
-}
-
-.side-nav .navigation {
-    list-style: none;
-    line-height: 1pt;
-    margin: 0;
-    padding: 0;
-}
-
-.side-nav button {
-    margin-bottom: 0.5rem;
-    text-align: left;
-    color: white;
-    text-decoration: none;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.side-nav button:hover {
-    background-color: #0056b3;
-}
-.content {
-    flex: 4;
-    display: flex;
-    flex-direction: column;
-    transition: margin-left 0.3s ease;
-}
-.text{
-    text-align: left;
-    color: #040e0e;
-    line-height: 15px;
-}
 main {
     background:#f4f4f9;
     display: flex;
@@ -364,28 +226,6 @@ footer a:hover {
     color: #1abc9c; /* Цвет ссылки при наведении */
 }
 
-/* Адаптивный дизайн */
-@media (max-width: 768px) {
-    main {
-        padding: 1rem;
-    }
-    article {
-        padding: 1rem;
-    }
-
-     footer {
-        padding: 1.5rem 0; /* Уменьшаем отступы */
-    }
-
-    footer .title {
-        font-size: 1.25rem; /* Уменьшаем размер заголовка */
-    }
-
-    footer .textwidget p {
-        font-size: 0.9rem; /* Уменьшаем размер текста */
-    }
-}
-
 .show-role {
     color: green;
     text-align: right;
@@ -405,266 +245,6 @@ footer a:hover {
     border: 1px solid #ccc;
 }
 
-#presentations-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: flex-start;
-}
-
-.presentation-card {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
-    width: calc(33.333% - 20px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    background: #f9f9f9;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.presentation-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-}
-
-.presentation-card h3 {
-    margin-bottom: 10px;
-    font-size: 18px;
-    color: #333;
-}
-
-.presentation-card p {
-    margin: 5px 0;
-    font-size: 14px;
-    color: #666;
-}
-
-
-#nav-presentation{
-    display: flex;
-    justify-content: flex-end;  /* Выравнивание содержимого вправо */
-    gap: 10px;  /* Отступ между кнопками, можно настроить по желанию */
-    margin-bottom: 10px;
-}
-
-
-
-/*#slide-show-container {*/
-/*    position: fixed;*/
-/*    top: 50%;*/
-/*    left: 50%;*/
-/*    transform: translate(-50%, -50%);*/
-/*    background: white;*/
-/*    padding: 20px;*/
-/*    border-radius: 10px;*/
-/*    box-shadow: 0 0 20px rgba(0,0,0,0.3);*/
-/*    z-index: 1000;*/
-/*    max-width: 80%;*/
-/*    max-height: 80vh;*/
-/*    overflow-y: auto;*/
-/*}*/
-
-/*#slide-content img {*/
-/*    max-width: 100%;*/
-/*    height: auto;*/
-/*    margin: 10px 0;*/
-/*}*/
-
-/*.question {*/
-/*    margin: 15px 0;*/
-/*    padding: 10px;*/
-/*    border: 1px solid #ddd;*/
-/*    border-radius: 5px;*/
-/*}*/
-
-/*.answer {*/
-/*    padding: 5px;*/
-/*    margin: 5px 0;*/
-/*}*/
-
-/*.answer.correct {*/
-/*    background-color: #e6ffe6;*/
-/*}*/
-
-
-/*!* Стили для слайдов *!*/
-/*#slide-content {*/
-/*    max-width: 800px;*/
-/*    margin: 0 auto;*/
-/*    padding: 20px;*/
-/*}*/
-
-/*.question-block {*/
-/*    margin: 20px 0;*/
-/*    border: 1px solid #ddd;*/
-/*    padding: 15px;*/
-/*    border-radius: 8px;*/
-/*}*/
-
-/*.answers {*/
-/*    margin-top: 10px;*/
-/*}*/
-
-/*.answer {*/
-/*    padding: 8px;*/
-/*    margin: 5px 0;*/
-/*    border: 1px solid #eee;*/
-/*}*/
-
-/*.answer.correct {*/
-/*    background-color: #e8f5e9;*/
-/*    border-color: #a5d6a7;*/
-/*}*/
-
-/*.math-content {*/
-/*    font-size: 1.1em;*/
-/*    margin: 10px 0;*/
-/*}*/
-
-/*.slide-image {*/
-/*    max-width: 100%;*/
-/*    margin-top: 15px;*/
-/*}*/
-
-/*.error {*/
-/*    color: red;*/
-/*    padding: 15px;*/
-/*    border: 2px solid red;*/
-/*}*/
-
-/*.answer {*/
-/*    display: flex;*/
-/*    align-items: center;*/
-/*    margin: 10px 0;*/
-/*    padding: 10px;*/
-/*    border: 1px solid #ddd;*/
-/*    border-radius: 5px;*/
-/*}*/
-
-/*.answer input[type="radio"] {*/
-/*    margin-right: 10px;*/
-/*}*/
-
-#student-slide-content {
-    margin: 0 auto;
-    min-height: 80%;
-    padding: 20px;
-    background: white !important;
-    min-width: 80%;
-    /*width: 100% !important;*/
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3) !important;
-    /*position: relative !important;*/
-}
-
-#student-slide-content img {
-    /* justify-self: center; Центрируем по горизонтали */
-    max-width: 400px !important; /* Ограничиваем размер картинки */
-    max-height: 300px !important;
-    /*width: 100%; !* Картинка будет масштабироваться в пределах ширины 200px *!*/
-    /*margin: 20px auto 0; !* Центрируем картинку по горизонтали и отступ сверху *!*/
-    border-radius: 8px; /* Округленные углы */
-    margin-top: 30px;
-    margin-bottom: 15px;
-}
-
-
-#slide-content img {
-    /*justify-self: center;  Центрируем по горизонтали */
-    max-width: 400px; /* Ограничиваем размер картинки */
-    max-height: 300px !important;
-    width: 100%; /* Картинка будет масштабироваться в пределах ширины 200px */
-    /*margin: 20px auto 0; !* Центрируем картинку по горизонтали и отступ сверху *!*/
-    border-radius: 8px; /* Округленные углы */
-    margin-top: 30px;
-    margin-bottom: 15px;
-}
-
-#slide-show-container {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0;
-    width: 100%;
-    height: 100% !important;
-    background: #f4f4f9 !important;
-    z-index: 10000 !important; /* Убедитесь, что z-index выше, чем у других элементов */
-    overflow-y: auto; /* Добавляем прокрутку, если контент не помещается */
-    /*padding: 20px;*/
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-    justify-content: center; /* Центрируем по горизонтали */
-    align-items: flex-start; /* Выравниваем по верху */
-}
-
-#slide-content {
-    /*max-width: 800px;*/
-    margin: 0 auto;
-    min-height: 80%;
-    padding: 20px;
-    background: white !important;
-    min-width: 80%;
-    /*width: 100% !important;*/
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3) !important;
-    /*position: relative;*/
-}
-
-.slide-controls {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.slide-controls button {
-    background-color: #007bff !important;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.slide-controls button:hover {
-    background-color: #0056b3 !important;
-}
-
-.question-block {
-    margin: 20px 0;
-    border: 1px solid #ddd;
-    padding: 15px;
-    border-radius: 8px;
-}
-
-.answers {
-    margin-top: 10px;
-}
-
-.answer {
-    padding: 8px;
-    margin: 5px 0;
-    border: 1px solid #eee;
-}
-
-.answer.correct {
-    background-color: #e8f5e9;
-    border-color: #a5d6a7;
-}
-
-.math-content {
-    font-size: 1.1em;
-    margin: 10px 0;
-}
-
-.slide-image {
-    max-width: 50%;
-    margin-top: 15px;
-}
 
 .error {
     color: #040e0e;
@@ -681,230 +261,124 @@ footer a:hover {
     border-left-width: 4px ;
 }
 
-.slide-image {
-    max-width: 70%;
-    height: auto;
-    display: block;
-    margin: 0 auto;
+.text{
+    text-align: left;
+    color: #040e0e;
+    line-height: 15px;
 }
 
-/*<script type="module">*/
-/*  // Import the functions you need from the SDKs you need*/
-/*  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";*/
-/*  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";*/
-/*  // TODO: Add SDKs for Firebase products that you want to use*/
-/*  // https://firebase.google.com/docs/web/setup#available-libraries*/
-
-/*  // Your web app's Firebase configuration*/
-/*  // For Firebase JS SDK v7.20.0 and later, measurementId is optional*/
-/*  const firebaseConfig = {*/
-/*    apiKey: "AIzaSyA-BhSxtY2S5eZaUBshRe2kHFr3fMi9T-Y",*/
-/*    authDomain: "visual-math-2d6f6.firebaseapp.com",*/
-/*    projectId: "visual-math-2d6f6",*/
-/*    storageBucket: "visual-math-2d6f6.firebasestorage.app",*/
-/*    messagingSenderId: "861576823267",*/
-/*    appId: "1:861576823267:web:b9b8a14e5f0b29956ba0d6",*/
-/*    measurementId: "G-NW5QC5S1J4"*/
-/*  };*/
-
-/*  // Initialize Firebase*/
-/*  const app = initializeApp(firebaseConfig);*/
-/*  const analytics = getAnalytics(app);*/
-/*</script>*/
-
-.stats-container {
-    margin: 20px 0;
-    padding: 15px;
-    background: #f5f5f5;
-    border-radius: 8px;
-}
-
-.stats-grid {
-    display: grid;
-    gap: 20px;
-}
-
-.question-stats {
-    padding: 10px;
-    background: white;
-    border-radius: 5px;
-}
-
-.answer-stat {
-    display: flex;
-    align-items: center;
-    margin: 5px 0;
-    gap: 10px;
-}
-
-.answer-stat progress {
-    flex-grow: 1;
-}
-
-
-/*.chart-container {*/
-/*    width: 100%;*/
-/*    max-width: 500px;*/
-/*}*/
-/*.chart-row {*/
-/*    display: flex;*/
-/*    align-items: center;*/
-/*    margin-bottom: 8px;*/
-/*}*/
-/*.chart-label {*/
-/*    width: 80px;*/
-/*    font-weight: bold;*/
-/*}*/
-/*.chart-bar-container {*/
-/*    flex-grow: 1;*/
-/*    position: relative;*/
-/*    height: 30px;*/
-/*    background: #f0f0f0;*/
-/*    border-radius: 4px;*/
-/*    overflow: hidden;*/
-/*}*/
-/*.chart-bar {*/
-/*    height: 100%;*/
-/*    background: #4CAF50;*/
-/*    transition: width 0.5s ease;*/
-/*}*/
-/*.chart-value {*/
-/*    position: absolute;*/
-/*    right: 10px;*/
-/*    top: 50%;*/
-/*    transform: translateY(-50%);*/
-/*    color: #333;*/
-/*}*/
-
-.pie-chart-container {
-    margin: 20px 0;
-}
-.pie-chart-wrapper {
-    text-align: center;
-    width: 80px;
-}
-.pie-chart {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: conic-gradient(#4CAF50 var(--percentage), #f0f0f0 0);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 5px;
-}
-.pie-value {
-    font-size: 12px;
-    font-weight: bold;
-}
-.pie-label {
-    font-size: 12px;
-}
-
-.answer[data-selected="true"] {
-    background-color: #E8F9FF !important;
-    border-color: #C4D9FF;
-    /*box-shadow: 0 2px 5px rgba(76, 175, 80, 0.3);*/
-}
-
-.answer[data-selected="false"] {
-    background-color: white !important;
-}
-
-.answer.multiple[data-selected="true"] {
-   background-color: #E8F9FF !important;
-    border-color: #C4D9FF;
-}
-
-.answer.multiple[data-selected="false"] {
-    background-color: white !important;
-}
-
-
-/* Стили для раздела инструкции */
-#instruction-content {
-    padding: 20px;
-    min-width: 80%;
-    margin: 0 auto;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.instruction-text {
-    line-height: 1.6;
-    color: #333;
-    font-size: 16px;
-}
-
-.instruction-text h3 {
-    color: #2c3e50;
-    margin-top: 25px;
-    margin-bottom: 15px;
-    border-top: 2px solid #eaeaea;
-    padding-top: 8px;
-}
-.instruction-text ol {
-    counter-reset: list-item 1; /* Инициализация счетчика */
-}
-.instruction-text ol,
-.instruction-text ul {
-    margin-left: 20px;
-    padding-left: 20px;
-    list-style: none;
-}
-
-.instruction-text ol li {
-    counter-increment: list-item; /* Увеличиваем счетчик для каждого элемента */
-}
-
-.instruction-text ol li::before {
-    content: counter(list-item) ". "; /* Показываем номер с точкой */
-    margin-right: 0.5em;
-    min-width: 1.5em;        /* Фиксированная ширина для выравнивания */
-    display: inline-block;
-    text-align: right;
-}
-
-.instruction-text ul li::before {
-    content: "•";            /* Маркер для ненумерованного списка */
-    margin-right: 0.5em;
-}
-
-
-.instruction-text li {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: baseline;
-}
-
-.instruction-text p {
-    margin-bottom: 15px;
-    display: flex;
-    align-items: baseline;
-    padding-left: 20px;
-}
-
-/* Адаптация для мобильных устройств */
-@media (max-width: 768px) {
-    #instruction-content {
-        padding: 15px;
+@media (max-width: 768px)  {
+    header {
+        flex-direction: column !important;
+        text-align: center !important;
+        background: #007bff !important;
     }
 
-    .instruction-text {
-        font-size: 14px;
+   header h1 {
+        font-size: 1.8rem !important;
+        line-height: 1.3;
+        background: #007bff !important;
+        box-shadow: none !important;
+   }
+
+    main {
+        display: flex;
+        flex-direction: column !important;
+        padding: 10px !important;
+        margin-left: 0 !important;
+        width: 100% !important;
     }
 
-    .instruction-text h3 {
-        font-size: 18px;
+    .content {
+        width: 100% !important;
+        padding: 5px !important;
+        font-size: 0.5rem !important;
     }
-}
 
-.highlighted-note {
-    background-color: #F6F0F0;  /* Светло-серый фон */
-    padding: 12px 15px;        /* Отступы внутри блока */
-    border-top: 2px solid #E69DB8;  /* Серая линия сверху */
-    margin-top: 20px;          /* Отступ от предыдущего контента */
-    border-radius: 4px;        /* Скругленные углы */
-    color: #333;               /* Цвет текста */
+    .text h3{
+        font-size: 0.7rem !important;
+    }
+
+    #desc{
+        font-size: 0.9rem !important;
+    }
+
+    article.con {
+        padding: 15px !important;
+        width: 80% !important;
+    }
+
+    /* FOOTER */
+    footer {
+        height: auto !important;
+        padding: 4px !important;
+    }
+
+    footer .wrapper {
+        padding: 0 !important;
+    }
+
+    footer .title {
+        font-size: 0.6rem !important;
+        margin: 0 !important;
+    }
+
+    footer .textwidget p {
+        font-size: 0.5rem !important;
+        margin-bottom: 5px !important;
+    }
+
+    #change-content {
+        width: 80% !important;
+        /*margin: 0 auto;*/
+        padding: 20px 15px !important;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        font-size: 0.9rem !important;
+        color: #333 !important;
+        position: relative;
+    }
+
+    #change-content h2 {
+        font-size: 1.2rem !important;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #007bff !important;
+    }
+
+    #change-content .btn {
+        width: 100%;
+        padding: 12px !important;
+        margin: 8px 0 !important;
+        border-radius: 10px !important;
+        font-size: 0.95rem !important;
+        background: linear-gradient(135deg, #4d87f6, #3a6bd8);
+        color: white !important;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    #change-content .btn:hover {
+        background: linear-gradient(135deg, #3a6bd8, #2a56c2);
+        transform: translateY(-2px);
+    }
+
+    #change-content .close {
+        width: 100%;
+        padding: 12px !important;
+        margin-top: 15px !important;
+        border-radius: 10px !important;
+        font-size: 0.95rem !important;
+        background: linear-gradient(135deg, #6c757d, #5a6268);
+        color: white !important;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    #change-content .close:hover {
+        background: linear-gradient(135deg, #5a6268, #495056);
+    }
+
 }
