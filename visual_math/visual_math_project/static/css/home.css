@@ -251,16 +251,6 @@ footer a:hover {
     padding: 15px;
     border: 2px solid #030404;
 }
-
-#join-form {
-    background-color: #0066cc; /* Темно-серый с холодным оттенком */
-    border-radius: 10px; /* Скругленные углы */
-    padding: 15px; /* Отступы внутри элемента */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Легкая тень для глубины */
-    border: solid #0056b3;
-    border-left-width: 4px ;
-}
-
 .text{
     text-align: left;
     color: #040e0e;
