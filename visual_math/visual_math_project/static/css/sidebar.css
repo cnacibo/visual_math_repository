@@ -17,7 +17,7 @@
     z-index: 1000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin: 10px auto;
-    border: solid black;
+    border: solid #0056b3;
     padding: 1rem; /* Фиксированные отступы */
 }
 
@@ -132,6 +132,16 @@
     transition: margin-left 0.3s ease;
 }
 
+#join-form {
+    background-color: #0066cc; /* Темно-серый с холодным оттенком */
+    border-radius: 10px; /* Скругленные углы */
+    padding: 15px; /* Отступы внутри элемента */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Легкая тень для глубины */
+    border: solid #0056b3;
+    border-left-width: 4px ;
+}
+
+
 @media (max-width: 768px) {
     /* Общие стили для мобильной панели */
     .side-nav {
@@ -165,7 +175,7 @@
         border-radius: 20px;
         padding: 20px !important;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        border: none !important;
+        /*border: none !important;*/
         height: 60% !important;
     }
     .sidebar h3 {
