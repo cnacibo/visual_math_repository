@@ -1,0 +1,72 @@
+/* Стили для раздела инструкции */
+#instruction-content {
+    padding: 20px;
+    min-width: 80%;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.instruction-text {
+    line-height: 1.6;
+    color: #333;
+    font-size: 16px;
+}
+
+.instruction-text h3 {
+    color: #2c3e50;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    border-top: 2px solid #eaeaea;
+    padding-top: 8px;
+}
+.instruction-text ol {
+    counter-reset: list-item 1; /* Инициализация счетчика */
+}
+.instruction-text ol,
+.instruction-text ul {
+    margin-left: 20px;
+    padding-left: 20px;
+    list-style: none;
+}
+
+.instruction-text ol li {
+    counter-increment: list-item; /* Увеличиваем счетчик для каждого элемента */
+}
+
+.instruction-text ol li::before {
+    content: counter(list-item) ". "; /* Показываем номер с точкой */
+    margin-right: 0.5em;
+    min-width: 1.5em;        /* Фиксированная ширина для выравнивания */
+    display: inline-block;
+    text-align: right;
+}
+
+.instruction-text ul li::before {
+    content: "•";            /* Маркер для ненумерованного списка */
+    margin-right: 0.5em;
+}
+
+
+.instruction-text li {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: baseline;
+}
+
+.instruction-text p {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: baseline;
+    padding-left: 20px;
+}
+
+.highlighted-note {
+    background-color: #F6F0F0;  /* Светло-серый фон */
+    padding: 12px 15px;        /* Отступы внутри блока */
+    border-top: 2px solid #E69DB8;  /* Серая линия сверху */
+    margin-top: 20px;          /* Отступ от предыдущего контента */
+    border-radius: 4px;        /* Скругленные углы */
+    color: #333;               /* Цвет текста */
+}

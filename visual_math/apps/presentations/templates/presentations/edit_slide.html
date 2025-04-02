@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование слайда</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
+    <style>
+        #canvas {
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Редактирование слайда</h1>
+
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <script>
+        var canvas = new fabric.Canvas('canvas');
+
+        var text = new fabric.Text('Ваш текст здесь', { left: 10, top: 10, fontSize: 30 });
+        canvas.add(text);
+    </script>
+</body>
+</html>

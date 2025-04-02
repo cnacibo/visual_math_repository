@@ -1,0 +1,374 @@
+main, footer {
+    font-family: "Georgia", serif;
+}
+
+/* HEADER */
+header {
+    display: flex;
+    background: linear-gradient(to bottom, #4a90e2, #007bff);
+    position: relative;
+    z-index: 10000;
+}
+
+header h1 {
+    flex: 2;
+    text-align: center;
+    font-size: 3rem;
+    color: white;
+    background: linear-gradient(to bottom, #4a90e2, #007bff);
+    margin: 0;
+    transform: scale(0.94);
+    animation: scale 1s forwards cubic-bezier(0.5, 1, 0.89, 1);
+    font-family: "Montserrat Medium", serif;
+    padding: 10px 0;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes scale {
+    100% {
+        transform: scale(1);
+    }
+}
+
+span .teacher-name {
+    display: inline-block;
+    opacity: 1;
+}
+span:nth-child(1) {
+    animation: fade-in 0.8 0.35s forwards cubic-bezier(0.11, 0, 0.5, 0);
+}
+span:nth-child(2) {
+    animation: fade-in 0.8 0.65s forwards cubic-bezier(0.11, 0, 0.5, 0);
+}
+@keyframes fade-in {
+    100% {
+        opacity: 1;
+    }
+}
+
+main {
+    background:#f4f4f9;
+    display: flex;
+    z-index: 0;
+    position: relative;
+    margin-left: 10px;
+    padding: 20px;
+    text-align: center;
+    color: darkslateblue;
+    transition: margin-left 0.0s; /* Анимация для основного контента */
+    flex-grow: 1; /* Расширяем основной контент, чтобы занять всё свободное пространство */
+}
+main p{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.main-shifted {
+    margin-right: 335px; /* Ширина панели */
+    transition: margin-right 0.3s ease; /* Анимация */
+}
+
+body {
+    margin: 0;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f9;
+    z-index: 0;
+    position: relative;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column; /* Вертикальный стек */
+}
+
+article {
+    /*flex: 4;*/
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.con {
+    border-left: solid #8CBA80;
+    border-left-width: 4px ;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+article .side-nav {
+    flex: 1;
+}
+section{
+    width: 100%;
+    margin-bottom: 1.5rem;
+    margin-left: 0;
+}
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: black;
+}
+input[type="text"],
+select {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    margin: 5px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+
+
+button:hover {
+    background-color: #0056b3;
+}
+
+
+.contents {
+    width: 80%;
+    padding: 20px;
+}
+.butt {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+}
+.butt:hover {
+    background-color: #0056b3;
+}
+.hidden {
+    display: none;
+}
+
+.close img{
+    width: 20px; /* Задаем размер изображения */
+    height: 20px;
+}
+
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column; /* Вертикальный стек */
+}
+
+
+footer {
+    background: #ffeecf;
+    color: black;
+}
+/* Основные стили для футера */
+footer {
+    background: #007BFF; /* Тёмный фон */
+    color: white; /* Светлый текст */
+    padding: 0 0 15px 0; /* Отступы сверху и снизу */
+    text-align: left; /* Выравнивание текста по центру */
+    height: 80px;
+    /*border-top: 4px solid #8CBA80;  Верхняя граница футера */
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+}
+
+/* Стили для контейнера внутри футера */
+footer .wrapper {
+    max-width: 1200px; /* Максимальная ширина контейнера */
+    margin: 0 10px; /* Центрирование контейнера */
+    padding: 0 10px; /* Отступы слева и справа */
+}
+
+/* Стили для заголовка футера */
+footer .title {
+    font-size: 1rem; /* Размер шрифта */
+    font-weight: bold; /* Жирный шрифт */
+    margin-bottom: 1rem; /* Отступ снизу */
+    color: white; /* Синий цвет заголовка */
+    text-transform: uppercase; /* Заглавные буквы */
+}
+
+/* Стили для текста внутри футера */
+footer .textwidget p {
+    font-size: 1rem; /* Размер шрифта */
+    margin: 0.5rem 0; /* Отступы между строками */
+    line-height: 1.2; /* Межстрочный интервал */
+}
+
+footer .textwidget b {
+    color: black;
+}
+
+/* Стили для ссылок (если они появятся) */
+footer a {
+    color: #3498db; /* Синий цвет ссылок */
+    text-decoration: none; /* Убираем подчёркивание */
+    transition: color 0.3s ease; /* Плавное изменение цвета */
+}
+
+footer a:hover {
+    color: #1abc9c; /* Цвет ссылки при наведении */
+}
+
+.show-role {
+    color: green;
+    text-align: right;
+    line-height: 15px;
+}
+
+.show-role b{
+    color: black;
+    font-weight: normal;
+}
+
+#subject {
+    margin-bottom: 20px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+
+.error {
+    color: #040e0e;
+    padding: 15px;
+    border: 2px solid #030404;
+}
+.text{
+    text-align: left;
+    color: #040e0e;
+    line-height: 15px;
+}
+
+@media (max-width: 768px)  {
+    header {
+        flex-direction: column !important;
+        text-align: center !important;
+        background: #007bff !important;
+    }
+
+   header h1 {
+        font-size: 1.8rem !important;
+        line-height: 1.3;
+        background: #007bff !important;
+        box-shadow: none !important;
+   }
+
+    main {
+        display: flex;
+        flex-direction: column !important;
+        padding: 10px !important;
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .content {
+        width: 100% !important;
+        padding: 5px !important;
+        font-size: 0.5rem !important;
+    }
+
+    .text h3{
+        font-size: 0.7rem !important;
+    }
+
+    #desc{
+        font-size: 0.9rem !important;
+    }
+
+    article.con {
+        padding: 15px !important;
+        width: 80% !important;
+    }
+
+    /* FOOTER */
+    footer {
+        height: auto !important;
+        padding: 4px !important;
+    }
+
+    footer .wrapper {
+        padding: 0 !important;
+    }
+
+    footer .title {
+        font-size: 0.6rem !important;
+        margin: 0 !important;
+    }
+
+    footer .textwidget p {
+        font-size: 0.5rem !important;
+        margin-bottom: 5px !important;
+    }
+
+    #change-content {
+        width: 80% !important;
+        /*margin: 0 auto;*/
+        padding: 20px 15px !important;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        font-size: 0.9rem !important;
+        color: #333 !important;
+        position: relative;
+    }
+
+    #change-content h2 {
+        font-size: 1.2rem !important;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #007bff !important;
+    }
+
+    #change-content .btn {
+        width: 100%;
+        padding: 12px !important;
+        margin: 8px 0 !important;
+        border-radius: 10px !important;
+        font-size: 0.95rem !important;
+        background: linear-gradient(135deg, #4d87f6, #3a6bd8);
+        color: white !important;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    #change-content .btn:hover {
+        background: linear-gradient(135deg, #3a6bd8, #2a56c2);
+        transform: translateY(-2px);
+    }
+
+    #change-content .close {
+        width: 100%;
+        padding: 12px !important;
+        margin-top: 15px !important;
+        border-radius: 10px !important;
+        font-size: 0.95rem !important;
+        background: linear-gradient(135deg, #6c757d, #5a6268);
+        color: white !important;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    #change-content .close:hover {
+        background: linear-gradient(135deg, #5a6268, #495056);
+    }
+
+}

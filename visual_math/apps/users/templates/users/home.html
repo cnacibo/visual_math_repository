@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Главная страница</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <!-- Подключаем CSS файл -->
+    <link href="{% static 'css/home.css' %}" rel="stylesheet">
+    <link href="{% static 'css/show_slides_students.css' %}" rel="stylesheet">
+    <link href="{% static 'css/show_slides.css' %}" rel="stylesheet">
+    <link href="{% static 'css/instruction.css' %}" rel="stylesheet">
+    <link href="{% static 'css/sidebar.css' %}" rel="stylesheet">
+    <script src="{% static 'js/home.js' %}" defer></script>
+    <script src="{% static 'js/student_slides.js' %}" defer></script>
+    <script src="{% static 'js/show_slides.js' %}" defer></script>
+    <script src="{% static 'js/show_slides_stats.js' %}" defer></script>
+    <script src="{% static 'js/teacher_slides.js' %}" defer></script>
+    <link rel="icon" type="image/x-icon" href="{% static 'images/icon.png' %}">
+     <!-- KaTeX для формул -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+
+<header id="header">
+    <h1>
+        <span>Welcome</span>
+        <span>to</span>
+        <span>VisualMath</span>
+    </h1>
+</header>
+
+<main>
+    <!-- Боковая панель -->
+    <article class="side-nav">
+        <div id="resizer"></div>
+    <!-- Панель информации об аккаунте -->
+        <div id="sidebar" class="sidebar">
+            <button class="close-btn" onclick="closeSidebar()">
+                <img src="{% static 'images/close-sidebar.png' %}" alt="Закрыть">
+            </button>
+            <h3>Информация </br> об аккаунте</h3>
+            <p><strong>Статус:</strong> {{ user.get_role_display }}</p>
+            <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <a href="{% url 'register' %}">
+                <button class="btn-logout">Выйти из аккаунта</button>
+            </a>
+            <button class="btn-values" onclick="showContent('change')">Изменить данные аккаунта</button>
+            <a href="{% url 'delete_user' %}">
+                <button class="btn-delete">Удалить аккаунт</button>
+            </a>
+        </div>
+        <!-- Кнопка открытия панели -->
+        <button id="account" class="open-btn" onclick="openSidebar()">☰ Аккаунт</button>
+        {% if user.role == 'teacher' %}
+        <!-- Навигация -->
+            <button class="butt" onclick="showContent('library')">Библиотека лекций</button>
+            <button class="butt" onclick="showContent('instruction')">Инструкция</button>
+        {% endif %}
+        {% if user.role == 'student' %}
+            <button class="butt" onclick="showJoinForm()">Зайти на презентацию</button>
+        {% endif %}
+
+        <div id="join-form" class="hidden">
+            <input type="text" id="presentation-id" placeholder="Введите ID презентации">
+            <button onclick="joinPresentation({{ user.id }})">Зайти</button>
+            <button onclick="closeJoinForm()">Закрыть</button>
+        </div>
+    </article>
+
+    <!-- Основной контент -->
+    <div class="content">
+        <article class = "con">
+            <h2 id="desc">Навигация по сайту</h2>
+            <div class = "text">
+                <h3>Аккаунт</h3>
+                <ul>
+                    <li><p>В этом разделе отображается основная информация о пользователе: статус (например, "Преподаватель"), имя пользователя, email и другие данные.</p></li>
+                    <li><p>Предоставляется возможность редактировать данные аккаунта (например, изменить имя, email или пароль) или удалить акакунт.</p></li>
+               </ul>
+                {% if user.role == 'teacher' %}
+                <h3>Библиотека лекций</h3>
+                <ul>
+                    <li><p>В этом разделе хранятся все созданные преподавателем лекции.</p></li>
+                    <li><p>Возможна сортировка по названию лекции / по модулю лекции.</p></li>
+                    <li><p>Возможны создание, показ и удаление лекций.</p></li>
+               </ul>
+               <h3>Инструкция</h3>
+                <ul>
+                    <li><p>Данный раздел содержит всю необходимую информацию для успешного создания и показа лекций.</p></li>
+                    <li><p>При возникновении вопросов, ответы на которых не содержатся в инструкции, напишите на нашу почту.</p></li>
+               </ul>
+                {% endif %}
+                {% if user.role == 'student' %}
+                <h3>Зайти на презентацию</h3>
+                <ul>
+                    <li><p>Перейдя по этой ссылке вы можете попасть на показ презентации.</p></li>
+                    <li><p>Чтобы зайти на нужную лекцию необходимо ввести id презентации.</p></li>
+               </ul>
+                {% endif %}
+            </div>
+            <h3 class="show-role">Ваша роль: <b class="role">{{ user.get_role_display }}</b></h3>
+        </article>
+        <div id="library-content" class="hidden">
+            <section>
+                <h2 id="section2">Библиотека лекций</h2>
+                <div id="nav-presentation">
+                    <button class = "close" onclick="closeModule()">Назад</button>
+                    {% if user.role == 'teacher' %}
+                        <a href = "/presentations/create/"><button class = "close" >Создать лекцию</button></a>
+                    {% endif %}
+                </div>
+                <label for="subject">Выберите предмет:</label>
+                <select id="subject" onchange="filterBySubject()">
+                    <option value="">-- Выберите предмет --</option>
+                    <option value="Calculus">Математический анализ</option>
+                    <option value="Algebra">Алгебра</option>
+                    <option value="Discrete">Дискретная математика</option>
+                </select>
+
+                <div id="presentations-container">
+                    {% if presentations %}
+                        {% for el in presentations %}
+                            <div class="presentation-card" data-subject="{{ el.subject }}">
+                                <h3>{{ el.title }}</h3>
+                                <p><strong>Предмет:</strong> {{ el.get_subject_display }}</p>
+                                <p><strong>Дата создания:</strong> {{ el.created_at|date:"d.m.Y H:i" }}</p>
+                                <button onclick="openPresentation({{ el.id }})" class="presentation-button">Показать лекцию</button>
+                                <button  onclick="deleteLecture({{ el.id }})"  class="link-button" >Удалить лекцию</button>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>У вас еще нет презентаций.</p>
+                    {% endif %}
+                </div>
+
+                <div id="math-analysis" class="lecture-list" style="display: none;"></div>
+                <div id="algebra" class="lecture-list" style="display: none;"></div>
+                <div id="discrete-math" class="lecture-list" style="display: none;"></div>
+
+            </section>
+        </div>
+
+    <div id="change-content" class="hidden">
+        <h2>Изменение данных аккаунта</h2>
+        <a href = "{% url 'update_profile' %}"><button class="btn">Изменить профиль аккаунта</button></a>
+        <a href = "{% url 'update_password' %}"><button class="btn">Изменить пароль аккаунта</button></a>
+        <button class = "close" onclick="closeModule()">Назад</button>
+    </div>
+    <div id="instruction-content" class="hidden">
+            <h2>Инструкция для преподавателей</h2>
+            <div class="instruction-text">
+                <h3>Создание лекции</h3>
+                <ol>
+                    <li>Нажмите кнопку "Библиотека лекций" в боковом меню.</li>
+                    <li>Нажмите кнопку "Создать лекцию".</li>
+                    <li>Заполните необходимые поля: название, предмет.</li>
+                    <li>Добавляйте/удаляйте/редактируйте слайды.</li>
+                    <li>Нажмите кнопку "Сохранить презентацию".</li>
+                </ol>
+                <h3>Проведение лекции</h3>
+                <ol>
+                    <li>Нажмите кнопку "Библиотека лекций" в боковом меню.</li>
+                    <li>Найдите нужную вам презентацию.</li>
+                    <li>Нажмите "Показать лекцию".</li>
+                    <li>Студенты смогут подключиться, введя ID презентации, который вы увидите перед началом показа.</li>
+                    <li>Управляйте слайдами с помощью кнопок "Вперед" и "Назад".</li>
+                </ol>
+                <h3>Дополнительные возможности</h3>
+                <ol>
+                    <li>Сортировка лекций по предмету.</li>
+                    <li>Удаление ненужных лекций.</li>
+                    <li>Изменение почты/имени аккаунта.</li>
+                     <li>Изменение пароля аккаунта.</li>
+                </ol>
+                <h3>Сохранение статистики в файл</h3>
+                <p>Если у вас возникли проблемы с открытием csv файла в Excel (Windows):</p>
+                <ul>
+                    <li>Откройте Excel.</li>
+                    <li>Вкладка "Данные" → "Получить данные" → "Из текста/CSV".</li>
+                    <li>Выберите скачанный файл.</li>
+                    <li>Установите кодировку: 65001: Юникод (UTF-8).</li>
+                    <li>Нажмите "Загрузить".</li>
+                </ul>
+                <p class="highlighted-note">Если у вас возникли вопросы, пожалуйста, напишите нам на почту: visualmathproject2024@gmail.com</p>
+            </div>
+            <button class = "close" onclick="closeModule()">Назад</button>
+        </div>
+    </div>
+
+</main>
+<footer>
+    <div class = "wrapper">
+        <p class = "title">Контакты</p>
+        <div class = "textwidget">
+            <p><b>Почта:</b> visualmathproject2024@gmail.com </p>
+        </div>
+    </div>
+</footer>
+<div id="slide-show-container" class="hidden"></div>
+<div id="student-slide-show" class="hidden">
+    <button class="close-slide-btn" onclick="closeStudentPresentation()">Закрыть</button>
+    <div id="student-slide-content"></div>
+</div>
+</body>
+</html>
