@@ -35,7 +35,6 @@ const App = () => {
     };
 
     const handleSlideTypeSelect = (type) => {
-        if (selectedSlideIndex === null) return;
         const updatedSlides = [...slides];
         updatedSlides[selectedSlideIndex].type = type;
         setSlides(updatedSlides);
@@ -73,19 +72,19 @@ const App = () => {
                             setSlides(updatedSlides);
                         }}
                         onImageUpload={(image) => handleImageUpload(selectedSlideIndex, image)}
-                        slideId={selectedSlideIndex}
+                        slideId={selectedSlideIndex} // Передаем ID слайда в TextSlide
                     />
                 );
             case 'test':
                 return (
                     <CheckBlock
-                        questions={selectedSlide.questions}
+                        questions={selectedSlide.questions}  // Передаем вопросы из слайда типа "test"
                         onChange={(field, updatedQuestions) => {
                             const updatedSlides = [...slides];
                             updatedSlides[selectedSlideIndex].questions = updatedQuestions;  // Обновляем вопросы слайда
                             setSlides(updatedSlides);
                         }}
-                        slideId={selectedSlideIndex}
+                        slideId={selectedSlideIndex}  // Передаем ID слайда в CheckBlock
                     />
                 );
             case 'questionnaire':

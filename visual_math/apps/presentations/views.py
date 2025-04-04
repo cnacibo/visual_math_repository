@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Presentation, Slide
 from .forms import PresentationForm, SlideForm, CreatePresentationForm
@@ -15,9 +17,11 @@ from django.core.files.base import ContentFile
 import base64
 from django.core.cache import cache
 from apps.users.models import User
+from django.contrib.auth.decorators import login_required
 
-# Просмотр всех презентаций
 
+
+@login_required(login_url='/')
 def create_new(request):
     if request.method == 'POST':
         form = CreatePresentationForm(request.POST)
@@ -31,11 +35,8 @@ def create_new(request):
     return render(request, 'presentations/create_new.html', {'form': form})
 
 # Создание новой презентации
+@login_required(login_url='/')
 def create_presentation(request):
-    # presentation = Presentation.objects.get(id=presentation_id)
-    # subject = presentation.subject
-    # title = presentation.title
-    # creation_date = presentation.created_at.strftime("%Y-%m-%d %H:%M:%S")
     return render(request, 'presentations/create_presentation.html')
 
 class PresentationViewSet(viewsets.ModelViewSet):
@@ -46,7 +47,7 @@ class SlideViewSet(viewsets.ModelViewSet):
     queryset = Slide.objects.all()
     serializer_class = SlideSerializer
 
-@csrf_exempt  # Временно отключаем CSRF для тестов
+@login_required(login_url='/')
 def save_presentation(request):
     if request.method == 'POST':
         try:
@@ -85,7 +86,8 @@ def save_presentation(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Метод не разрешен'}, status=405)
-@csrf_exempt
+
+@login_required(login_url='/')
 def delete_presentation(request):
     if request.method == "POST":
         try:
@@ -95,16 +97,58 @@ def delete_presentation(request):
             if not presentation_id:
                 return JsonResponse({"success": False, "error": "Не указан ID презентации."}, status=400)
 
-            # Ищем презентацию, но только ту, что принадлежит пользователю
+            # Получаем презентацию, принадлежащую текущему пользователю
             presentation = get_object_or_404(Presentation, id=presentation_id, creator=request.user)
-            slides = presentation.slides.all()
 
-            for slide in slides:
-                if slide.image:
-                    # Удаляем файл изображения из файловой системы
-                    slide.image.delete(save=False)
+            # Функция для обработки URL изображения
+            def process_image_url(image_url):
+                if image_url and isinstance(image_url, str):
+                    # Удаляем префикс /media/
+                    clean_path = image_url.replace('/media/', '').replace('media/', '')
+                    from visual_math.visual_math_project import settings
+                    full_path = os.path.join(settings.MEDIA_ROOT, clean_path)
+                    if os.path.exists(full_path):
+                        try:
+                            os.remove(full_path)
+                        except Exception as e:
+                            print(f"Ошибка удаления изображения: {e}")
 
-            # Удаляем презентацию
+            # Обрабатываем все слайды презентации
+            for slide in presentation.slides.all():
+                if slide.slide_type == 'text' and slide.image:
+                    # Удаляем основное изображение слайда
+                    try:
+                        slide.image.delete(save=False)
+                    except Exception as e:
+                        print(f"Ошибка удаления изображения слайда: {e}")
+
+                elif slide.slide_type == 'questionnaire' and slide.questions:
+                    # Обрабатываем анкетные слайды
+                    if isinstance(slide.questions, dict):
+                        if 'questionImageUrl' in slide.questions:
+                            process_image_url(slide.questions['questionImageUrl'])
+                            slide.questions['questionImageUrl'] = ""
+                            slide.save()
+
+                elif slide.slide_type == 'test' and slide.questions:
+                    # Обрабатываем тестовые слайды
+                    if isinstance(slide.questions, list):
+                        for question in slide.questions:
+                            if isinstance(question, dict):
+                                # Обрабатываем изображение в основном вопросе
+                                if 'questionImageUrl' in question:
+                                    process_image_url(question['questionImageUrl'])
+                                    question['questionImageUrl'] = ""
+
+                                # Обрабатываем вложенный questionData
+                                if 'questionData' in question and isinstance(question['questionData'], dict):
+                                    if 'questionImageUrl' in question['questionData']:
+                                        process_image_url(question['questionData']['questionImageUrl'])
+                                        question['questionData']['questionImageUrl'] = ""
+
+                        slide.save()
+
+            # Удаляем саму презентацию (слайды удалятся каскадом)
             presentation.delete()
 
             return JsonResponse({"success": True, "message": "Презентация успешно удалена."})
@@ -116,7 +160,7 @@ def delete_presentation(request):
 
     return JsonResponse({"success": False, "error": "Неверный метод запроса."}, status=405)
 
-
+@login_required(login_url='/')
 @csrf_exempt
 def upload_image(request):
     if request.method == 'POST' and request.FILES.get('image'):
@@ -131,12 +175,10 @@ def upload_image(request):
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+@login_required(login_url='/')
 def presentation_api(request, presentation_id):
-    #print(f"Requested presentation ID: {presentation_id}")
     presentation = get_object_or_404(Presentation, id=presentation_id)
 
-    #print(f"User: {request.user}")
-    #print(f"Found presentation: {presentation}")
     presentation = get_object_or_404(Presentation, id=presentation_id)
     slides = Slide.objects.filter(presentation=presentation).values(
         'slide_type',
@@ -149,7 +191,6 @@ def presentation_api(request, presentation_id):
         'slides': list(slides)
     }
 
-    #print("Returning data:", result)  # Добавьте это
     return JsonResponse(result)
 
 
@@ -162,19 +203,7 @@ class PresentationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# def check_presentation(request, presentation_id):
-#     try:
-#         # Получаем презентацию по ID
-#         presentation = Presentation.objects.get(id=presentation_id)
-#
-#
-#         # Проверяем, если презентация активна (например, поле `is_active` в модели)
-#         is_active = presentation.is_active
-#         return JsonResponse({"exists": True, "is_active": is_active})
-#     except:
-#         return JsonResponse({"exists": False, "is_active": False})
-
-
+@login_required(login_url='/')
 def check_presentation(request, presentation_id):
     try:
         presentation = Presentation.objects.get(id=presentation_id)
@@ -194,12 +223,13 @@ def check_presentation(request, presentation_id):
         return JsonResponse({'exists': False})
 
 
+@login_required(login_url='/')
 def get_student_name(request, student_id):
     try:
         student = User.objects.get(id=student_id)
         return JsonResponse({
             'id': student.id,
-            'name': f"{student.username}",  # Или ваш формат имени
+            'name': f"{student.username}",
             'status': 'success'
         })
     except User.DoesNotExist:

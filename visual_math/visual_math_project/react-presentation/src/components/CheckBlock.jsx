@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import {useState } from 'react';
 import PropTypes from 'prop-types';
 import QuestionSlide from './QuestionSlide';
+// import 'visual_math_project/react-presentation/src/components/CheckBlock.css';
 
 const CheckBlock = ({ onChange, slideId }) => {
     const [questions, setQuestions] = useState([{}]);
@@ -17,12 +18,6 @@ const CheckBlock = ({ onChange, slideId }) => {
             isMultiple: false,
         }]); // Добавляем новый вопрос
     };
-     const removeQuestion = (index) => {
-            if (questions.length <= 1) return;
-            const newQuestions = questions.filter((_, i) => i !== index);
-            setQuestions(newQuestions);
-            onChange('questions', newQuestions);
-     };
 
     // Обработчик изменения вопроса
     const handleQuestionChange = (index, field, value) => {
@@ -39,45 +34,25 @@ const CheckBlock = ({ onChange, slideId }) => {
     };
 
     return (
-        <div className="check-block-container">
-            <div className="check-block-header">
-                <h2>Слайд {slideId + 1} - Проверочный блок</h2>
-                <button className="add-question-button" onClick={addQuestionField}>
-                    <span>+</span> Добавить вопрос
-                </button>
-            </div>
-
-            <div className="questions-list">
-                {questions.map((question, index) => (
-                    <div key={index} className="question-item">
-                        <div className="question-header">
-                            <div className="question-number">Вопрос {index + 1}</div>
-                            {questions.length > 1 && (
-                                <button
-                                    className="remove-question-button"
-                                    onClick={() => removeQuestion(index)}
-                                >
-                                    × Удалить
-                                </button>
-                            )}
-                        </div>
-
-                        <QuestionSlide
-                            content={questions[index].question || ''}
-                            onChange={(field, value) => handleQuestionChange(index, field, value)}
-                            slideId={`${slideId}-${index}`}
-                        />
-                    </div>
-                ))}
-            </div>
+        <div className="check-block">
+            <h2>Проверочный блок</h2>
+            {questions.map((question, index) => (
+                <div key={index}>
+                    <QuestionSlide
+                        content={questions[index].question || ''}  // Передаем текущее содержание вопроса
+                        onChange={(field, value) => handleQuestionChange(index, field, value)}  // Обработчик изменений
+                        slideId={slideId}
+                    />
+                </div>
+            ))}
+            <button onClick={addQuestionField}>Добавить вопрос</button>
         </div>
     );
 };
 
+// Валидация типов для props
 CheckBlock.propTypes = {
-    onChange: PropTypes.func.isRequired,
-    slideId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    content: PropTypes.string
+    onChange: PropTypes.func.isRequired, // Функция для обновления данных
+    slideId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired // Идентификатор слайда (строка или число)
 };
-
 export default CheckBlock;

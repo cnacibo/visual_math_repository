@@ -44,17 +44,17 @@ def register(request):
         'log_form': log_form
     })
 
-@login_required
+@login_required(login_url='/')
 def home(request):
     presentations = request.user.presentations.all().order_by('-created_at')  # Сортируем по убыванию
     return render(request, 'users/home.html', {'user': request.user, 'presentations': presentations})
 
 
-@login_required
+@login_required(login_url='/')
 def delete_user(request):
     return render(request, 'users/delete_user.html')
 
-@login_required
+@login_required(login_url='/')
 def delete_user_confirmed(request):
     if request.method == 'POST':
         user = request.user
@@ -64,33 +64,17 @@ def delete_user_confirmed(request):
 
     return render(request, 'users/delete_user.html')
 
-@login_required
+@login_required(login_url='/')
 def logout_view(request):
     return render(request, 'users/logout_user.html')
 
-@login_required
+@login_required(login_url='/')
 def logout_confirmed(request):
     logout(request)  # Выход из аккаунта
     return redirect('register')  # Перенаправляем на страницу регистрации
 
-# def login_view(request):
-#     if request.method == 'POST':
-#         form = LoginForm(request.POST)
-#         if form.is_valid():
-#             username = form.cleaned_data['username']
-#             password = form.cleaned_data['password']
-#             user = authenticate(request, username=username, password=password)
-#             if user is not None:
-#                 login(request, user)
-#                 return redirect('home')
-#             else:
-#                 form.add_error(None, 'Неправильное имя пользователя или пароль')
-#     else:
-#         form = LoginForm()
-#
-#     return render(request, 'users/register.html', {'form': form})
 
-@login_required
+@login_required(login_url='/')
 def update_profile(request):
     if request.method == 'POST':
         form = UpdateProfileForm(request.POST, instance=request.user)
@@ -103,7 +87,7 @@ def update_profile(request):
 
     return render(request, 'users/update_profile.html', {'form': form})
 
-@login_required
+@login_required(login_url='/')
 def update_password(request):
     if request.method == 'POST':
         form = UpdatePasswordForm(user=request.user, data=request.POST)
@@ -141,14 +125,14 @@ def reset_password(request):
                 send_mail(
                     'Ваш новый пароль',
                     f'Ваш новый пароль: {new_password}',
-                    'from@example.com',  # Укажите ваш реальный email отправителя
+                    'from@example.com',
                     [email],
                     fail_silently=False,
                 )
 
                 return redirect('register')
             else:
-                # Если пользователь не найден, можно отобразить ошибку
+                # Если пользователь не найден
                 return render(request, 'users/password_reset_form.html', {'form': form, 'error': 'Пользователь с таким email не найден.'})
 
     else:

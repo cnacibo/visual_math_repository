@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import  { useState } from 'react';
 import { BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import katex from 'katex';
@@ -8,7 +8,7 @@ import '../App.css';
 const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
   const [questionData, setQuestionData] = useState({
     question: content || '',
-    answers: [{ text: '', isCorrect: false }],
+    answers: [{ text: '', isCorrect: false }], // Начальный массив ответов
     questionImageUrl: '',
     isMultiple: false,
   });
@@ -41,6 +41,41 @@ const QuestionSlide = ({ content = '', onChange, onImageUpload, slideId }) => {
              });
          }
   };
+
+  // const handleAnswerImageUpload = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //       const reader = new FileReader();
+  //       reader.onloadend = () => {
+  //           onImageUpload(reader.result, `answer-${index}`); // Передаем изображение для конкретного ответа
+  //       };
+  //       reader.readAsDataURL(file);
+  //   }
+  // };
+
+  // const handleQuestionChange = (e) => {
+  //   const updatedQuestion = e.target.value;
+  //   setQuestionData((prev) => ({
+  //     ...prev,
+  //     question: updatedQuestion,
+  //   }));
+  //   onChange('questionData', {
+  //     ...questionData,
+  //     question: updatedQuestion,
+  //   });
+  // };
+  //   const handleQuestionChange = (e) => {
+  //   const updatedQuestion = e.target.value;
+  //   setQuestionData(prev => ({ ...prev, question: updatedQuestion }));
+  //
+  //   // Сериализуем весь объект вопроса
+  //   onChange('content', JSON.stringify({
+  //       ...questionData,
+  //       question: updatedQuestion
+  //   }));
+  //   onChange('type', 'questionnaire');
+  //   };
+
     const handleQuestionChange = (e) => {
         const updatedQuestion = e.target.value;
         setQuestionData((prev) => ({
@@ -147,95 +182,80 @@ const renderedContentq = renderKatexInText(questionData.question);
 
   return (
     <div className="question-slide">
-         <div className="slide-header">
-          <h2>
-              {(typeof slideId === 'string' && slideId.includes('-'))
-                ? `Вопрос`
-                : `Слайд ${parseInt(slideId) + 1} - Вопрос`}
-            </h2>
-        </div>
-        <div className="question-section">
-            <label className="section-label">Текст вопроса:</label>
-            <textarea
-                 className="question-textarea"
-                value={questionData.question}
-                onChange={handleQuestionChange}
-                placeholder="Введите текст вопроса (поддерживается LaTeX: $формула$ или $$формула$$)..."
-            />
-            <div className="preview-container">
-                <h3 className="preview-title">Предпросмотр вопроса:</h3>
-                <div className="preview-content" dangerouslySetInnerHTML={{__html: renderedContentq}}/>
-            </div>
-        </div>
-
-        <div className="image-upload-section">
-          {/* Загрузка изображения для вопроса */}
-          <label className="section-label">Изображение для вопроса:</label>
-          <div className="upload-container">
-            <input type="file" accept="image/*" onChange={handleQuestionImageUpload} />
-          </div>
-          {questionData.questionImageUrl && (
-            <span className="file-name">Изображение загружено</span>
-          )}
-        </div>
-
-      <div className="answer-type-section">
-        <label className="section-label">Тип ответов:</label>
-        <div className="radio-group">
-          <label className="radio-option">
-            <input
-              type="radio"
-              value="radio"
-              checked={!questionData.isMultiple}
-              onChange={handleAnswerTypeChange}
-            />
-            <span className="radio-label">Один верный ответ</span>
-          </label>
-          <label className="radio-option">
-            <input
-              type="radio"
-              value="checkbox"
-              checked={questionData.isMultiple}
-              onChange={handleAnswerTypeChange}
-            />
-            <span className="radio-label">Несколько верных ответов</span>
-          </label>
-        </div>
+      <h2>Слайд {slideId + 1} - вопрос</h2> {/* Здесь отображаем ID слайда */}
+      <textarea
+        value={questionData.question}
+        onChange={handleQuestionChange}
+        placeholder="Введите TeX код..."
+      />
+      <div className="preview-container">
+            <h3>Предпросмотр вопроса:</h3>
+            {/*<BlockMath>{questionData.question || ''}</BlockMath>*/}
+            <div dangerouslySetInnerHTML={{__html: renderedContentq}}/>
       </div>
 
-      <div className="answers-section">
-        <label className="section-label">Варианты ответов:</label>
-        {questionData.answers.map((answer, index) => (
-          <div key={index} className="answer-item">
-            <div className="answer-controls">
-              <input
-                type={questionData.isMultiple ? 'checkbox' : 'radio'}
-                className="answer-checkbox"
-                checked={answer.isCorrect}
-                onChange={() => handleCorrectAnswerChange(index)}
-              />
-              <span className="answer-number">Ответ {index + 1}</span>
-            </div>
-            <textarea
-              className="answer-textarea"
-              value={answer.text}
-              onChange={(e) => handleAnswerChange(index, e)}
-              placeholder={`Текст ответа ${index + 1}...`}
-            />
-            <div className="preview-container">
-              <h3 className="preview-title">Предпросмотр:</h3>
-              <div className="preview-content" dangerouslySetInnerHTML={{__html: renderKatexInText(answer.text)}}/>
-            </div>
-          </div>
-        ))}
+      {/* Загрузка изображения для вопроса */}
+      <div>
+        <h3>Вставка изображения для вопроса:</h3>
+        <input type="file" accept="image/*" onChange={handleQuestionImageUpload} />
       </div>
 
-      <button className="add-answer-button" onClick={addAnswerField}>
-        + Добавить ответ
-      </button>
+      <div className="answer-container input">
+        <label>
+          <input
+            type="radio"
+            value="radio"
+            checked={!questionData.isMultiple}
+            onChange={handleAnswerTypeChange}
+          />
+          Радиокнопки
+        </label>
+        <label>
+          <input
+            type="radio"
+            value="checkbox"
+            checked={questionData.isMultiple}
+            onChange={handleAnswerTypeChange}
+          />
+          Чекбоксы
+        </label>
+      </div>
+
+      {questionData.answers.map((answer, index) => (
+        <div key={index} className="answer-container">
+          <input
+            type={questionData.isMultiple ? 'checkbox' : 'radio'}
+            name="answer"
+            value={answer.text}
+            checked={answer.isCorrect}
+            onChange={() => handleCorrectAnswerChange(index)}
+          />
+          <textarea
+            value={answer.text}
+            onChange={(e) => handleAnswerChange(index, e)}
+            placeholder={`Ответ ${index + 1} с TeX кодом...`}
+          />
+           <div className="preview-container">
+                <h3>Предпросмотр ответа {index + 1}:</h3>
+                {/*<BlockMath>{questionData.question || ''}</BlockMath>*/}
+                <div dangerouslySetInnerHTML={{__html: renderKatexInText(answer.text)}}/>
+          </div>
+          {/*<div className="preview-container">*/}
+          {/*  <h3>Предпросмотр ответа {index + 1}:</h3>*/}
+          {/*  <BlockMath>{answer.text}</BlockMath>*/}
+          {/*</div>*/}
+        </div>
+      ))}
+
+      <button onClick={addAnswerField}>Добавить ответ</button>
 
     </div>
   );
 };
-
+// QuestionSlide.propTypes = {
+//   content: PropTypes.string, // Текущий контент вопроса
+//   onChange: PropTypes.func.isRequired, // Обработчик изменения данных
+//   onImageUpload: PropTypes.func.isRequired, // Обработчик загрузки изображения
+//   slideId: PropTypes.number.isRequired, // ID слайда
+// };
 export default QuestionSlide

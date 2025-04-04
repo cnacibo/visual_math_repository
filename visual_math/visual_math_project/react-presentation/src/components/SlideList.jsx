@@ -17,13 +17,17 @@ const SlideList = ({ slides, onAddSlide, onRemoveSlide, onSelectSlide }) => {
             return;
         }
 
-
-
-    const presentationData = {
-        title,
-        subject,
-        slides,
-    }
+        const presentationData = {
+            title,
+            subject,
+            slides,
+            // slides: slides.map(slide => ({
+            // slide_type: slide.slide_type,
+            // content: slide.content || '', // Сериализованные данные вопросов
+            // image: slide.image || '',
+            // questions: [] // Пустой массив для слайдов типа "test"
+        // }))
+        };
 
         console.log("Данные для отправки:", presentationData);
 
@@ -59,63 +63,53 @@ const SlideList = ({ slides, onAddSlide, onRemoveSlide, onSelectSlide }) => {
     };
 
     return (
-        <div className="slide-list-container">
-            <div className="presentation-settings">
-                <h3 className="settings-title">Настройки презентации</h3>
-                <div className="form-group">
-                    <label htmlFor="title" className="form-label">Название лекции:</label>
-                    <input
-                        type="text"
-                        id="title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        required
-                        className="form-input"
-                    />
-                </div>
+        <div style={{ width: '250px', borderRight: '1px solid #ccc', padding: '10px' }}>
+            <h3>Настройки презентации</h3>
+            <label htmlFor="title">Название лекции:</label>
+            <input
+                type="text"
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                className="form-control"
+                style={{ width: '100%', marginBottom: '10px' }}
+            />
 
-                <div className="form-group">
-                    <label htmlFor="subject" className="form-label">Предмет:</label>
-                    <select
-                        id="subject"
-                        value={subject}
-                        onChange={(e) => setSubject(e.target.value)}
-                        required
-                        className="form-select"
+            <label htmlFor="subject">Предмет:</label>
+            <select
+                id="subject"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                required
+                className="form-control"
+                style={{ width: '100%', marginBottom: '20px' }}
+            >
+                <option value="Calculus">Математический анализ</option>
+                <option value="Algebra">Алгебра</option>
+                <option value="Discrete">Дискретная математика</option>
+            </select>
+
+            <h3>Слайды</h3>
+            <ul>
+                {slides.map((slide, index) => (
+                    <li
+                        key={index}
+                        style={{ margin: '5px 0', cursor: 'pointer' }}
+                        onClick={() => onSelectSlide(index)}
                     >
-                        <option value="Calculus">Математический анализ</option>
-                        <option value="Algebra">Алгебра</option>
-                        <option value="Discrete">Дискретная математика</option>
-                    </select>
-                </div>
-            </div>
-
-            <div className="slides-section">
-                <h3 className="slides-title">Слайды</h3>
-                <ul className="slides-list">
-                    {slides.map((slide, index) => (
-                        <li
-                            key={index}
-                            className="slide-item"
-                            onClick={() => onSelectSlide(index)}
-                        >
-                            <span className="slide-number">Слайд {index + 1}</span>
-                            <button
-                                className="delete-slide-btn"
-                                onClick={(e) => { e.stopPropagation(); onRemoveSlide(index); }}>Удалить</button>
-                        </li>
-                    ))}
-                </ul>
-                <button className="add-slide-btn" onClick={onAddSlide}>+ Добавить слайд</button>
-            </div>
-            <div className="action-buttons">
-                <button className="save-btn" onClick={savePresentation}>
-                    Сохранить презентацию
-                </button>
-                 <button className="exit-btn" onClick={goToHomePage}>
+                        Слайд {index + 1}
+                        <button onClick={(e) => { e.stopPropagation(); onRemoveSlide(index); }}>Удалить</button>
+                    </li>
+                ))}
+            </ul>
+            <button onClick={onAddSlide}>Добавить слайд</button>
+            <button className="save-btn" onClick={savePresentation}>
+                Сохранить презентацию
+            </button>
+            <button className="exit-btn" onClick={goToHomePage}>
                     Выйти из редактирования
-                </button>
-            </div>
+            </button>
         </div>
     );
 };
